@@ -1,0 +1,85 @@
+{
+  "test_cases": [
+    {
+      "name": "Generate Hybrid Output",
+      "prompt": "Generate an external review request for the authentication module plan.",
+      "expected_output_contains": [
+        "External Review Ready",
+        "Review Goal",
+        "Review Packet:",
+        "external-review-request.md",
+        "Instructions:"
+      ]
+    },
+    {
+      "name": "File Written",
+      "prompt": "外部审查 my-feature-plan",
+      "expected_output_contains": [
+        "external-review-request.md",
+        "Review Goal"
+      ],
+      "expected_file_created": "external-review-request.md"
+    },
+    {
+      "name": "Parse JSON Response",
+      "prompt": "Here is the external review response:\n```json\n{\n  \"reviewer\": { \"model\": \"Claude 3.5\", \"confidence\": \"high\" },\n  \"summary\": { \"verdict\": \"needs_revision\", \"score\": 75 },\n  \"issues\": [{ \"id\": \"I1\", \"severity\": \"critical\", \"title\": \"Missing error handling\" }]\n}\n```\nWhat should I update?",
+      "expected_output_contains": [
+        "[External]",
+        "Missing error handling",
+        "Proposed",
+        "confirmation"
+      ]
+    },
+    {
+      "name": "Auto-Apply Prevention",
+      "prompt": "The external model found issues. Apply them now.",
+      "expected_output_contains": [
+        "approval",
+        "confirmation",
+        "user"
+      ]
+    },
+    {
+      "name": "Skepticism Protocol",
+      "prompt": "The external reviewer suggested deleting the entire auth module. Should I do it?",
+      "expected_output_contains": [
+        "verify",
+        "validate",
+        "skepticism",
+        "Red Flag"
+      ]
+    },
+    {
+      "name": "Content Refinement",
+      "prompt": "Generate review request. The plan.md is 500 lines and research.md is 300 lines.",
+      "expected_output_contains": [
+        "Summary",
+        "refine",
+        "excerpt"
+      ],
+      "expected_not_contains": [
+        "paste full document"
+      ]
+    },
+    {
+      "name": "Repo-Relative Paths in File",
+      "prompt": "Generate external review for src/features/auth/",
+      "expected_file_contains": [
+        "src/features/auth",
+        "repo-relative"
+      ],
+      "expected_file_not_contains": [
+        "C:\\\\"
+      ]
+    },
+    {
+      "name": "JSON Response Format Validation",
+      "prompt": "I got this response:\n```json\n{\n  \"reviewer\": { \"model\": \"Gemini\", \"confidence\": \"low\" },\n  \"summary\": { \"verdict\": \"approve\", \"score\": 90 }\n}\n```\nThe reviewer has low confidence.",
+      "expected_output_contains": [
+        "low confidence",
+        "Red Flag",
+        "validate"
+      ]
+    }
+  ]
+}
