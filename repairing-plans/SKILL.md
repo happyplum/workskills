@@ -25,9 +25,11 @@ This skill defines a second-pass repair workflow for existing plans. The goal is
 8. Require explicit checkpoints and checkpoint-level audit records for structural repair, verification closure, and final release-readiness decisions.
 9. For `plan-set` decomposition, require each sub-plan to include a preflight validation stage that re-verifies upstream outputs for blockers before current-phase implementation starts.
 10. Enforce task decomposition granularity: every task must be decomposed to the smallest independently executable unit. If a task can be further split, it is under-decomposed. Premium categories (`deep`, `ultrabrain`, `visual-engineering`, `artistry`) are reserved exclusively for tasks that genuinely require their specialized capabilities — using them on routine work is a hard gate failure.
-11. Require every plan to include a concise user-readable summary of the current development core and requirements before deep execution detail; this summary must use natural language, not only executor shorthand.
-12. Require every repaired plan to preserve a lightweight anti-drift top section near the top: a natural-language `## User Requirement Digest` and a concise `## Intent Anchor` that captures why/what/non-goals/must-not-drift without becoming a second task truth source.
-13. Require **ATOMIC COMMIT** for `Task N-V` nodes: immediately after a verification node (`Task N-V`) achieves `PASS` status, the agent MUST perform an atomic commit of all relevant implementation and verification code with a clear, concise message before starting the next implementation task.
+11. Require task-level executor annotation by default: every `Task N` / `Task N-V` should declare `category` or `subagent_type`; if neither is declared, the plan must include `executor_judgment` or `routing_by_executor` with a one-line rationale explaining why routing is intentionally deferred to execution.
+12. Keep routing economical: premium-tier tasks should include `why_not_lower_cost`, and missing/weak executor annotation is a quality warning unless ambiguity becomes execution-blocking.
+13. Require every plan to include a concise user-readable summary of the current development core and requirements before deep execution detail; this summary must use natural language, not only executor shorthand.
+14. Require every repaired plan to preserve a lightweight anti-drift top section near the top: a natural-language `## User Requirement Digest` and a concise `## Intent Anchor` that captures why/what/non-goals/must-not-drift without becoming a second task truth source.
+15. Require **ATOMIC COMMIT** for `Task N-V` nodes: immediately after a verification node (`Task N-V`) achieves `PASS` status, the agent MUST perform an atomic commit of all relevant implementation and verification code with a clear, concise message before starting the next implementation task.
 
 ## Failure Handling
 
@@ -105,6 +107,9 @@ Before any repair, enforce these plan-level inputs:
 6. **Verification mode per task**: `inline` or `Task N-V`
    - Shared surfaces (contracts, infra, API aggregation, integration boundaries) MUST use `Task N-V`
 7. **Routing declarations are valid enums** for category/subagent\_type/skills
+   - Every `Task N` / `Task N-V` SHOULD declare `category` or `subagent_type`
+   - If routing is intentionally deferred, the task SHOULD declare `executor_judgment` or `routing_by_executor` with a one-line rationale
+   - Premium-tier tasks SHOULD declare `why_not_lower_cost`
 8. **Plan Size Audit block present** with deterministic fields:
    - `estimated_waves`
    - `integration_boundaries`
@@ -163,6 +168,10 @@ If any required input is missing, auto-repair only deterministic structure/forma
    - Ensure the plan has `## Execution Skill Requirements`
    - Classify skills into `Always preload`, `Conditionally load`, `Task-local only`
    - Declare execution mode and selection rationale for conditional skills
+2. **Task Executor Annotation**
+   - Ensure every `Task N` / `Task N-V` declares `category` or `subagent_type`, unless routing is intentionally deferred with `executor_judgment` or `routing_by_executor`
+   - Ensure deferred routing includes a one-line reason that preserves economic routing intent
+   - Ensure premium-tier tasks include `why_not_lower_cost` when specialized capability is required
 2. **User-Facing Summary**
    - Ensure the plan has `## User-Facing Summary` near the top
    - Ensure it includes both `Development Core` and `User Requirements`
@@ -252,14 +261,15 @@ If any required input is missing, auto-repair only deterministic structure/forma
    - **Decomposition completeness**: for every task node, evaluate whether it can be further split into smaller independent units. If yes, the task is under-decomposed — hard gate failure (`TASK_UNDER_DECOMPOSED`).
    - Using a premium-tier category on a task that can be handled by the standard tier is a routing overkill — **hard gate failure**.
    - Conversely, routing a genuinely complex task to `quick` or `unspecified-low` is a routing underkill — **soft warning**.
-   - **Repair action**: When a premium-tier category is assigned to a routine task, downgrade to standard tier and decompose the original task into smaller units if it can be further split.
-   - **Reminder**: premium-tier tasks SHOULD include a one-line rationale explaining why the specialized capability is required. If the rationale is unclear, default to standard tier.
+    - **Repair action**: When a premium-tier category is assigned to a routine task, downgrade to standard tier and decompose the original task into smaller units if it can be further split.
+    - **Executor annotation default**: every task SHOULD declare `category` or `subagent_type`. If the task intentionally leaves the final routing choice to execution time, require `executor_judgment` or `routing_by_executor` plus a one-line rationale.
+    - **Reminder**: premium-tier tasks SHOULD include a one-line rationale explaining why the specialized capability is required, preferably using `why_not_lower_cost`. If the rationale is unclear, default to standard tier.
 
 ## Repair Order
 
 Apply fixes in this order:
 
-1. Repair execution-skill header and routing enums
+1. Repair execution-skill header, task-level executor annotations, and routing enums
 2. Repair user-facing summary block (`## User-Facing Summary`, `Development Core`, `User Requirements`)
    - Synthesize concise user-readable wording from explicit request context and settled plan scope; if the core/requirements cannot be inferred deterministically, ask targeted clarification questions first and emit `BLOCKED_NEEDS_DECISION` only if ambiguity remains
 3. Repair anti-drift top section (`## User Requirement Digest`, `## Intent Anchor`)
@@ -327,6 +337,7 @@ If any `BLOCKED_NEEDS_DECISION` item remains open, verdict MUST be `REJECT`.
 ### Soft Warnings
 
 - `ROUTING_HEURISTIC_WEAK`
+- `TASK_EXECUTOR_ANNOTATION_WEAK`
 - `THRESHOLD_UNJUSTIFIED`
 - `NOISY_VERIFICATION`
 - `ROUTING_UNDERKILL`
@@ -345,6 +356,7 @@ If any `BLOCKED_NEEDS_DECISION` item remains open, verdict MUST be `REJECT`.
 - `ROUTING_SCHEMA_INVALID`: Fail when any routing declaration uses an unsupported value.
   - Allowed `category`: `visual-engineering`, `ultrabrain`, `deep`, `artistry`, `quick`, `unspecified-low`, `unspecified-high`, `writing`
   - Allowed `subagent_type`: `explore`, `librarian`, `oracle`, `metis`, `momus`
+- `TASK_EXECUTOR_ANNOTATION_WEAK`: Warn when a task omits both explicit routing (`category` / `subagent_type`) and a justified deferred-routing marker (`executor_judgment` / `routing_by_executor`), or when a premium-tier task omits `why_not_lower_cost`.
 - `STACK_MISMATCH_BLOCKING`: Fail when stack declarations contradict one or more executable tasks or QA paths (e.g., plan declares Go-only but executable QA requires Node-only runtime without declared exception).
 - `ID_GRAPH_MISMATCH`: Fail on duplicate IDs, unknown IDs, phantom dependencies, or dependency references to non-existent task nodes.
 - `QA_NOT_EXECUTABLE`: Fail when a QA block lacks concrete commands/inputs plus expected observable and evidence target.
@@ -390,6 +402,7 @@ If any `BLOCKED_NEEDS_DECISION` item remains open, verdict MUST be `REJECT`.
 | QA is narrative only                                        | Add runnable commands + expected observable + evidence path                                                     |
 | Downstream depends on `Task N` only                         | Add dependency on `Task N-V` for shared surfaces                                                                |
 | Invalid category/skill in header                            | Replace with allowed enum or mark as task-local with explicit rationale                                         |
+| Task omits executor annotation                              | Add `category` / `subagent_type`, or declare `executor_judgment` / `routing_by_executor` with one-line reason |
 | Business contract missing (e.g. prefix/versioning)          | Emit `BLOCKED_NEEDS_DECISION` instead of guessing                                                               |
 | Size is `Medium`/`Large`/`XLarge` but plan is single-file   | Convert to `plan-set` (index + phase files) in the **same directory**, no new subfolder; add phase gates        |
 | Plan lacks parallel declaration for independent tasks       | Add `parallel-safe` / `serial-only` labels and justify serial edges                                             |
@@ -411,6 +424,7 @@ If any `BLOCKED_NEEDS_DECISION` item remains open, verdict MUST be `REJECT`.
 - Treating normalization as permission to keep malformed new plans
 - Leaving task-local skills implicit
 - Writing a plan that jumps straight into executor detail without a quick user-readable summary of the current development core and requirements
+- Leaving task-level executor choice implicit when a cheap, explicit routing declaration was available
 - Fixing wave prose but not dependency matrix
 - Fixing task body but not QA/final verification
 - Marking a plan executable before hard-gate recheck returns zero failures
@@ -423,4 +437,3 @@ If any `BLOCKED_NEEDS_DECISION` item remains open, verdict MUST be `REJECT`.
 - Routing a routine implementation task to `deep` or `ultrabrain` — premium categories are scarce, not default
 - Leaving large monolithic tasks undecomposed when they could be split into smaller independent units
 - Assigning premium-tier categories without a clear rationale for why the specialized capability is needed
-

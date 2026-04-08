@@ -56,7 +56,7 @@ Secondary triggers:
 4. Reject or return plans when structural consistency gate fails; do not guess.
 5. Require concrete evidence before completion claims and before review gates.
 6. Keep execution state recoverable with truthful status/evidence updates.
-7. If a task is discovered to be under-decomposed or misrouted during execution, do NOT expand or self-upgrade routing. Stop the node, record evidence, and request plan repair/replan.
+7. If execution complexity rises while task boundary and business intent remain unchanged, Atlas MAY use bounded runtime escalation with explicit evidence and audit logging. If the task is under-decomposed, misrouted beyond bounded escalation, or requires scope change, stop the node, record evidence, and request plan repair/replan.
 
 ## Failure Handling
 
@@ -65,6 +65,7 @@ Secondary triggers:
 3. If phase gate evidence is missing, keep phase/index state unchanged and loop fix+reverify.
 4. If issue is document-level repairable, stop runtime and request explicit manual `repairing-plans` pass.
 5. If any executable task or paired verification node reopens, reset the affected Phase/Wave checkbox until closure is restored from underlying phase-file truth.
+6. If proposed runtime escalation would change task boundary, business intent, or planned deliverables, deny escalation and request plan repair/replan.
 
 ## Required Preload Chain
 
@@ -131,6 +132,7 @@ Before executing any task, verify:
 - Waves/TODO/dependency/verification reference the same task set.
 - All dependency references point to existing tasks.
 - Contract constants remain consistent across task body, QA, and verification.
+- Every task either declares `category` / `subagent_type` or carries a justified deferred-routing marker (`executor_judgment` / `routing_by_executor`).
 - Final verification does not claim features with no implementation task.
 
 If any check fails, stop and return plan for repair.
@@ -140,6 +142,38 @@ If any check fails, stop and return plan for repair.
 - Do not mark a task complete without concrete evidence.
 - Ensure required artifacts are written under declared `evidence/` path before review gates.
 - If evidence root is missing, fallback to `evidence/<plan-filename-basename>/task-n-*`.
+
+## Bounded Runtime Escalation Protocol
+
+Use runtime escalation only when all of the following are true:
+
+- The task boundary remains unchanged.
+- The business intent remains unchanged.
+- The work is harder than expected due to execution complexity, not because the plan omitted deliverables.
+- Concrete evidence exists (for example: broader-than-expected discovery surface, higher coupling, or need for stronger reasoning/domain capability).
+
+Allowed escalation actions within the same node:
+
+- Raise category within the same task boundary when lower-cost execution is no longer sufficient (for example `unspecified-low` -> `unspecified-high` -> `deep`).
+- Re-route the current node to the correct domain category when the execution surface proves different in kind while the same task boundary still holds (for example UI/screenshot work requiring `visual-engineering`).
+- Add extra evidence capture or checkpoint notes needed to preserve auditability.
+
+Forbidden even during escalation:
+
+- Expanding scope or adding unplanned deliverables.
+- Using escalation to swallow an under-decomposed task that should be split.
+- Premium-tier escalation without evidence.
+- Silent routing changes without an audit record.
+
+Every escalation record must include:
+
+- `escalation_reason`
+- `from -> to`
+- `evidence`
+- `why_task_boundary_still_holds`
+- `repair_required_afterward`
+
+If `repair_required_afterward = true`, Atlas must stop after the current node's evidence is captured and request explicit plan repair before executing the next node.
 
 ## Parent Completion Rule
 
@@ -179,6 +213,7 @@ During execution updates, always keep:
 - verification status for paired `Task N-V`
 - evidence pointer/path
 - blocker/escalation state
+- escalation audit record when runtime escalation occurs
 - next executable node
 - current Phase/Wave index state when executing a `plan-set`
 
@@ -190,5 +225,5 @@ During execution updates, always keep:
 - Leaving a Phase/Wave checked after one of its underlying tasks or verification nodes reopens
 - Running review gate without evidence artifacts
 - Guessing through contradictory plan sections instead of stopping
-- Expanding a task scope or self-upgrading routing during execution instead of stopping and requesting repair
+- Expanding a task scope under the label of runtime escalation, or escalating routing without the bounded escalation audit record
 - Continuing to execute a premium-tier task when it clearly doesn't need premium capability
