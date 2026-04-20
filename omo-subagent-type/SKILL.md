@@ -1,6 +1,6 @@
 ---
 name: omo-subagent-type
-description: "Use when calling task() to route work. Covers subagent_type selection (explore/librarian/oracle/metis/momus), category selection, run_in_background, and load_skills configuration."
+description: "Use when calling task() to route work. Covers subagent_type selection, category selection, run_in_background, and load_skills configuration."
 ---
 
 # omo-subagent-type
@@ -34,9 +34,8 @@ Q2: Is the task primarily about this repo/worktree artifacts (code, docs, config
 
 Q3: What is the task type?
     → Search/discover patterns → subagent_type="explore", run_in_background=true
-    → Clarify ambiguous request → subagent_type="metis", run_in_background=false
-    → Architecture/debug (2+ failures) → subagent_type="oracle", run_in_background=false
-    → Review plan/work → subagent_type="momus", run_in_background=false
+    → Clarify ambiguous request or critique/review → route to appropriate review agent, run_in_background=false
+    → Architecture/debug or explicit escalation → route to appropriate escalation agent, run_in_background=false
     → Implement code → Continue to Q4.
 
 Q4 (Implementation — domain categories override cost tiers):
@@ -75,7 +74,7 @@ task({
 |---|------|--------------|
 | 1 | **XOR:** Provide `subagent_type` OR `category`, never both | Schema check |
 | 2 | **Required:** `run_in_background`, `load_skills`, `description`, `prompt` | Schema check |
-| 3 | **Background:** `explore`/`librarian` = true; `oracle`/`metis`/`momus`/category = false | Agent type check |
+| 3 | **Background:** `explore`/`librarian` = true; review/escalation agents/category = false | Agent type check |
 | 4 | **Skills:** Only use skills from your `available_skills` list; verify exact name; default `[]` unless task clearly matches a skill's trigger | Cross-check system list |
 | 5 | **Prompt:** Must include `[CONTEXT]`, `[GOAL]`, `[RETURN]` | Field presence |
 | 6 | **Language:** Prompt body in English; quote original non-English input via `[INPUT-ORIGINAL]` | LLM instruction |
@@ -91,9 +90,9 @@ task({
 |-------|------|--------|
 | `explore` | Internal codebase search, pattern discovery | File paths + pattern summaries |
 | `librarian` | External docs, OSS examples, API correctness | URLs + quoted excerpts |
-| `metis` | Ambiguous request, need plan before coding | Clarified requirements |
-| `oracle` | Architecture tradeoffs, debugging (2+ failures) | Decision + reasoning |
-| `momus` | Review plan or completed work | Pass/fail + fixes |
+| `metis` | Ambiguous request, need plan before coding, critique/review | Clarified requirements |
+| `oracle` | Architecture tradeoffs, debugging, explicit escalation | Decision + reasoning |
+| `momus` | Plan review (when explicitly requested) | Pass/fail + fixes |
 
 ### Cost Guardrails
 
@@ -117,8 +116,8 @@ For Task N-V verification tasks: match the parent task's domain category. Downgr
 2. **Add context** — Expand prompt sections before retry.
 3. **Max 2 retries** — After 2 failures with same approach, switch strategy:
    - `explore` failed → Try `librarian` for external docs
-   - `category` failed → Try `metis` to clarify requirements first
-4. **Escalate** — After 3 total failures, use `oracle` or ask user.
+   - `category` failed → Try review agent to clarify requirements first
+4. **Escalate** — After 3 total failures, escalate or ask user.
 5. **Async discipline** — `run_in_background=true`: do NOT plan dependent follow-up until system reminder arrives.
 
 ### Prohibited Behaviors

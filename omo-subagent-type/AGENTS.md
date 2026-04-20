@@ -68,14 +68,12 @@ description: Use when [specific triggering conditions]
 
 ## Review Process
 
-### Quality Gates (@metis → @momus Protocol)
+### Review Process
 
 **After any skill modification:**
 
-1. **@metis (Critic)**: Detect hidden issues, AI blind spots, over-engineering
-2. **@momus (Validator)**: Verify completeness, logical correctness, style adherence
-3. **Iterate until pass**: Fix issues, re-run cycle
-4. **External review** (optional): For major changes, request external model audit
+1. Review for hidden issues, AI blind spots, over-engineering
+2. Iterate until pass
 
 ### Review Criteria
 
@@ -94,7 +92,7 @@ description: Use when [specific triggering conditions]
 1. Read current SKILL.md content
 2. Identify specific section to modify
 3. Make targeted changes (don't rewrite entire file)
-4. Run @momus audit for verification
+4. Run review for verification
 5. Apply any fixes from audit
 
 ### Adding New Examples
