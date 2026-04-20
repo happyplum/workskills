@@ -99,7 +99,7 @@ When `*-index.md` exists:
 
 Default order:
 
-`Task N` -> `Task N-V` -> milestone quality gate (when required)
+`Task N` -> `Task N-V` -> milestone review (when required)
 
 Rules:
 
@@ -185,11 +185,11 @@ A parent task cannot be marked complete while any of the following remains incom
 
 ## Review Rejection Loop
 
-When plan defines `@metis -> @momus` quality gates:
+When plan defines a review gate:
 
 1. Run the reviewer loop with evidence.
 2. If rejected, do not proceed; fix according to feedback.
-3. Re-run full quality-gate cycle until explicit OKAY.
+3. Re-run review until explicit OKAY.
 
 ## Routing for Mostly-Independent Work
 
