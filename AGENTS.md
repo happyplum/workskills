@@ -71,10 +71,9 @@ skills/
 
 ## REVIEW PROCESS
 
-修改 skill 后执行 `@metis → @momus` 质量门控循环：
-1. `@metis`（Critic）: 检测隐藏问题、AI 盲点、过度工程
-2. `@momus`（Validator）: 验证完整性、逻辑正确性、风格合规
-3. 迭代至通过
+修改 skill 后进行审查：
+1. 检测隐藏问题、AI 盲点、过度工程
+2. 迭代至通过
 
 ## NOTES
 
