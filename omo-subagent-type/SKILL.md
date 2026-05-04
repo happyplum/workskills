@@ -7,8 +7,6 @@ description: "Use when calling task() to route work. Covers subagent_type select
 
 Use this skill before ANY `task()` call. It ensures valid schema, correct routing, and prompts subagents can execute.
 
----
-
 ## 0. Quick Start
 
 **One rule:** `task()` requires exactly one of `subagent_type` XOR `category`, plus `run_in_background`, `load_skills`, `description`, and `prompt`.
@@ -35,6 +33,8 @@ Q2: Is the task primarily about this repo/worktree artifacts (code, docs, config
 Q3: What is the task type?
     → Search/discover patterns → subagent_type="explore", run_in_background=true
     → Clarify ambiguous request or critique/review → route to appropriate review agent, run_in_background=false
+        - completion-status / omission check → `metis` first
+        - post-`metis` deep review / plan-revision guidance → `oracle`
     → Architecture/debug or explicit escalation → route to appropriate escalation agent, run_in_background=false
     → Implement code → Continue to Q4.
 
@@ -84,14 +84,16 @@ task({
 
 ## 2. Agent & Category Guide
 
+This table is a scoped routing guide for the common subagent choices this skill standardizes. It is not intended to be an exhaustive catalog of every system-available agent.
+
 ### Subagent Types
 
 | Agent | When | Output |
 |-------|------|--------|
 | `explore` | Internal codebase search, pattern discovery | File paths + pattern summaries |
 | `librarian` | External docs, OSS examples, API correctness | URLs + quoted excerpts |
-| `metis` | Ambiguous request, need plan before coding, critique/review | Clarified requirements |
-| `oracle` | Architecture tradeoffs, debugging, explicit escalation | Decision + reasoning |
+| `metis` | Ambiguous request, need plan before coding, critique/review, Final Verification Wave reviewer, completion-status gap finding | Clarified requirements + omission review |
+| `oracle` | Architecture tradeoffs, debugging, explicit escalation, post-`metis` deep review, plan-revision guidance | Decision + reasoning + revision brief |
 | `momus` | Plan review (when explicitly requested) | Pass/fail + fixes |
 
 ### Cost Guardrails
@@ -187,7 +189,5 @@ task({
 // ✅ CORRECT: Direct tool
 read({ filePath: "/absolute/path/to/tsconfig.json" })
 ```
-
----
 
 **Remember:** Subagents don't share your conversation context. Every missing parameter forces them to guess. Explicit = reliable.

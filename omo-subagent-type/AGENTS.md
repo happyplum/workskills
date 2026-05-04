@@ -20,7 +20,7 @@ This is a **skill repository** for the oh-my-opencode multi-agent system. The sk
 **File Structure:**
 ```
 omo-subagent-type/
-  SKILL.md    # Main skill document (178 lines)
+  SKILL.md    # Main skill document
 ```
 
 ## Skill Writing Conventions
@@ -33,7 +33,7 @@ omo-subagent-type/
 
 ### Token Efficiency
 - **Target:** <200 words for frequently-loaded skills
-- **Current:** 178 lines (~150 words of content)
+- Re-check the live file before making assumptions about size or token cost
 - Compress examples, eliminate redundancy
 
 ### Structure Pattern
@@ -68,7 +68,6 @@ description: Use when [specific triggering conditions]
 
 ## Review Process
 
-### Review Process
 
 **After any skill modification:**
 
@@ -122,8 +121,7 @@ description: Use when [specific triggering conditions]
 ## External References
 
 - **Parent AGENTS.md**: `C:\Users\lzy\.config\opencode\AGENTS.md`
-- **Skill Writing Guide**: `../writing-skills/SKILL.md`
-- **Anthropic Best Practices**: `../writing-skills/anthropic-best-practices.md`
+- **Skill Writing Guidance**: Use the local skill-writing conventions in this file and the repository-level guidance in `skills/AGENTS.md`; do not assume sibling repo-relative writing guides exist here.
 
 ---
 

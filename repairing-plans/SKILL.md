@@ -1,7 +1,7 @@
 ***
 
 name: repairing-plans
-description: Normative specification for validating and repairing existing execution plans before Atlas runs, covering task-ID graph integrity, contract consistency, executable QA, routing schema validity, verification closure, and size/decomposition audits.
+description: Normative specification for validating and repairing existing execution plans, covering task-ID graph integrity, contract consistency, executable QA, routing schema validity, verification closure, and size/decomposition audits.
 ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 # Repairing Plans
@@ -15,21 +15,12 @@ This skill defines a second-pass repair workflow for existing plans. The goal is
 
 ## Mandatory Rules
 
-1. Never re-scope product intent; repair structure and verification truth only.
-2. Enforce one task-ID scheme and one contract constant set before any downstream edits.
-3. Run deterministic two-pass flow: normalize first, then hard-gate re-evaluation.
-4. Emit `REJECT` whenever any hard gate remains non-zero.
-5. For high-impact ambiguous business choices, ask 1-3 targeted clarification questions first; if the answer still cannot be recovered deterministically, emit `BLOCKED_NEEDS_DECISION`; never guess.
-6. Keep repair outputs auditable with explicit gate codes and fixed sections.
-7. Keep acceptance artifacts isolated from implementation tasks: do not place acceptance criteria, evidence capture lists, or deliverable-proof checks inside implementation task bodies. Verification and evidence-collection work must be promoted to first-class `Task N-V` nodes — not inlined as sections within `Task N`.
-8. Require explicit checkpoints and checkpoint-level audit records for structural repair, verification closure, and final release-readiness decisions.
-9. For `plan-set` decomposition, require each sub-plan to include a preflight validation stage that re-verifies upstream outputs for blockers before current-phase implementation starts.
-10. Enforce task decomposition granularity: every task must be decomposed to the smallest independently executable unit. If a task can be further split, it is under-decomposed. Premium categories (`deep`, `ultrabrain`, `visual-engineering`, `artistry`) are reserved exclusively for tasks that genuinely require their specialized capabilities — using them on routine work is a hard gate failure.
-11. Require task-level executor annotation by default: every `Task N` / `Task N-V` should declare `category` or `subagent_type`; if neither is declared, the plan must include `executor_judgment` or `routing_by_executor` with a one-line rationale explaining why routing is intentionally deferred to execution.
-12. Keep routing economical: premium-tier tasks should include `why_not_lower_cost`, and missing/weak executor annotation is a quality warning unless ambiguity becomes execution-blocking.
-13. Require every plan to include a concise user-readable summary of the current development core and requirements before deep execution detail; this summary must use natural language, not only executor shorthand.
-14. Require every repaired plan to preserve a lightweight anti-drift top section near the top: a natural-language `## User Requirement Digest` and a concise `## Intent Anchor` that captures why/what/non-goals/must-not-drift without becoming a second task truth source.
-15. Require **ATOMIC COMMIT** for `Task N-V` nodes: immediately after a verification node (`Task N-V`) achieves `PASS` status, the agent MUST perform an atomic commit of all relevant implementation and verification code with a clear, concise message before starting the next implementation task.
+1. **Repair Boundary**: Never re-scope product intent; repair structure, dependency truth, and verification truth only. When a hard gate remains unresolved, emit `REJECT`. For high-impact ambiguity, ask 1-3 targeted clarification questions first; if the answer still cannot be recovered deterministically, emit `BLOCKED_NEEDS_DECISION`; never guess.
+2. **Deterministic Repair Process**: Enforce one task-ID scheme and one contract constant set before downstream edits. Run deterministic two-pass flow (normalize first, then hard-gate re-evaluation), and keep outputs auditable with explicit gate codes and fixed sections.
+3. **Verification Isolation**: Keep acceptance artifacts isolated from implementation tasks. Do not place acceptance criteria, evidence capture lists, or deliverable-proof checks inside implementation task bodies. Verification and evidence-collection work must be promoted to first-class `Task N-V` nodes rather than inlined inside `Task N`.
+4. **Checkpoint & Plan-Set Governance**: Require explicit checkpoints and checkpoint-level audit records for structural repair, verification closure, and release-readiness decisions. For `plan-set` decomposition, require each sub-plan to include a preflight validation stage that re-verifies upstream outputs for blockers before current-phase implementation starts.
+5. **Decomposition & Routing Discipline**: Enforce smallest independently executable task granularity. Premium categories (`deep`, `ultrabrain`, `visual-engineering`, `artistry`) are reserved for work that genuinely requires their specialized capabilities. Every `Task N` / `Task N-V` should declare `category` or `subagent_type`; if routing is intentionally deferred, require `executor_judgment` or `routing_by_executor` with a one-line rationale. Keep routing economical: premium-tier tasks should include `why_not_lower_cost`, and weak executor annotation is a quality warning unless ambiguity becomes execution-blocking.
+6. **User-Facing Anti-Drift Surface**: Require every plan to include a concise user-readable summary of the current development core and requirements near the top, and require every repaired plan to preserve a lightweight anti-drift top section (`## User Requirement Digest` and `## Intent Anchor`) without creating a second task-truth source.
 
 ## Failure Handling
 
@@ -106,7 +97,7 @@ Before any repair, enforce these plan-level inputs:
    - Required in the primary plan and in each sub-plan file when `decomposition_decision = plan-set`
 6. **Verification mode per task**: `inline` or `Task N-V`
    - Shared surfaces (contracts, infra, API aggregation, integration boundaries) MUST use `Task N-V`
-7. **Routing declarations are valid enums** for category/subagent\_type/skills
+7. **Routing declarations are valid enums** for category/subagent_type/skills
    - Every `Task N` / `Task N-V` SHOULD declare `category` or `subagent_type`
    - If routing is intentionally deferred, the task SHOULD declare `executor_judgment` or `routing_by_executor` with a one-line rationale
    - Premium-tier tasks SHOULD declare `why_not_lower_cost`
@@ -123,7 +114,7 @@ Before any repair, enforce these plan-level inputs:
 - A `Wave` checkbox may be checked only when every implementation task assigned to that `Wave` and every paired `Task N-V` verification node are complete
 - A `Phase` checkbox may be checked only when that phase file's executable tasks and required verification nodes are complete
 
-1. **Sub-plan preflight validation stage present** for each phase file when `decomposition_decision = plan-set`
+11. **Sub-plan preflight validation stage present** for each phase file when `decomposition_decision = plan-set`
 
 - Stage must validate upstream outputs, unresolved blockers, and interface/contract compatibility before implementation tasks
 
@@ -172,34 +163,34 @@ If any required input is missing, auto-repair only deterministic structure/forma
    - Ensure every `Task N` / `Task N-V` declares `category` or `subagent_type`, unless routing is intentionally deferred with `executor_judgment` or `routing_by_executor`
    - Ensure deferred routing includes a one-line reason that preserves economic routing intent
    - Ensure premium-tier tasks include `why_not_lower_cost` when specialized capability is required
-2. **User-Facing Summary**
+3. **User-Facing Summary**
    - Ensure the plan has `## User-Facing Summary` near the top
    - Ensure it includes both `Development Core` and `User Requirements`
    - Ensure the content is concise and user-readable, summarizing the current development core and requirements without collapsing into task-ID/file-path jargon
-3. **Anti-Drift Top Section**
+4. **Anti-Drift Top Section**
    - Ensure the repaired plan has both `## User Requirement Digest` and `## Intent Anchor` near the top
    - Ensure the digest stays close to the user's natural-language requirements, constraints, prohibitions, and current focus
    - Ensure the anchor captures `Why`, `What`, `Non-Goals`, and `Must Not Drift` without duplicating task truth
    - If these sections cannot be recovered deterministically, ask targeted clarification questions before emitting `BLOCKED_NEEDS_DECISION`
-4. **Task Flattening**
+5. **Task Flattening**
    - Promote executable nested bullets/checklists into top-level tasks (`Task N`, `Task N.a`, `Task N-V`)
    - Keep notes, file lists, and explanatory bullets nested only if they are non-executable
-5. **Identifier Integrity**
+6. **Identifier Integrity**
    - Make Waves, task list, dependency matrix, and verification tasks reference the same task IDs
    - Remove phantom dependencies and missing task references
-6. **Verification Pairing**
+7. **Verification Pairing**
    - When an implementation task contains acceptance criteria, evidence capture, or verification content, a paired `Task N-V` must exist as a **first-class task node** — it must appear in the TODO list, Wave assignment, and dependency matrix as an independent executable task, not as a section within `Task N`.
    - If an implementation task has no acceptance criteria or verification content, no `Task N-V` is needed.
    - Downstream dependencies on `Task N` must also depend on `Task N-V` when `Task N-V` exists.
    - **Repair action**: When `Task N` contains acceptance criteria/evidence content but `Task N-V` is missing, create `Task N-V` as a first-class task node (TODO entry, Wave assignment, dependency matrix entry, routing declaration). Strip all verification content from `Task N` body (including `### Acceptance Criteria`, `#### Acceptance Criteria`, `### Success Criteria`, `AC:`-prefixed bullets, evidence capture checklists, deliverable-proof items) and relocate to `Task N-V`.
-7. **Contract Consistency**
+8. **Contract Consistency**
    - Route prefixes, naming rules, storage paths, and feature scope must match across task body, QA, and final verification
    - Final verification must not claim features with no implementation task
-8. **Task Graph Compilation (NEW)**
+9. **Task Graph Compilation (NEW)**
    - Compile Waves + TODO + dependency matrix + final verification references into one graph
    - Reject duplicate IDs, unknown IDs, phantom dependencies, and unreachable required nodes
    - Reject mixed-ID aliasing (same logical task expressed in two ID systems)
-9. **QA Executability (NEW)**
+10. **QA Executability (NEW)**
    - Each QA block must include:
      - `Tool`
      - `Preconditions`
@@ -208,62 +199,57 @@ If any required input is missing, auto-repair only deterministic structure/forma
      - `Evidence`
    - Reject narrative-only steps (e.g., “调用/验证/等待”) without concrete executable actions
    - For `Tool: Bash`, require runnable command lines instead of prose verbs
-10. **Verification Closure**
-
-- For shared surfaces (contracts, infra, API aggregation, integration boundaries), verification must be modeled as `Task N-V`
-- Downstream and final verification must depend on `Task N-V`, not only `Task N`
-- `inline` verification is allowed only for non-shared local tasks with no downstream dependency consumers
-- **Repair action**: When a shared-surface task lacks `Task N-V`, create one as a first-class task node and add dependency edges from downstream consumers. When downstream tasks depend on `Task N` only, add dependency on `Task N-V` as well.
-- **Atomic Commit Enforcement**: After a `Task N-V` node is verified as `PASS`, the agent MUST perform an atomic commit of all relevant code changes before starting the next implementation task. Do not batch multiple `Task N-V` closures into a single commit.
-
-1. **Stack/Routing Congruence (NEW)**
-
-- Validate routing declarations against actual project stack and allowed enums
-- Invalid enum = hard failure; stack-incongruent checks = warning or hard failure by impact
-
-1. **Nested Executables Gate (NEW)**
+11. **Verification Closure**
+   - For shared surfaces (contracts, infra, API aggregation, integration boundaries), verification must be modeled as `Task N-V`
+   - Downstream and final verification must depend on `Task N-V`, not only `Task N`
+   - `inline` verification is allowed only for non-shared local tasks with no downstream dependency consumers
+   - **Repair action**: When a shared-surface task lacks `Task N-V`, create one as a first-class task node and add dependency edges from downstream consumers. When downstream tasks depend on `Task N` only, add dependency on `Task N-V` as well.
+12. **Stack/Routing Congruence (NEW)**
+   - Validate routing declarations against actual project stack and allowed enums
+   - Invalid enum = hard failure; stack-incongruent checks = warning or hard failure by impact
+13. **Nested Executables Gate (NEW)**
    - Detect executable nested checklist/bullets that should be promoted to task nodes
    - Reject plans that keep executable nested work as prose after normalization pass
-2. **Plan Size Audit (NEW)**
+14. **Plan Size Audit (NEW)**
    - Ensure plan includes a `Plan Size Audit` block with required fields and deterministic size classification
    - Recompute expected size class from `estimated_waves` and `integration_boundaries`
    - Reject plans where declared class conflicts with computed class
-3. **Parallelization Audit (NEW)**
+15. **Parallelization Audit (NEW)**
    - Prefer splitting work into the smallest independently executable tasks before creating serial chains
    - For planning and plan-check tasks, require explicit `parallel-safe` / `serial-only` declaration
    - Reject plans that force serial execution for independent tasks without constraint justification
    - Reject plans when task-level parallel declaration is missing or `serial-only` lacks one-line reason
    - For `Medium`/`Large`/`XLarge`, verify decomposition into multiple plan files and phase-level handoff gates
-4. **Validation Scope Isolation**
+16. **Validation Scope Isolation**
    - Implementation tasks must not contain acceptance criteria, evidence capture lists, or deliverable-proof checklists
    - Acceptance/evidence assertions must live only in dedicated verification tasks (`Task N-V`) or checkpoint audit blocks
    - **Repair action**: When `Task N` contains acceptance criteria or evidence content, strip it from `Task N` body — including `### Acceptance Criteria`, `#### Acceptance Criteria`, `### Success Criteria`, `AC:`-prefixed bullets, evidence capture checklists, and deliverable-proof items. Relocate stripped content to the corresponding `Task N-V` QA block; if no paired `Task N-V` exists, create one as a first-class task node before relocating. If `Task N` has no such content, no repair is needed.
-5. **Checkpoint Coverage (NEW)**
+17. **Checkpoint Coverage (NEW)**
    - Require explicit checkpoint definitions for `CP0`, `CP1`, `CP2`, `CP3`
    - Require checkpoint outputs to map to gate status, fixed sections, and unresolved blockers
-6. **Index Status Synchronization (NEW)**
+18. **Index Status Synchronization (NEW)**
    - For `plan-set`, the index file must include first-class checkbox entries for every Wave and every Phase
    - The index file must treat Wave/Phase state as summary status only; task-level checkbox truth remains in the corresponding phase files
    - A Wave checkbox may be checked only after all implementation tasks assigned to that Wave and all paired `Task N-V` verification nodes are complete
    - A Phase checkbox may be checked only after that phase file's executable tasks and paired verification nodes are complete
    - **Repair action**: add missing Wave/Phase checkboxes to the index, link phases to their files, remove duplicated task-level status from the index, and normalize Wave completion criteria so `Task N` plus required `Task N-V` closure is explicit
-7. **Sub-Plan Preflight Validation (NEW)**
+19. **Sub-Plan Preflight Validation (NEW)**
    - For `plan-set`, each phase file must begin with a preflight validation stage before implementation tasks
    - Preflight must verify upstream phase outputs against current-phase blockers, contracts, and dependency assumptions
-8. **Task Routing Tier Audit (NEW)**
-   \- Enforce a two-tier routing model:
-   \- **Premium tier** (`deep`, `ultrabrain`, `visual-engineering`, `artistry`): reserved for tasks that genuinely require their specialized capabilities.
-   \- `deep`: multi-system autonomous problem-solving, unfamiliar domains, end-to-end implementation with significant uncertainty.
-   \- `ultrabrain`: genuinely hard logic-heavy tasks — algorithm design, complex architecture decisions, non-obvious constraint satisfaction.
-   \- `visual-engineering`: visual/UI/UX work, styling, layout, animation, design system implementation.
-   \- `artistry`: unconventional or creative approaches that go beyond standard patterns.
-   \- **Standard tier** (`unspecified-high`, `unspecified-low`, `quick`, `writing`): the default for all implementation tasks.
+20. **Task Routing Tier Audit (NEW)**
+   - Enforce a two-tier routing model:
+   - **Premium tier** (`deep`, `ultrabrain`, `visual-engineering`, `artistry`): reserved for tasks that genuinely require their specialized capabilities.
+   - `deep`: multi-system autonomous problem-solving, unfamiliar domains, end-to-end implementation with significant uncertainty.
+   - `ultrabrain`: genuinely hard logic-heavy tasks — algorithm design, complex architecture decisions, non-obvious constraint satisfaction.
+   - `visual-engineering`: visual/UI/UX work, styling, layout, animation, design system implementation.
+   - `artistry`: unconventional or creative approaches that go beyond standard patterns.
+   - **Standard tier** (`unspecified-high`, `unspecified-low`, `quick`, `writing`): the default for all implementation tasks.
    - **Decomposition completeness**: for every task node, evaluate whether it can be further split into smaller independent units. If yes, the task is under-decomposed — hard gate failure (`TASK_UNDER_DECOMPOSED`).
    - Using a premium-tier category on a task that can be handled by the standard tier is a routing overkill — **hard gate failure**.
    - Conversely, routing a genuinely complex task to `quick` or `unspecified-low` is a routing underkill — **soft warning**.
-    - **Repair action**: When a premium-tier category is assigned to a routine task, downgrade to standard tier and decompose the original task into smaller units if it can be further split.
-    - **Executor annotation default**: every task SHOULD declare `category` or `subagent_type`. If the task intentionally leaves the final routing choice to execution time, require `executor_judgment` or `routing_by_executor` plus a one-line rationale.
-    - **Reminder**: premium-tier tasks SHOULD include a one-line rationale explaining why the specialized capability is required, preferably using `why_not_lower_cost`. If the rationale is unclear, default to standard tier.
+   - **Repair action**: When a premium-tier category is assigned to a routine task, downgrade to standard tier and decompose the original task into smaller units if it can be further split.
+   - **Executor annotation default**: every task SHOULD declare `category` or `subagent_type`. If the task intentionally leaves the final routing choice to execution time, require `executor_judgment` or `routing_by_executor` plus a one-line rationale.
+   - **Reminder**: premium-tier tasks SHOULD include a one-line rationale explaining why the specialized capability is required, preferably using `why_not_lower_cost`. If the rationale is unclear, default to standard tier.
 
 ## Repair Order
 
@@ -283,13 +269,11 @@ Apply fixes in this order:
 9. Repair verification closure (`Task N` / `Task N-V`)
    - When creating `Task N-V`, strip acceptance criteria from `Task N` body and relocate to `Task N-V` QA block
 10. Repair plan-set index state model (Wave/Phase checkboxes + completion sync rules)
-
-- Recompute Phase/Wave checkbox eligibility after any `Task N-V` creation, verification-closure repair, or reopened node discovered during normalization
-
-1. Repair sub-plan preflight validation stages for each phase file (`plan-set` only)
-2. Repair QA executability blocks and validation-scope isolation
-3. Run checkpoint loop to closure (`CP1` -> `CP2` -> `CP3`) and re-run hard-gate evaluation
-4. Audit task routing tiers and decompose overkill tasks into standard-tier units
+   - Recompute Phase/Wave checkbox eligibility after any `Task N-V` creation, verification-closure repair, or reopened node discovered during normalization
+11. Repair sub-plan preflight validation stages for each phase file (`plan-set` only)
+12. Repair QA executability blocks and validation-scope isolation
+13. Run checkpoint loop to closure (`CP1` -> `CP2` -> `CP3`) and re-run hard-gate evaluation
+14. Audit task routing tiers and decompose overkill tasks into standard-tier units
 
 ## Output Requirements
 
@@ -382,9 +366,12 @@ If any `BLOCKED_NEEDS_DECISION` item remains open, verdict MUST be `REJECT`.
 
 ## Integration with Atlas/Prometheus
 
-- This skill is a pre-execution plan repair/validation layer.
+- This skill is the canonical structural-repair landing path for authoritative plan edits.
+- This skill may be used both before execution and after review-driven discovery of plan defects; completion-review findings do not bypass this repair path.
+- This skill defines what a structurally valid, repair-complete plan looks like; it does not own runtime execution ordering, runtime evidence discipline, or commit timing.
 - Atlas consumes this skill as the normative repair specification when plan structural consistency must be repaired before execution.
 - Prometheus may provide only compact routing intent; this skill expands and enforces concrete repair gates.
+- `metis` may expose omissions or plan-level gaps, and `oracle` may produce a structured revision brief; authoritative structural repair should then be landed through this skill rather than by patching the plan inline during execution.
 - Plan drafting guidance and global workflow policy should remain in project-level MD documents.
 - Output should be emitted inline in the current review message; no separate artifact file is required unless the plan itself requests one.
 
@@ -411,7 +398,6 @@ If any `BLOCKED_NEEDS_DECISION` item remains open, verdict MUST be `REJECT`.
 | Acceptance/Evidence appears in implementation task          | Strip from `Task N` body and relocate to `Task N-V` QA block                                                    |
 | Plan-set index has no Wave/Phase checkboxes                 | Add checkbox entries for every Wave and Phase; keep fine-grained task state in phase files                      |
 | Phase is checked before executable/verification closure     | Reopen the Phase checkbox until all executable tasks and required verification nodes in that Phase are complete |
-| `Task N-V` achieves `PASS` status                           | Perform an **ATOMIC COMMIT** of relevant code before starting next implementation task                          |
 | Wave is checked before paired verification closes           | Reopen the Wave checkbox until all implementation tasks and required `Task N-V` nodes are complete              |
 | Reopened task leaves Phase/Wave checked                     | Reset the affected Phase/Wave checkbox until underlying closure is restored                                     |
 | Sub-plan starts implementation without preflight validation | Insert phase preflight stage and validate upstream blockers/contracts first                                     |
