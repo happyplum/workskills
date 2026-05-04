@@ -34,7 +34,6 @@ Validate the monolith-to-microservices migration plan for service boundary corre
 > Review the following markdown packet. Follow the "Required Output" section exactly. Analysis only. No implementation. No code patches.
 
 ---
-*File size: ~85 lines | Generated: 2026-03-18*
 ```
 
 ### File Content (external-review-request.md)
@@ -176,7 +175,6 @@ Security audit of the JWT-based authentication redesign for token handling vulne
 3. Paste the JSON response back here
 
 ---
-*File size: ~72 lines | Generated: 2026-03-18*
 ```
 
 ### External Model JSON Response

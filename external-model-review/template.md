@@ -36,7 +36,6 @@ Output this to chat when user triggers external review:
 > Review the following markdown packet. Follow the "Required Output" section exactly. Analysis only. No implementation. No code patches.
 
 ---
-*File size: ~[N] lines | Generated: [TIMESTAMP]*
 ```
 
 ---
