@@ -5,7 +5,7 @@ description: "Use when calling task() to route work. Covers subagent_type select
 
 # omo-subagent-type
 
-Use this skill before ANY `task()` call. It ensures valid schema, correct routing, and prompts subagents can execute.
+Use this skill before ANY `task()` call. It ensures valid schema, correct routing, and prompts subagents can execute. For coding work already inside `subagent-driven-development`, use that skill as the source of truth for decomposition-first routing, premium-tier restraint, and escalation boundaries; this skill handles the actual `task()` schema and category/subagent selection surface.
 
 ## 0. Quick Start
 
@@ -99,6 +99,7 @@ This table is a scoped routing guide for the common subagent choices this skill 
 ### Cost Guardrails
 
 - Do **not** choose `deep` when the task is mostly deterministic with known patterns.
+- For bug-fix work, route one independently verifiable bug at a time; do not send a bag of unrelated bugs to `deep` merely because they were reported together.
 - Do **not** choose `ultrabrain` unless there is explicit hard-logic evidence.
 - If undecided between `quick` and `deep`, choose `unspecified-low` first.
 - For verification-only work (assertions, logs, simple checks), default to `quick`.
