@@ -13,6 +13,7 @@ skills/
 ├── omo-gated-routing-rules/         # Core: 路由决策
 ├── omo-subagent-type/               # Core: task() 配置 (has AGENTS.md)
 ├── superpowers-gated-rules/         # Core: skill-first 规范
+├── subagent-driven-development/     # Execution: SDD 共享治理
 ├── atlas-execution-constraints/     # Execution: 执行时约束
 ├── repairing-plans/                 # Execution: 计划验证与结构修复
 ├── codex-gemini-collab-rules/       # External: 模型协作规则
@@ -46,6 +47,7 @@ skills/
 ### 常见章节标题变体
 - `repairing-plans`: 无标准 frontmatter（使用 `***` 分隔），节标题含 `## Required Checks`, `## Checkpoint Model`
 - `atlas-execution-constraints`: 含 `## Preload Chain`, `## Verification Ordering`
+- `subagent-driven-development`: 含共享的拆分、路由、贵价层约束与提级边界规则
 
 ### 文件命名
 - 目录: kebab-case
