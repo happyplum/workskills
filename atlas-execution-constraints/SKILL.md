@@ -9,8 +9,9 @@ description: Use when Atlas needs deterministic execution governance for reliabl
 
 This skill is the source of truth for Atlas execution-time constraints.
 
-- Atlas prompt stays lean and only routes into this skill.
-- Execution constraints live here, not in prompt text.
+- Atlas prompt stays lean and only routes into the owning execution skills.
+- Shared Subagent-Driven decomposition, routing, premium-restraint, and escalation doctrine lives in `subagent-driven-development`.
+- Atlas-specific runtime constraints live here, not in prompt text.
 - `repairing-plans` remains a separate manual repair skill.
 
 Core principle: execute only what is structurally valid, verifiable, and evidenced.
@@ -110,6 +111,7 @@ Rules:
 - If Metis finds plan-level gaps, route to `oracle` for deeper analysis and structured plan-revision guidance, then stop runtime and request explicit repair/replan through the owning planning or `repairing-plans` path rather than patching the plan in place.
 - If `Task N-V` fails, reopen parent task, fix, collect fresh evidence, and rerun.
 - After a `Task N-V` node passes, perform an atomic commit of the relevant implementation and verification changes before starting the next implementation task. Do not batch multiple `Task N-V` closures into one commit.
+- For bug-fix work, each `Task N` / `Task N-V` pair should isolate one independently verifiable bug unless a shared root cause and shared verification surface are explicitly evidenced.
 - If `Task N-V` fails or any previously closed node reopens, recompute the affected Phase/Wave index state before continuing.
 - Escalate after 2 failed reruns or immediately when evidence is ambiguous/contradictory.
 
