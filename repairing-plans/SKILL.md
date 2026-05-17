@@ -34,8 +34,9 @@ This skill defines a second-pass repair workflow for existing plans. The goal is
 This skill is the canonical rule source for plan repair/validation.
 
 - Prometheus should stay lean and delegate repair semantics here.
-- If prompt text and this skill drift, this skill wins for all repair decisions.
-- Do not duplicate long hard-gate rule blocks in Prometheus; keep them here.
+- Shared Subagent-Driven decomposition, routing, and economical-escalation doctrine lives in `subagent-driven-development`; this skill enforces that doctrine during plan repair instead of redefining it globally.
+- If prompt text and this skill drift, this skill wins for plan-repair decisions only.
+- Do not duplicate long hard-gate rule blocks in Prometheus; keep repair-specific gates here.
 
 ## Second-Pass Repair Mode (MANDATORY)
 
