@@ -7,234 +7,105 @@ description: Use when Atlas needs deterministic execution governance for reliabl
 
 ## Overview
 
-This skill is the source of truth for Atlas execution-time constraints.
-
-- Atlas prompt stays lean and only routes into the owning execution skills.
-- Shared Subagent-Driven decomposition, routing, premium-restraint, and escalation doctrine lives in `subagent-driven-development`.
-- Atlas-specific runtime constraints live here, not in prompt text.
-- `repairing-plans` remains a separate manual repair skill.
-
-Core principle: execute only what is structurally valid, verifiable, and evidenced.
+Source of truth for Atlas execution-time constraints. Atlas prompt stays lean; SDD handles decomposition/routing/escalation; `repairing-plans` is a separate manual repair skill. Core principle: execute only what is structurally valid, verifiable, and evidenced.
 
 ## Load Conditions
 
-Load this skill when Atlas is about to execute an existing plan and needs deterministic runtime constraints.
-
-- Use only after plan authoring and plan review are complete upstream.
-- Use during execution when Subagent-Driven discipline, verification ordering, normalization, or evidence discipline could drift.
+Load when Atlas is about to execute an existing reviewed plan, or during execution when discipline could drift. Use only after plan authoring and review are complete upstream.
 
 ## Minimal CSO Triggers
 
-Primary triggers:
-
-- `atlas execute`
-- `task n-v`
-- `execution gate`
-- `evidence before complete`
-- `normalize nested tasks`
-
-Secondary triggers:
-
-- `plan-set entry exit gate`
-- `phase handoff`
-- `parent completion rule`
-- `review rejection loop`
+Primary: `atlas execute`, `task n-v`, `execution gate`, `evidence before complete`, `normalize nested tasks`
+Secondary: `plan-set entry exit gate`, `phase handoff`, `parent completion rule`, `review rejection loop`
 
 ## Counter-Examples (Do Not Trigger)
 
 | Input Pattern | Why not |
 |---|---|
-| "生成计划" / "write a plan" | This is planning stage; use `writing-plans`. |
-| "修复计划结构错误" | This is document-repair stage; use `repairing-plans`. |
-| "只要解释流程，不执行" | Pure explanation does not require execution-governance loading. |
-| "单文件微小文本修正" | Trivial edits do not need full execution constraint stack. |
+| "生成计划" / "write a plan" | Planning stage; use `writing-plans`. |
+| "修复计划结构错误" | Document-repair; use `repairing-plans`. |
+| "只要解释流程，不执行" | Pure explanation needs no execution governance. |
+| "单文件微小文本修正" | Trivial edits need no full constraint stack. |
 
 ## Mandatory Rules
 
-1. Enforce preload chain before execution starts; missing required skill means stop.
-2. Atlas executes only against an existing reviewed plan; if the plan is missing, contradictory, or not execution-ready, stop and request upstream repair.
-3. Before execution starts, Atlas may convert the accepted approved plan into an execution-only TODO surface; use that TODO surface as the immediate orchestration layer without reframing it as plan authoring.
+1. Enforce preload chain before execution; missing required skill means stop.
+2. Execute only against an existing reviewed plan; if missing, contradictory, or not execution-ready, stop and request upstream repair.
+3. May convert the approved plan into an execution-only TODO surface as the orchestration layer without reframing as plan authoring.
 4. Keep `subagent-driven-development` as the execution core for coding work; do not silently switch to sequential execution.
 5. Do not execute downstream tasks before paired `Task N-V` passes.
 6. Normalize executable nested items before parent completion decisions.
 7. Reject or return plans when structural consistency gate fails; do not guess.
-8. Require concrete evidence before completion claims and before review gates, and keep execution state recoverable with truthful status/evidence updates. If execution complexity rises while task boundary and business intent remain unchanged, Atlas MAY use bounded runtime escalation with explicit evidence and audit logging. If the task is under-decomposed, misrouted beyond bounded escalation, or requires scope change, stop the node, record evidence, and request plan repair/replan.
+8. Require concrete evidence before completion claims and review gates; keep execution state recoverable. Bounded runtime escalation allowed when task boundary and business intent stay unchanged but execution complexity rises; stop and request repair/replan if under-decomposed, misrouted beyond bounded escalation, or scope change needed.
 
 ## Failure Handling
 
-1. If skill header contract is missing/contradictory, stop and return plan for repair.
-2. If verification repeatedly fails (>=2 reruns) or evidence is contradictory, escalate.
-3. If phase gate evidence is missing, keep phase/index state unchanged and loop fix+reverify.
-4. If issue is document-level repairable, stop runtime and request explicit manual `repairing-plans` pass.
-5. If any executable task or paired verification node reopens, reset the affected Phase/Wave checkbox until closure is restored from underlying phase-file truth.
-6. If proposed runtime escalation would change task boundary, business intent, or planned deliverables, deny escalation and request plan repair/replan.
+- Header contract missing/contradictory → stop, return plan for repair.
+- Verification fails ≥2 reruns or evidence contradictory → escalate.
+- Phase gate evidence missing → keep state unchanged, loop fix+reverify.
+- Document-level repairable → stop, request explicit `repairing-plans` pass.
+- Task or verification reopens → reset affected Phase/Wave checkbox until closure restored.
+- Escalation would change task boundary/intent/deliverables → deny, request repair/replan.
 
 ## Required Preload Chain
 
-Before execution, ensure this load order:
-
-1. `omo-subagent-type`
-2. `subagent-driven-development`
-3. `atlas-execution-constraints` (this skill)
-
-If any required skill is missing, stop and load it first.
+1. `omo-subagent-type` → 2. `subagent-driven-development` → 3. `atlas-execution-constraints` (this skill). Missing any → stop and load first.
 
 ## Execution Skill Header Contract
 
-- Plan must include `## Execution Skill Requirements`.
-- Treat that section as source of truth for additional skills.
-- That section must require `subagent-driven-development` for Atlas-executed coding work; if it does not, stop and return the plan for repair or rerouting.
-- If missing, incomplete, or contradictory with task body, stop and return plan for repair.
+Plan must include `## Execution Skill Requirements` as source of truth for additional skills. Must require `subagent-driven-development` for Atlas coding work; if missing or contradictory with task body, stop and return plan for repair.
 
 ## Plan-Set Contract
 
-When `*-index.md` exists:
-
-- Use index as orchestration source of truth.
-- Treat the index as a Wave/Phase progress surface only; detailed task checkbox truth remains in the corresponding phase files.
-- Execute phases strictly in declared order.
-- Do not start a phase without prior phase `Entry Gate` prerequisites met.
-- After each phase, verify `Exit Gate` evidence, update the Phase checkbox, and recompute any affected Wave checkbox from underlying phase-file truth.
-- Reject cross-plan direct task-ID dependencies; require phase gate tokens.
+When `*-index.md` exists: index is orchestration source of truth and Wave/Phase progress surface; detailed checkbox truth remains in phase files. Execute phases strictly in declared order; do not start phase without prior `Entry Gate` prerequisites met. After each phase, verify `Exit Gate` evidence, update Phase checkbox, recompute Wave checkboxes from phase-file truth. Reject cross-plan direct task-ID dependencies; require phase gate tokens.
 
 ## Verification & Gate Ordering
 
-Default order:
+Default chain: `Task N` → `Task N-V` → `metis` (when required) → `oracle` (when required).
 
-`Task N` -> `Task N-V` -> `metis` completion-status review (when required) -> `oracle` deep review / plan-revision guidance (when required)
-
-Rules:
-
-- Do not start downstream tasks before paired `Task N-V` passes.
 - Load `verification-before-completion` before any `Task N-V` or evidence-backed completion.
-- When a completion-status review is needed, use `metis` first to detect omissions, hidden issues, and scope drift.
-- If Metis finds plan-level gaps, route to `oracle` for deeper analysis and structured plan-revision guidance, then stop runtime and request explicit repair/replan through the owning planning or `repairing-plans` path rather than patching the plan in place.
-- If `Task N-V` fails, reopen parent task, fix, collect fresh evidence, and rerun.
-- After a `Task N-V` node passes, perform an atomic commit of the relevant implementation and verification changes before starting the next implementation task. Do not batch multiple `Task N-V` closures into one commit.
-- For bug-fix work, each `Task N` / `Task N-V` pair should isolate one independently verifiable bug unless a shared root cause and shared verification surface are explicitly evidenced.
-- If `Task N-V` fails or any previously closed node reopens, recompute the affected Phase/Wave index state before continuing.
-- Escalate after 2 failed reruns or immediately when evidence is ambiguous/contradictory.
+- Metis finds plan-level gaps → route to `oracle` for analysis, then stop and request repair/replan.
+- `Task N-V` fails → reopen parent, fix, fresh evidence, rerun; after pass, atomic-commit before next task (no batching).
+- Bug-fix: each `Task N`/`Task N-V` pair isolates one independently verifiable bug unless shared root cause and shared verification surface explicitly evidenced.
+- Node reopens or `Task N-V` fails → recompute Phase/Wave index state; escalate after 2 failed reruns or ambiguous evidence.
 
 ## Normalization Protocol
 
-Before execution:
+Before execution: (1) validate header contract, (2) scan for nested executable checklist/bullets, (3) newly generated malformed → reject and return for flattening, (4) legacy/repairable → normalize into tracked subtasks, (5) re-run structural consistency gate.
 
-1. Validate header contract.
-2. Scan for nested executable checklist/bullets.
-3. If newly generated malformed structure: reject and return for flattening.
-4. If legacy/repairable structure: normalize into explicit tracked subtasks.
-5. Re-run structural consistency gate after normalization.
-
-Nested-item classification:
-
-- Checkbox nested item => executable => normalize.
-- Action-verb nested item (add/create/write/run/verify/update/delete/refactor/test/capture) => executable => normalize.
-- Pure notes/file lists/labels with no action semantics => keep as notes.
+Nested-item classification: checkbox → executable → normalize; action-verb (add/create/write/run/verify/update/delete/refactor/test/capture) → executable → normalize; pure notes/lists/labels with no action → keep as notes.
 
 ## Structural Consistency Gate
 
-Before executing any task, verify:
+Before executing any task, verify all of:
 
-- Waves/TODO/dependency/verification reference the same task set.
-- All dependency references point to existing tasks.
-- Contract constants remain consistent across task body, QA, and verification.
-- Every task either declares `category` / `subagent_type` or carries a justified deferred-routing marker (`executor_judgment` / `routing_by_executor`).
-- Atlas-executed coding branches cannot omit `subagent-driven-development`; if the supplied plan depends on another execution workflow, stop and request repair or rerouting instead of adapting the workflow silently.
+- Waves/TODO/dependency/verification reference the same task set; all dependency refs point to existing tasks.
+- Contract constants consistent across task body, QA, and verification.
+- Every task declares `category`/`subagent_type` or carries justified deferred-routing marker (`executor_judgment`/`routing_by_executor`).
+- Atlas coding branches cannot omit `subagent-driven-development`; if plan depends on another workflow, stop and request repair.
 - Final verification does not claim features with no implementation task.
 
-If any check fails, stop and return plan for repair.
+Any check fails → stop and return plan for repair.
 
 ## Evidence Discipline
 
-- Do not mark a task complete without concrete evidence.
-- Ensure required artifacts are written under declared `evidence/` path before review gates.
-- If evidence root is missing, fallback to `evidence/<plan-filename-basename>/task-n-*`.
+- Do not mark task complete without concrete evidence.
+- Required artifacts under declared `evidence/` path before review gates; fallback to `evidence/<plan-filename-basename>/task-n-*`.
 
 ## Bounded Runtime Escalation Protocol
 
-Use runtime escalation only when all of the following are true:
+Use only when: task boundary unchanged, business intent unchanged, harder due to execution complexity (not omitted deliverables), concrete evidence exists.
 
-- The task boundary remains unchanged.
-- The business intent remains unchanged.
-- The work is harder than expected due to execution complexity, not because the plan omitted deliverables.
-- Concrete evidence exists (for example: broader-than-expected discovery surface, higher coupling, or need for stronger reasoning/domain capability).
+Allowed within same node: raise category (e.g. `unspecified-low` → `unspecified-high` → `deep`); re-route to correct domain category when surface proves different in kind; add extra evidence/checkpoint notes.
 
-Allowed escalation actions within the same node:
+Forbidden: expanding scope or adding unplanned deliverables; swallowing under-decomposed tasks; premium-tier without evidence; silent routing without audit record.
 
-- Raise category within the same task boundary when lower-cost execution is no longer sufficient (for example `unspecified-low` -> `unspecified-high` -> `deep`).
-- Re-route the current node to the correct domain category when the execution surface proves different in kind while the same task boundary still holds (for example UI/screenshot work requiring `visual-engineering`).
-- Add extra evidence capture or checkpoint notes needed to preserve auditability.
-
-Forbidden even during escalation:
-
-- Expanding scope or adding unplanned deliverables.
-- Using escalation to swallow an under-decomposed task that should be split.
-- Premium-tier escalation without evidence.
-- Silent routing changes without an audit record.
-
-Every escalation record must include:
-
-- `escalation_reason`
-- `from -> to`
-- `evidence`
-- `why_task_boundary_still_holds`
-- `repair_required_afterward`
-
-If `repair_required_afterward = true`, Atlas must stop after the current node's evidence is captured and request explicit plan repair before executing the next node.
+Every escalation record: `escalation_reason`, `from -> to`, `evidence`, `why_task_boundary_still_holds`, `repair_required_afterward`. If `repair_required_afterward = true`, stop after current node evidence and request plan repair before next node.
 
 ## Parent Completion Rule
 
-A parent task cannot be marked complete while any of the following remains incomplete:
-
-- normalized executable child task
-- paired verification task
-- required checklist item
+Parent cannot be marked complete while any remains incomplete: normalized executable child task, paired verification task, required checklist item.
 
 ## Review Rejection Loop
 
-When plan defines a review gate:
-
-1. Run the reviewer loop with evidence.
-2. If rejected, do not proceed; fix according to feedback.
-3. Re-run review until explicit OKAY.
-
-## Subagent-Driven Execution Core
-
-Atlas uses `subagent-driven-development` as the default execution model for coding work.
-
-- The provided plan must already be decomposed and review-ready for task-scoped subagent execution.
-- Atlas must keep fresh-subagent-per-task execution as the core workflow and preserve the accompanying review loop.
-- If the supplied plan actually requires staged sequential execution, batch handoff, or another workflow, Atlas must stop, record evidence, and request upstream repair or rerouting; Atlas does not silently downgrade to `executing-plans`.
-- Cross-session or non-Atlas execution models are upstream routing decisions, not runtime improvisations inside Atlas.
-
-## Boundary with `repairing-plans`
-
-This skill does not replace `repairing-plans`.
-
-- If plan is structurally invalid but repairable at document level, stop and request explicit manual repair.
-- Manual repair workflow is defined only in `repairing-plans`.
-- Do not embed `repairing-plans` hard-gate details here.
-
-## Output Requirements for Atlas Runtime
-
-During execution updates, always keep:
-
-- current node status
-- verification status for paired `Task N-V`
-- evidence pointer/path
-- blocker/escalation state
-- escalation audit record when runtime escalation occurs
-- next executable node
-- current Phase/Wave index state when executing a `plan-set`
-
-## Common Mistakes
-
-- Skipping `Task N-V` because implementation "looks done"
-- Normalizing nested executables but not updating dependencies
-- Marking parent complete while child verification remains open
-- Leaving a Phase/Wave checked after one of its underlying tasks or verification nodes reopens
-- Running review gate without evidence artifacts
-- Batch-closing multiple `Task N-V` nodes without an atomic commit after each verified closure
-- Guessing through contradictory plan sections instead of stopping
-- Expanding a task scope under the label of runtime escalation, or escalating routing without the bounded escalation audit record
-- Continuing to execute a premium-tier task when it clearly doesn't need premium capability
+When plan defines a review gate: (1) run reviewer loop with evidence, (2) if rejected → fix per feedback, (3) re-run until explicit OKAY.
