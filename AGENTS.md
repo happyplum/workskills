@@ -76,6 +76,7 @@ skills/
 
 ## NOTES
 
-- `repairing-plans` 是仓库里最大的 skill 之一，包含检查点审计模型（CP0-CP3）和大量强约束规则
+- `repairing-plans`（172行）和 `omo-subagent-type`（159行）是仓库里最大的两个 skill，分别包含检查点审计模型（CP0-CP3）和 task() 路由决策树
 - `omo-subagent-type/AGENTS.md` 包含完整的 skill 写作规范，是新增 skill 的参考文档
 - `external-model-review` 提供模板、示例与 `evals/evals.json`，是查看外部审查配套材料的首选入口
+- `sisyphus-cleanup` 与 `memory-restructuring` 有明确边界：前者仅处理 `.sisyphus` 工作区临时产物，后者处理持久化记忆的结构性重组；清理时先 sisyphus-cleanup 再按需 memory-restructuring
