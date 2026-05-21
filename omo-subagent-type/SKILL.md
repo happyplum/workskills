@@ -5,7 +5,7 @@ description: "Use when calling task() to route work. Covers subagent_type select
 
 # omo-subagent-type
 
-Use this skill before ANY `task()` call. It ensures valid schema, correct routing, and prompts subagents can execute. For coding work already inside `subagent-driven-development`, use that skill as the source of truth for decomposition-first routing, premium-tier restraint, and escalation boundaries; this skill handles the actual `task()` schema and category/subagent selection surface.
+Use before ANY `task()` call to ensure valid schema, correct routing, and executable prompts. For coding work inside `subagent-driven-development`, that skill governs decomposition-first routing; this skill handles `task()` schema and category/subagent selection.
 
 ## 0. Quick Start
 
@@ -13,9 +13,7 @@ Use this skill before ANY `task()` call. It ensures valid schema, correct routin
 
 ### Escalation Ladder
 
-**Category cost order (default low→high):** direct tools → `quick` → `unspecified-low` → `unspecified-high` → `deep` → `ultrabrain`. Domain categories (`visual-engineering`, `artistry`, `writing`) override cost tiers — see Q4.
-
-Only escalate when lower-cost tiers are clearly insufficient.
+**Category cost order (default low→high):** direct tools → `quick` → `unspecified-low` → `unspecified-high` → `deep` → `ultrabrain`. Domain categories (`visual-engineering`, `artistry`, `writing`) override cost tiers — see Q4. Only escalate when lower-cost tiers are clearly insufficient.
 
 ### Decision Questions (answer in order)
 
@@ -62,29 +60,25 @@ task({
 })
 ```
 
-**Prompt fields:** `[CONTEXT]` (situation), `[GOAL]` (what to achieve), `[RETURN]` (expected output format) — required. Add `[SCOPE]`/`[SKIP]`/`[WHY_NOT_LOWER_COST]`/`[INPUT-ORIGINAL]` only when needed.
+**Prompt fields:** `[CONTEXT]`/`[GOAL]`/`[RETURN]` required. Add `[SCOPE]`/`[SKIP]`/`[WHY_NOT_LOWER_COST]`/`[INPUT-ORIGINAL]` only when needed.
 
 ---
 
 ## 1. Core Contract (MUST — 7 rules)
 
-**Violating any of these causes task() to fail or produce garbage output.**
-
 | # | Rule | Verification |
 |---|------|--------------|
-| 1 | **XOR:** Provide `subagent_type` OR `category`, never both | Schema check |
+| 1 | **XOR:** `subagent_type` OR `category`, never both | Schema check |
 | 2 | **Required:** `run_in_background`, `load_skills`, `description`, `prompt` | Schema check |
 | 3 | **Background:** `explore`/`librarian` = true; review/escalation agents/category = false | Agent type check |
-| 4 | **Skills:** Only use skills from your `available_skills` list; verify exact name; default `[]` unless task clearly matches a skill's trigger | Cross-check system list |
+| 4 | **Skills:** Only from `available_skills`; verify exact name; default `[]` unless task matches a skill's trigger | Cross-check list |
 | 5 | **Prompt:** Must include `[CONTEXT]`, `[GOAL]`, `[RETURN]` | Field presence |
-| 6 | **Language:** Prompt body in English; quote original non-English input via `[INPUT-ORIGINAL]` | LLM instruction |
-| 7 | **Async:** Wait for system reminder before `background_output()`; never poll running task | Call sequence |
+| 6 | **Language:** Prompt in English; quote non-English input via `[INPUT-ORIGINAL]` | LLM instruction |
+| 7 | **Async:** Wait for system reminder before `background_output()`; never poll | Call sequence |
 
 ---
 
 ## 2. Agent & Category Guide
-
-This table is a scoped routing guide for the common subagent choices this skill standardizes. It is not intended to be an exhaustive catalog of every system-available agent.
 
 ### Subagent Types
 
@@ -92,55 +86,50 @@ This table is a scoped routing guide for the common subagent choices this skill 
 |-------|------|--------|
 | `explore` | Internal codebase search, pattern discovery | File paths + pattern summaries |
 | `librarian` | External docs, OSS examples, API correctness | URLs + quoted excerpts |
-| `metis` | Ambiguous request, need plan before coding, critique/review, Final Verification Wave reviewer, completion-status gap finding | Clarified requirements + omission review |
-| `oracle` | Architecture tradeoffs, debugging, explicit escalation, post-`metis` deep review, plan-revision guidance | Decision + reasoning + revision brief |
+| `metis` | Ambiguous request, need plan before coding, completion-status gap finding | Clarified requirements + omission review |
+| `oracle` | Architecture tradeoffs, debugging, post-`metis` deep review, plan-revision guidance | Decision + reasoning + revision brief |
 | `momus` | Plan review (when explicitly requested) | Pass/fail + fixes |
 
 ### Cost Guardrails
 
-- Do **not** choose `deep` when the task is mostly deterministic with known patterns.
-- For bug-fix work, route one independently verifiable bug at a time; do not send a bag of unrelated bugs to `deep` merely because they were reported together.
-- Do **not** choose `ultrabrain` unless there is explicit hard-logic evidence.
-- If undecided between `quick` and `deep`, choose `unspecified-low` first.
-- For verification-only work (assertions, logs, simple checks), default to `quick`.
-- **MUST:** When selecting `deep` or `ultrabrain`, include `[WHY_NOT_LOWER_COST]` in prompt. *(Verification: field presence)*
+- Do **not** choose `deep` when task is mostly deterministic with known patterns.
+- Route one independently verifiable bug at a time; never batch unrelated bugs into `deep`.
+- Do **not** choose `ultrabrain` without explicit hard-logic evidence.
+- Undecided between `quick` and `deep`? Choose `unspecified-low` first.
+- Verification-only work (assertions, logs, checks) defaults to `quick`.
+- **MUST:** any premium/high-cost route (`deep`, `ultrabrain`, `visual-engineering`, `artistry`) requires `[WHY_NOT_LOWER_COST]` in prompt. *(Verification: field presence)*
 
 ### Plan-Execution Verification Exception
 
-For Task N-V verification tasks: match the parent task's domain category. Downgrade to `quick` if verification is only CLI/log/assertion work. Use `visual-engineering` for UI/playwright/screenshot validation. Include evidence destination and success gate in the delegation prompt. *(Verification: prompt contains evidence destination + success gate)*
+Match parent task's domain category. Downgrade to `quick` for CLI/log/assertion work; use `visual-engineering` for UI/screenshot validation. Include evidence destination and success gate in prompt.
 
 ---
 
 ## 3. Failure Protocol
 
-### When Delegation Fails
-
-1. **Read the error** — Schema validation? Fix args. Subagent failure? Retry with more context.
+1. **Read error** — Schema validation? Fix args. Subagent failure? Retry with more context.
 2. **Add context** — Expand prompt sections before retry.
-3. **Max 2 retries** — After 2 failures with same approach, switch strategy:
-   - `explore` failed → Try `librarian` for external docs
-   - `category` failed → Try review agent to clarify requirements first
+3. **Max 2 retries** — Then switch strategy: `explore` failed → `librarian`; `category` failed → review agent.
 4. **Escalate** — After 3 total failures, escalate or ask user.
-5. **Async discipline** — `run_in_background=true`: do NOT plan dependent follow-up until system reminder arrives.
+5. **Async discipline** — Do NOT plan dependent follow-up until system reminder arrives.
 
 ### Prohibited Behaviors
 
 | ❌ Prohibited | Why |
 |---------------|-----|
-| `task(subagent_type=..., category=..., ...)` | XOR violation, schema error |
-| `task(load_skills=["magic-skill"], ...)` | Invented skill, load error |
-| `run_in_background=true` then immediate `background_output()` | Polling running task, blocks forever |
-| Missing `[RETURN]` in prompt | Subagent produces unstructured garbage |
-| Silent retry without adding context | Repeats same failure |
-| Infinite agent chaining (A→B→C→D...) | Context dilution, no progress |
+| `task(subagent_type=..., category=..., ...)` | XOR violation |
+| `task(load_skills=["magic-skill"], ...)` | Invented skill |
+| `run_in_background=true` then immediate `background_output()` | Polling blocks forever |
+| Missing `[RETURN]` in prompt | Unstructured garbage |
+| Silent retry without added context | Repeats same failure |
+| Infinite agent chaining (A→B→C→D...) | Context dilution |
 | Skipping `background_output()` after async task | Wasted work, no result |
-| Mixing search + implement in one delegation | Subagent overwhelmed |
 
 ---
 
 ## 4. Appendix
 
-### Good Examples
+### Good Example
 
 **Explore (internal search):**
 ```typescript
@@ -150,28 +139,6 @@ task({
   load_skills: [],
   description: "Find auth middleware patterns",
   prompt: "[CONTEXT]: Adding JWT auth to REST API.\n[GOAL]: Find existing auth middleware and token flow.\n[SCOPE]: src/api/ and src/middleware/\n[SKIP]: test files\n[RETURN]: File paths + brief pattern description"
-})
-```
-
-**Librarian (external docs):**
-```typescript
-task({
-  subagent_type: "librarian",
-  run_in_background: true,
-  load_skills: [],
-  description: "Find Fastify JWT plugin best practices",
-  prompt: "[CONTEXT]: Building JWT auth with Fastify, need production patterns.\n[GOAL]: Find @fastify/jwt usage examples, token refresh patterns, and security recommendations.\n[SKIP]: Basic 'what is JWT' tutorials.\n[RETURN]: Code snippets + best practice summary"
-})
-```
-
-**Category (deep — with justification):**
-```typescript
-task({
-  category: "deep",
-  run_in_background: false,
-  load_skills: [],
-  description: "Untangle unknown legacy dispatch",
-  prompt: "[CONTEXT]: Dispatch path spans unknown modules with conflicting behavior.\n[GOAL]: Map flow and implement stable routing.\n[WHY_NOT_LOWER_COST]: Requires iterative discover-and-fix across uncertain interactions.\n[RETURN]: Flow map + final patch"
 })
 ```
 
@@ -190,5 +157,3 @@ task({
 // ✅ CORRECT: Direct tool
 read({ filePath: "/absolute/path/to/tsconfig.json" })
 ```
-
-**Remember:** Subagents don't share your conversation context. Every missing parameter forces them to guess. Explicit = reliable.
