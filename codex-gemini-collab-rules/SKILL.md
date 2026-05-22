@@ -1,24 +1,24 @@
 ---
 name: codex-gemini-collab-rules
-description: Use when planning external model handoff via collaborating-with-codex or collaborating-with-gemini.
+description: 当计划通过 collaborating-with-codex 或 collaborating-with-gemini 将任务交接给外部模型时使用。
 ---
 
-# Codex/Gemini Collaboration Rules
+# Codex/Gemini 协作规则
 
-## Load Conditions
+## 加载条件
 
-Load when planning to invoke `collaborating-with-codex` or `collaborating-with-gemini` for external model collaboration.
+当计划调用 `collaborating-with-codex` 或 `collaborating-with-gemini` 进行外部模型协作时加载。
 
-## Mandatory Rules
+## 强制规则
 
-1. If a `SESSION_ID` is returned, record it and explicitly decide whether to continue multi-turn conversation.
-2. Never write to local filesystem via external model channels.
-3. Require external models to return **unified diff patch** only for code changes; findings/recommendations only for analysis tasks.
-4. Treat external model output as prototype; refactor to project style before applying.
-5. Never directly apply sub-agent/external model output without local verification.
-6. Do not claim fix or review readiness without concrete local verification evidence.
-7. Strip or block any potential secrets from prompts/patches before handoff.
+1. 若返回了 `SESSION_ID`，记录并在后续显式决定是否继续多轮对话。
+2. 禁止通过外部模型通道写入本地文件系统。
+3. 要求外部模型对代码变更只返回**统一差异补丁（unified diff patch）**；分析任务只返回发现/建议。
+4. 外部模型产出仅作原型；应用前必须按项目风格重构。
+5. 禁止未经本地验证就直接应用子代理/外部模型的产出。
+6. 未经具体本地验证证据，不得声称修复完成或审查就绪。
+7. 交接前必须从提示词/补丁中剥离或拦截任何潜在的敏感信息。
 
-## Failure Handling
+## 失败处理
 
-If required collaboration skill/tool is unavailable, skip this skill and continue with local tools only.
+若所需的协作 skill/工具不可用，跳过本 skill，仅使用本地工具继续。

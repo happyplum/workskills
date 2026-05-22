@@ -1,38 +1,38 @@
-# External Model Review - Hybrid Output Templates
+# 外部模型审查 - 混合输出模板
 
-## Overview
+## 概述
 
-This skill uses **hybrid output**: chat summary (control plane) + file packet (data plane).
+本 skill 使用**混合输出**：聊天摘要（控制面）+ 文件包（数据面）。
 
-**Control Plane (Chat)**: Concise operator card with file path, instructions, and wrapper prompt.
-**Data Plane (File)**: Complete review packet with refined content, written to `external-review-request.md`.
+**控制面（聊天）**：简洁的操作卡片，含文件路径、说明和包装提示词。
+**数据面（文件）**：完整的审查包，含精炼内容，写入 `external-review-request.md`。
 
 ---
 
-# Template 1: Chat Summary (Control Plane)
+# 模板 1：聊天摘要（控制面）
 
-Output this to chat when user triggers external review:
+当用户触发外部审查时输出到聊天：
 
 ```markdown
-## 📤 External Review Ready
+## 📤 外部审查就绪
 
-**Review Goal:**
-[One sentence describing what needs review and why]
+**审查目标：**
+[一句话描述需要审查的内容和原因]
 
-**Focus Areas:**
-- [Focus area 1]
-- [Focus area 2]
-- [Focus area 3]
+**关注领域：**
+- [关注领域 1]
+- [关注领域 2]
+- [关注领域 3]
 
-**Review Packet:**
+**审查包：**
 `[ABSOLUTE_PATH_TO_FILE]`
 
-**Instructions:**
-1. Open the file above (or copy its full contents)
-2. Paste into Gemini, Codex, or Claude
-3. Paste the JSON response back here
+**操作说明：**
+1. 打开上述文件（或复制其全部内容）
+2. 粘贴到 Gemini、Codex 或 Claude
+3. 将 JSON 响应粘贴回此处
 
-**Optional Wrapper Prompt:**
+**可选包装提示词：**
 > Review the following markdown packet. Follow the "Required Output" section exactly. Analysis only. No implementation. No code patches.
 
 ---
@@ -40,9 +40,9 @@ Output this to chat when user triggers external review:
 
 ---
 
-# Template 2: Review Request File (Data Plane)
+# 模板 2：审查请求文件（数据面）
 
-Write this to `external-review-request.md` in the project root:
+写入项目根目录的 `external-review-request.md`：
 
 ```markdown
 # External Review Request
@@ -202,64 +202,64 @@ Return **exactly one** fenced `json` block and nothing else.
 
 ---
 
-# Content Refinement Heuristics
+# 内容精炼启发式
 
-When constructing the review packet, apply these rules:
+构建审查包时，应用以下规则：
 
-## File Size Limits
+## 文件大小限制
 
-| Content Type | Max Lines | Action if Exceeded |
-|--------------|-----------|-------------------|
-| Plan Summary | 30 lines | Bullet summary only |
-| Research Summary | 20 lines | Key findings only |
-| Each Code Excerpt | 50 lines | Trim to relevant functions |
-| Each Evidence Block | 30 lines | Summarize, show key snippet |
+| 内容类型 | 最大行数 | 超出时动作 |
+|----------|----------|------------|
+| 计划摘要 | 30 行 | 仅列表摘要 |
+| 研究摘要 | 20 行 | 仅关键发现 |
+| 每段代码摘录 | 50 行 | 裁剪至相关函数 |
+| 每个证据块 | 30 行 | 摘要，展示关键片段 |
 
-## What to Include
+## 应包含的内容
 
-**ALWAYS Include:**
-- Architectural decisions and rationale
-- Security-sensitive code sections
-- Performance-critical paths
-- Error handling logic
-- Integration points
+**始终包含：**
+- 架构决策及其理由
+- 安全敏感的代码段
+- 性能关键路径
+- 错误处理逻辑
+- 集成点
 
-**NEVER Include:**
-- Boilerplate code
-- Auto-generated files
-- Test fixtures
-- Full configuration files (show relevant sections only)
-- Import statements (unless relevant to the issue)
+**绝不包含：**
+- 样板代码
+- 自动生成的文件
+- 测试固件
+- 完整配置文件（仅展示相关部分）
+- 导入语句（除非与问题相关）
 
-## Path Convention
+## 路径约定
 
-| Context | Path Format | Example |
-|---------|-------------|---------|
-| File content (review packet) | Repo-relative | `src/auth/service.ts` |
-| Chat summary | Absolute (Windows) | `C:\project\src\auth\service.ts` |
+| 上下文 | 路径格式 | 示例 |
+|--------|----------|------|
+| 文件内容（审查包） | 仓库相对路径 | `src/auth/service.ts` |
+| 聊天摘要 | 绝对路径（Windows） | `C:\project\src\auth\service.ts` |
 
 ---
 
-# Usage Summary
+# 使用摘要
 
-## For Local Agent
+## 本地代理
 
-1. **Locate** all relevant files
-2. **Refine** content using heuristics above
-3. **Write** `external-review-request.md` with Template 2
-4. **Output** chat summary with Template 1
-5. **Wait** for user to paste JSON response
+1. **定位**所有相关文件
+2. **精炼**内容（使用上述启发式规则）
+3. **写入** `external-review-request.md`（使用模板 2）
+4. **输出**聊天摘要（使用模板 1）
+5. **等待**用户粘贴 JSON 响应
 
-## For User
+## 用户
 
-1. Open the file or copy its contents
-2. Paste into external model (Gemini, Codex, Claude)
-3. Copy the JSON response
-4. Paste back to this agent
+1. 打开文件或复制其内容
+2. 粘贴到外部模型（Gemini、Codex、Claude）
+3. 复制 JSON 响应
+4. 粘贴回本代理
 
-## For External Model
+## 外部模型
 
-1. Review all materials
-2. DO NOT generate code or modify files
-3. Return exactly one JSON block
-4. Include confidence score and assumptions
+1. 审查所有材料
+2. 不生成代码或修改文件
+3. 仅返回一个 JSON 块
+4. 包含信心分数和假设

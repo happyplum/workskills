@@ -1,42 +1,43 @@
-# External Model Review Examples
+# 外部模型审查示例
 
-Real-world examples using the **hybrid output** approach (chat summary + file packet).
+使用**混合输出**方法（聊天摘要 + 文件包）的真实示例。
 
 ---
 
-## Example 1: Architecture Review
+## 示例 1：架构审查
 
-### Context
-Planning a migration from monolithic to microservices architecture. Uncertain about service boundaries and data consistency strategy.
+### 背景
 
-### Chat Summary Output
+计划从单体架构迁移到微服务架构。对服务边界和数据一致性策略存在不确定性。
+
+### 聊天摘要输出
 
 ```markdown
-## 📤 External Review Ready
+## 📤 外部审查就绪
 
-**Review Goal:**
-Validate the monolith-to-microservices migration plan for service boundary correctness and data consistency risks.
+**审查目标：**
+验证单体到微服务的迁移计划，关注服务边界正确性和数据一致性风险。
 
-**Focus Areas:**
-- Service decomposition strategy
-- Distributed transaction handling
-- Data ownership boundaries
+**关注领域：**
+- 服务分解策略
+- 分布式事务处理
+- 数据所有权边界
 
-**Review Packet:**
+**审查包：**
 `C:\Projects\ecommerce-refactor\external-review-request.md`
 
-**Instructions:**
-1. Open the file above (or copy its full contents)
-2. Paste into Gemini, Codex, or Claude
-3. Paste the JSON response back here
+**操作说明：**
+1. 打开上述文件（或复制其全部内容）
+2. 粘贴到 Gemini、Codex 或 Claude
+3. 将 JSON 响应粘贴回此处
 
-**Optional Wrapper Prompt:**
+**可选包装提示词：**
 > Review the following markdown packet. Follow the "Required Output" section exactly. Analysis only. No implementation. No code patches.
 
 ---
 ```
 
-### File Content (external-review-request.md)
+### 文件内容（external-review-request.md）
 
 ```markdown
 # External Review Request
@@ -92,7 +93,7 @@ Review the migration plan from monolith to microservices, focusing on service bo
 [JSON schema as defined in template.md]
 ```
 
-### External Model JSON Response
+### 外部模型 JSON 响应
 
 ```json
 {
@@ -138,46 +139,47 @@ Review the migration plan from monolith to microservices, focusing on service bo
 }
 ```
 
-### Integration Steps
+### 集成步骤
 
-1. **Apply Skepticism Protocol**: Verify issues exist in actual plan
-2. **Propose `[External]` Tasks**:
-   - `[External-CRITICAL]` Implement saga pattern for Order-Inventory flow
-   - `[External-CRITICAL]` Refactor product catalog ownership to Inventory service
-3. **User Approval**: "External review found 2 critical architecture gaps. Update plan?"
+1. **应用怀疑协议**：验证问题在实际计划中确实存在
+2. **提议 `[External]` 任务**：
+   - `[External-CRITICAL]` 为 Order-Inventory 流程实现 saga 模式
+   - `[External-CRITICAL]` 将产品目录所有权重构至 Inventory 服务
+3. **用户审批**：「外部审查发现 2 个关键架构缺口。是否更新计划？」
 
 ---
 
-## Example 2: Security Audit
+## 示例 2：安全审计
 
-### Context
-Redesigning authentication system with JWT tokens and refresh token rotation.
+### 背景
 
-### Chat Summary Output
+使用 JWT 令牌和刷新令牌轮换重新设计认证系统。
+
+### 聊天摘要输出
 
 ```markdown
-## 📤 External Review Ready
+## 📤 外部审查就绪
 
-**Review Goal:**
-Security audit of the JWT-based authentication redesign for token handling vulnerabilities.
+**审查目标：**
+对基于 JWT 的认证重新设计进行安全审计，关注令牌处理漏洞。
 
-**Focus Areas:**
-- Token storage and transmission
-- Session management
-- Attack vectors (XSS, CSRF, replay)
+**关注领域：**
+- 令牌存储和传输
+- 会话管理
+- 攻击向量（XSS、CSRF、重放）
 
-**Review Packet:**
+**审查包：**
 `C:\Projects\auth-service\external-review-request.md`
 
-**Instructions:**
-1. Open the file above (or copy its full contents)
-2. Paste into Gemini, Codex, or Claude
-3. Paste the JSON response back here
+**操作说明：**
+1. 打开上述文件（或复制其全部内容）
+2. 粘贴到 Gemini、Codex 或 Claude
+3. 将 JSON 响应粘贴回此处
 
 ---
 ```
 
-### External Model JSON Response
+### 外部模型 JSON 响应
 
 ```json
 {
@@ -228,31 +230,32 @@ Security audit of the JWT-based authentication redesign for token handling vulne
 }
 ```
 
-### Skepticism Protocol Applied
+### 怀疑协议应用
 
-| Issue | Verified? | Notes |
-|-------|-----------|-------|
-| I1: localStorage | ✅ Yes | Confirmed in token-service.ts line 45 |
-| I2: Token binding | ✅ Yes | No fingerprint in JWT payload |
-| I3: Secret rotation | ⚠️ Partial | Plan mentions rotation but lacks details |
+| 问题 | 已验证？ | 备注 |
+|------|----------|------|
+| I1：localStorage | ✅ 是 | 在 token-service.ts 第 45 行确认 |
+| I2：令牌绑定 | ✅ 是 | JWT 载荷中无指纹 |
+| I3：密钥轮换 | ⚠️ 部分 | 计划提及轮换但缺乏细节 |
 
-### Integration Steps
+### 集成步骤
 
-1. **Validate**: Confirmed issues exist in code/plan
-2. **Propose `[External]` Tasks**:
-   - `[External-CRITICAL]` Migrate refresh token storage to httpOnly cookies
-   - `[External-CRITICAL]` Add device fingerprint to JWT claims
-   - `[External-MAJOR]` Design JWT secret rotation mechanism
-3. **User Approval**: "Security audit found 3 issues (2 critical). Proceed with fixes?"
+1. **验证**：确认问题存在于代码/计划中
+2. **提议 `[External]` 任务**：
+   - `[External-CRITICAL]` 将刷新令牌存储迁移至 httpOnly cookies
+   - `[External-CRITICAL]` 在 JWT claims 中添加设备指纹
+   - `[External-MAJOR]` 设计 JWT 密钥轮换机制
+3. **用户审批**：「安全审计发现 3 个问题（2 个关键）。是否进行修复？」
 
 ---
 
-## Example 3: Skepticism Protocol in Action
+## 示例 3：怀疑协议实战
 
-### Context
-External reviewer with **low confidence** suggested major architectural changes.
+### 背景
 
-### External Model JSON Response
+外部审查者**低信心**建议进行重大架构变更。
+
+### 外部模型 JSON 响应
 
 ```json
 {
@@ -285,47 +288,47 @@ External reviewer with **low confidence** suggested major architectural changes.
 }
 ```
 
-### Skepticism Protocol Triggered
+### 怀疑协议触发
 
-**🚨 Red Flags Detected:**
-- Reviewer confidence is **low**
-- Recommendation is **disproportionate** (rewrite entire module)
-- Assumptions may be **incorrect** (team does have tests, no OAuth2 expertise)
+**🚨 检测到红旗：**
+- 审查者信心**低**
+- 建议**不成比例**（因「不够优化」而重写整个模块）
+- 假设可能**不正确**（项目有测试，团队无 OAuth2 专业知识）
 
-**Agent Response:**
+**代理响应：**
 ```
-⚠️ Skepticism Protocol Alert
+⚠️ 怀疑协议警报
 
-The external review has red flags:
-1. Low confidence (55%)
-2. Disproportionate recommendation (rewrite entire module for "not optimal")
-3. Incorrect assumptions (project has tests, team lacks OAuth2 expertise)
+外部审查存在红旗：
+1. 低信心（55%）
+2. 不成比例的建议（因「不够优化」而重写整个模块）
+3. 不正确的假设（项目有测试，团队缺乏 OAuth2 专业知识）
 
-Before applying, please confirm:
-- Have you verified the current auth implementation is fundamentally flawed?
-- Is a full rewrite proportional to the issues found?
-- Does the team have OAuth2 expertise for this approach?
+应用前请确认：
+- 您是否已验证当前认证实现存在根本性缺陷？
+- 完全重写是否与发现的问题成比例？
+- 团队是否具备 OAuth2 专业知识来采用此方案？
 
-I recommend requesting a second opinion or asking the reviewer to clarify with correct assumptions.
+建议请求第二意见或要求审查者基于正确假设重新澄清。
 ```
 
 ---
 
-## Common Patterns
+## 常见模式
 
-### Request Construction
-- Chat summary: Goal + Focus areas + File path + Instructions
-- File packet: Refined content, repo-relative paths, JSON output schema
+### 请求构建
+- 聊天摘要：目标 + 关注领域 + 文件路径 + 说明
+- 文件包：精炼内容、仓库相对路径、JSON 输出模式
 
-### Response Processing
-- Parse JSON response
-- Apply Skepticism Protocol
-- Convert issues to `[External]` prefixed tasks
-- Wait for user confirmation
+### 响应处理
+- 解析 JSON 响应
+- 应用怀疑协议
+- 将问题转换为 `[External]` 前缀任务
+- 等待用户确认
 
-### Skepticism Triggers
-- Low confidence score
-- Disproportionate recommendations
-- Incorrect assumptions
-- Non-existent file paths
-- Contradictions with codebase patterns
+### 怀疑触发条件
+- 低信心分数
+- 不成比例的建议
+- 不正确的假设
+- 不存在的文件路径
+- 与代码库模式矛盾

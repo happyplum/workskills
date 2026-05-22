@@ -1,31 +1,31 @@
 ---
 name: serena-gated-rules
-description: Use when project work needs Serena symbol-level editing or Serena memory hygiene after durable project-content or plan changes.
+description: 当项目编辑需要使用 Serena 符号级编辑能力，或持久化项目内容/计划变更后需要 Serena 记忆同步时使用。
 ---
 
-# Serena Gated Rules
+# Serena 门控规则
 
-## Load Conditions
+## 加载条件
 
-Load this skill when precise project editing should use Serena, or when durable project changes require Serena memory sync.
+当精确的项目编辑应使用 Serena，或持久化项目变更需要 Serena 记忆同步时加载。
 
-## Core Purpose
+## 核心目的
 
-Use Serena for symbol-level edits and durable knowledge hygiene, not for generic search or transient task logs.
+使用 Serena 进行符号级编辑和持久化知识维护，而非通用搜索或临时任务日志。
 
-## Mandatory Rules
+## 强制规则
 
-1. Initialize Serena context before deep project edits.
-2. Prefer Serena symbol/navigation/edit tools over broad text edits when Serena can perform the change precisely.
-3. After durable project-content or plan changes, run memory hygiene.
-4. Persist only durable, reusable project knowledge; never store transient task chatter.
-5. If a written plan or todo list exists, each item must declare memory impact: `update`, `delete`, `rename`, `write`, or `none`.
+1. 深度项目编辑前先初始化 Serena 上下文。
+2. 当 Serena 能精确执行变更时，优先使用 Serena 符号/导航/编辑工具而非大范围文本替换。
+3. 持久化项目内容或计划变更后，执行记忆维护。
+4. 只持久化可复用的项目知识；禁止存储临时任务对话。
+5. 若存在书面计划或 TODO 列表，每个条目必须声明记忆影响：`update`、`delete`、`rename`、`write` 或 `none`。
 
-## Memory Hygiene Order
+## 记忆维护顺序
 
-- Maintenance order: `list_memories` → `read_memory` → `edit_memory` → `rename_memory` → `write_memory` → `delete_memory`.
-- A planned item is not complete until its memory impact is executed or marked `none`.
+- 维护顺序：`list_memories` → `read_memory` → `edit_memory` → `rename_memory` → `write_memory` → `delete_memory`。
+- 计划条目在其记忆影响执行或标记为 `none` 前不算完成。
 
-## Failure Handling
+## 失败处理
 
-- If Serena tools are unavailable, skip this skill and use non-Serena fallback workflows/tools.
+- 若 Serena 工具不可用，跳过本 skill，使用非 Serena 的回退工作流/工具。

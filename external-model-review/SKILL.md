@@ -1,81 +1,81 @@
 ---
 name: external-model-review
-description: Use when user explicitly requests external review with trigger phrases like "外部审查", "进行外部审查", "计划外部审查", or "外部审查 [plan name]"
+description: 当用户使用触发词明确请求外部审查时使用，如「外部审查」、「进行外部审查」、「计划外部审查」或「外部审查 [计划名称]」。
 ---
 
-# External Model Review
+# 外部模型审查
 
-## Overview
+## 概述
 
-Bridge between local agent and external AI auditors (Codex, Gemini, Claude) for **plan validation**, **architecture review**, **security audit**, **code audit**. Enforces **human-in-the-loop approval** - external reviewers analyze only, never execute.
+本地代理与外部 AI 审查者（Codex、Gemini、Claude）之间的桥接，用于**计划验证**、**架构审查**、**安全审计**、**代码审计**。强制执行**人工在环审批**——外部审查者仅分析，永不执行。
 
-## File Manifest
+## 文件清单
 
-| File | Purpose | Load When |
-|------|---------|-----------|
-| @template.md | Hybrid output templates (chat summary + file packet) | Before constructing request |
-| @examples.md | Real request/response examples | Before first use |
+| 文件 | 用途 | 何时加载 |
+|------|------|----------|
+| @template.md | 混合输出模板（聊天摘要 + 文件包） | 构建请求前 |
+| @examples.md | 真实请求/响应示例 | 首次使用前 |
 
-## Core Pattern
+## 核心模式
 
-### Phase 1: Generate Review Request (Hybrid Output)
+### 阶段一：生成审查请求（混合输出）
 
-When user requests external review: Locate materials → Refine content (summarize large files, preserve critical excerpts) → Write `external-review-request.md` with full review packet → Output chat summary (operator card with file path). Output: chat summary (control plane) + file packet (data plane).
+当用户请求外部审查时：定位材料 → 精炼内容（摘要大文件，保留关键摘录）→ 编写含完整审查包的 `external-review-request.md` → 输出聊天摘要（操作卡片含文件路径）。输出：聊天摘要（控制面）+ 文件包（数据面）。
 
-### Phase 2: Process External Review Results
+### 阶段二：处理外部审查结果
 
-When user pastes external model's JSON response: Parse JSON → extract structured findings → Apply Skepticism Protocol → Propose updates → Wait for user confirmation.
+当用户粘贴外部模型的 JSON 响应时：解析 JSON → 提取结构化发现 → 应用怀疑协议 → 提议更新 → 等待用户确认。
 
-## Quick Reference
+## 快速参考
 
-| Phase | User Action | Agent Response |
-|-------|-------------|----------------|
-| Request | Says trigger phrase | Writes file + outputs chat summary |
-| Review | Pastes JSON response | Parses, validates, proposes `[External]` tasks |
-| Integration | Confirms changes | Applies updates to plan |
+| 阶段 | 用户动作 | 代理响应 |
+|------|----------|----------|
+| 请求 | 说触发词 | 写文件 + 输出聊天摘要 |
+| 审查 | 粘贴 JSON 响应 | 解析、验证、提议 `[External]` 任务 |
+| 集成 | 确认变更 | 将更新应用到计划 |
 
-## User Trigger Recognition
+## 用户触发识别
 
-**Trigger phrases** (Chinese): "外部审查", "进行外部审查", "计划外部审查", "外部审查 [plan name]"
+**触发词**（中文）：「外部审查」、「进行外部审查」、「计划外部审查」、「外部审查 [计划名称]」
 
-When triggered: Read @template.md for hybrid output format → Locate materials with repo-relative (file) and absolute (chat) paths → Refine content (summarize large files, preserve critical excerpts) → Write `external-review-request.md` to project root → Output chat summary with file path and instructions.
+触发时：读取 @template.md 获取混合输出格式 → 使用仓库相对路径（文件）和绝对路径（聊天）定位材料 → 精炼内容（摘要大文件，保留关键摘录）→ 将 `external-review-request.md` 写入项目根目录 → 输出含文件路径和说明的聊天摘要。
 
-When user pastes JSON response: Parse fenced `json` block → Apply Skepticism Protocol → Convert issues to `[External]` prefixed tasks → **Present proposed changes and wait for user confirmation**.
+当用户粘贴 JSON 响应时：解析围栏 `json` 块 → 应用怀疑协议 → 将问题转换为 `[External]` 前缀任务 → **展示提议变更并等待用户确认**。
 
-## Skepticism Protocol
+## 怀疑协议
 
-**PRINCIPLE**: External reviewers can be wrong. Always validate before applying.
+**原则**：外部审查者可能出错。应用前始终验证。
 
-### Validation Checklist
+### 验证清单
 
-Before applying any `[External]` task:
+在应用任何 `[External]` 任务前：
 
-| Check | Action |
-|-------|--------|
-| **Verify Finding** | Does issue actually exist in code/plan? |
-| **Check Context** | Did reviewer miss existing patterns or solutions? |
-| **Assess Impact** | Is suggested fix proportional to issue? |
-| **Flag Disagreements** | If advice contradicts codebase conventions, escalate to user |
+| 检查项 | 动作 |
+|--------|------|
+| **验证发现** | 问题是否确实存在于代码/计划中？ |
+| **检查上下文** | 审查者是否遗漏了已有模式或解决方案？ |
+| **评估影响** | 建议的修复是否与问题成比例？ |
+| **标记分歧** | 若建议与代码库惯例矛盾，提级至用户 |
 
-### Red Flags (require user confirmation)
+### 红旗（需要用户确认）
 
-- Reviewer suggests architectural changes without understanding existing patterns
-- Reviewer recommends deleting code without explaining side effects
-- Reviewer's file path references don't exist
-- Reviewer's confidence is "low"
-- Reviewer made assumptions that may be incorrect
+- 审查者在不了解已有模式的情况下建议架构变更
+- 审查者建议删除代码但未解释副作用
+- 审查者引用的文件路径不存在
+- 审查者信心为「低」
+- 审查者做出的假设可能不正确
 
-### Apply Skepticism In
+### 应用怀疑的场景
 
-Phase 2 processing of external response and any `[External]` task before adding to plan.
+阶段二处理外部响应时以及在将任何 `[External]` 任务添加到计划前。
 
-## Common Mistakes
+## 常见错误
 
-| Mistake | Why It Fails | Correct Approach |
-|---------|--------------|------------------|
-| **Reviewer acts as implementer** | External model generates code instead of reviewing | Reinforce: "Analysis ONLY, No Implementation" |
-| Auto-applying changes | Violates human-in-the-loop principle | Always present proposed changes for confirmation |
-| Missing reviewer warning | External model may generate code | Always include rules in review packet |
-| Full content dump | Context overflow, poor review quality | Summarize large files, preserve critical excerpts only |
-| Tasks without `[External]` prefix | Loses audit trail | Prefix all external-sourced tasks |
-| Blind trust in external review | Reviewer can be wrong | Apply Skepticism Protocol |
+| 错误 | 失败原因 | 正确做法 |
+|------|----------|----------|
+| **审查者充当实现者** | 外部模型生成代码而非审查 | 强调：「仅分析，不实现」 |
+| 自动应用变更 | 违反人工在环原则 | 始终展示提议变更等待确认 |
+| 缺少审查者警告 | 外部模型可能生成代码 | 始终在审查包中包含规则 |
+| 完整内容转储 | 上下文溢出，审查质量差 | 摘要大文件，仅保留关键摘录 |
+| 任务缺少 `[External]` 前缀 | 丢失审计轨迹 | 所有外部来源任务加前缀 |
+| 盲目信任外部审查 | 审查者可能出错 | 应用怀疑协议 |

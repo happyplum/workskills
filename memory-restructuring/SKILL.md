@@ -1,98 +1,98 @@
 ---
 name: memory-restructuring
-description: Use when a project's persistent memory store needs structural reorganization across multiple memories—because it is bloated, overlapping, low-precision, or hard to retrieve—while preserving valuable experience. Do not use for routine single-memory edits or one-off deletions.
+description: 当项目的持久化记忆存储因臃肿、重叠、精度低或难以检索而需要跨多条记忆进行结构性重组时使用，同时保留有价值的经验。不用于单条记忆的常规编辑或一次性删除。
 ---
 
-# Memory Restructuring
+# 记忆重组
 
-## Overview
+## 概述
 
-Reorganize persistent memories for higher retrieval precision **without purging valuable experience**. Core rule: **split, refine, rename, reclassify first; delete only after verification**.
+重组持久化记忆以提高检索精度，**不清除有价值经验**。核心规则：**先拆分、精炼、重命名、重分类；仅在验证后删除**。
 
-## Load Conditions
+## 加载条件
 
-Load when any is true:
+以下任一条件为真时加载：
 
-- Memory store feels concentrated, bloated, or hard to search
-- Many memories overlap, mix concerns, or use vague names
-- Historical memories contain lessons worth preserving but hurt retrieval
-- User asks to clean, reorganize, optimize, refactor, trim, split, merge, or audit project memories
+- 记忆存储感觉臃肿、难以搜索
+- 大量记忆重叠、混合关注点或使用模糊名称
+- 历史记忆包含值得保留的经验但影响检索
+- 用户要求清理、重组、优化、重构、修剪、拆分、合并或审计项目记忆
 
-## Mandatory Rules
+## 强制规则
 
-1. Start from full inventory, not intuition. Read current memory list before proposing changes.
-2. Preserve valuable experience by default. Do NOT treat overlap or age as deletion proof.
-3. Prefer safety ladder: **split → trim → rename → keep → merge → rewrite → delete** when bloated, mixed, or oversized.
-4. Giant/monolithic memories are hit-rate problems. When mixing responsibilities, query patterns, or unrelated sections, split first.
-5. Each memory should have one dominant responsibility: `contract`, `guardrails`, `reference`, `topology`, or similarly sharp scope.
-6. Historical lessons should compress into current guardrails/reference memories, not drop as "old".
-7. If pre-restructure history explains new structure, preserve in organized anti-regression form to prevent drift.
-8. General knowledge may cache if avoiding repeated external search; trim and classify rather than delete reflexively.
-9. Delete only when memory is **verified** obsolete, useless, retired, fully superseded **and** has no residual experience value.
-10. For split/merge/rewrite, create/update destination first, verify unique lessons preserved before deleting/overwriting source.
-11. Do not leave dual sources of truth. If skill/file is authoritative, memory should hold summary, guardrails, or cross-file relationships—not stale mirror.
-12. Names are retrieval infrastructure. Use concrete words like `contract`, `edit-rules`, `reference`, `topology`, `guardrails`; avoid vague names.
-13. After restructuring, persist reusable lessons from restructuring itself only when durable, cross-task, and likely to improve future decisions.
+1. 从完整盘点开始，而非直觉。提议变更前先读取当前记忆列表。
+2. 默认保留有价值经验。禁止将重叠或陈旧作为删除证明。
+3. 膨胀、混合或过大时优先使用安全阶梯：**拆分 → 修剪 → 重命名 → 保留 → 合并 → 重写 → 删除**。
+4. 巨型/单体记忆是命中率问题。当混合职责、查询模式或不相关章节时，先拆分。
+5. 每条记忆应有一个主要职责：`contract`（契约）、`guardrails`（防护栏）、`reference`（参考）、`topology`（拓扑）或类似精确范围。
+6. 历史经验应压缩为当前的防护栏/参考记忆，而非作为「旧的」丢弃。
+7. 若重组前历史能解释新结构，以有组织的防回归形式保留，防止漂移。
+8. 通用知识可在避免重复外部搜索时缓存；修剪和分类而非动辄删除。
+9. 仅在记忆**已验证**过时、无用、已废弃、完全被取代**且**无残余经验价值时才删除。
+10. 对于拆分/合并/重写，先创建/更新目标，验证独特经验已保留后再删除/覆盖来源。
+11. 禁止留下双重事实来源。若 skill/文件是权威来源，记忆应持有摘要、防护栏或跨文件关系——而非过时镜像。
+12. 名称是检索基础设施。使用具体词汇如 `contract`、`edit-rules`、`reference`、`topology`、`guardrails`；避免模糊名称。
+13. 重组后，仅在重组所得洞察本身是持久的、跨任务的、可能改善未来决策时才持久化为可复用记录。
 
-## Split Triggers
+## 拆分触发条件
 
-MUST split when ANY is true:
+以下**任一**为真时必须拆分：
 
-- Mixes multiple responsibilities (contract + guardrails + history)
-- Serves unrelated query patterns better answered by separate memories
-- Has long sections that can stand alone as focused memories
-- Bloated enough that trimming still leaves broad, low-precision memory
-- Future query would need only one subsection rather than whole memory
+- 混合多种职责（契约 + 防护栏 + 历史）
+- 服务于不相关的查询模式，拆分后更好回答
+- 有长章节可独立成为聚焦记忆
+- 膨胀到即使修剪仍留下宽泛、低精度记忆
+- 未来查询只需一个子章节而非整条记忆
 
-## Execution Order
+## 执行顺序
 
-1. Inventory current memory set before proposing changes
-2. Classify each memory by size, focus, redundancy, hit-rate potential
-3. If giant, monolithic, or mixed-purpose, split before considering keep/merge/delete
-4. Choose least destructive operation that resolves problem
-5. For split/merge/rewrite, stage new structure first
-6. Verify valuable lessons, guardrails, authority boundaries, relevant pre-restructure path preserved
-7. Delete only after replacement structure confirmed sufficient
+1. 提议变更前先盘点当前记忆集
+2. 按大小、聚焦度、冗余度、命中率潜力分类每条记忆
+3. 若为巨型、单体或混合用途，在考虑保留/合并/删除前先拆分
+4. 选择破坏性最小的操作解决问题
+5. 对于拆分/合并/重写，先搭建新结构
+6. 验证有价值的经验、防护栏、权威边界、相关的重组前路径已保留
+7. 仅在替代结构确认充分后才删除
 
-## Classification Pass
+## 分类检查
 
-For each memory, evaluate four axes:
+对每条记忆，沿四个轴评估：
 
-- **Size** — compact or bloated enough to hurt precision?
-- **Focus** — answers one question or mixes multiple concerns?
-- **Redundancy** — duplicates file/skill/memory or adds unique value?
-- **Hit-Rate Potential** — would future query naturally match this name/content?
+- **大小** — 紧凑还是臃肿到影响精度？
+- **聚焦度** — 回答一个问题还是混合多种关注点？
+- **冗余度** — 重复文件/skill/记忆还是增加独特价值？
+- **命中率潜力** — 未来查询是否能自然匹配此名称/内容？
 
-Classify by responsibility:
+按职责分类：
 
-- **Contract** — hard rules, schemas, required fields, must/never constraints
-- **Guardrails** — anti-regression lessons, design rationale preventing bad edits
-- **Reference** — reusable general knowledge worth caching locally
-- **Topology** — cross-file/runtime wiring and system relationships
-- **Transient/Junk** — task logs, obsolete notes, valueless leftovers
+- **Contract（契约）** — 硬规则、模式、必填字段、必须/禁止约束
+- **Guardrails（防护栏）** — 防回归经验、设计理由防止错误编辑
+- **Reference（参考）** — 值得本地缓存的通用可复用知识
+- **Topology（拓扑）** — 跨文件/运行时连接和系统关系
+- **Transient/Junk（临时/垃圾）** — 任务日志、过时笔记、无价值残留
 
-## Operation Selection
+## 操作选择
 
-Choose least destructive operation:
+选择破坏性最小的操作：
 
-| Operation | Use When |
+| 操作 | 使用场景 |
 |---|---|
-| Split | One memory mixes multiple responsibilities, query patterns, or oversized sections |
-| Trim | Memory is focused but padded with low-value detail |
-| Rename | Content is good but name hurts retrieval |
-| Keep | Memory is focused, named well, and still useful |
-| Merge | Two memories serve same responsibility and same future query |
-| Rewrite | Content is valuable but current form is historical, noisy, poorly shaped |
-| Delete | Memory is verified obsolete/useless/retired and no longer worth preserving |
+| 拆分 | 一条记忆混合多种职责、查询模式或超大章节 |
+| 修剪 | 记忆聚焦但填充了低价值细节 |
+| 重命名 | 内容好但名称影响检索 |
+| 保留 | 记忆聚焦、命名良好且仍有用 |
+| 合并 | 两条记忆服务同一职责和同一未来查询 |
+| 重写 | 内容有价值但当前形式为历史性的、嘈杂的、结构不佳 |
+| 删除 | 记忆已验证过时/无用/已废弃且不再值得保留 |
 
-## Deletion Checklist
+## 删除检查清单
 
-Delete only if **all** are true:
+仅在以下**全部**为真时才删除：
 
-- Content is provably obsolete, useless, retired, or replaced
-- Any valuable lesson inside already preserved elsewhere
-- No active workflow, file contract, or guardrail still depends on it
-- Removal improves store more than keeping trimmed version would
-- Decision verified against current project context, not just similarity
+- 内容已可证明过时、无用、已废弃或已替代
+- 内部任何有价值经验已保存到其他位置
+- 无活跃工作流、文件契约或防护栏仍依赖它
+- 移除比保留修剪版本更能改善存储
+- 决策已对照当前项目上下文验证，而非仅凭相似性
 
-If any item uncertain, **preserve and downscope** instead of deleting.
+若任一条不确定，**保留并缩小范围**而非删除。

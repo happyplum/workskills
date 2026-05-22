@@ -1,31 +1,31 @@
 ---
 name: subagent-driven-development
-description: Use when multi-step coding work must run through a decomposition-first workflow where standard-tier routing is the default, premium categories require explicit justification, and escalation cannot substitute for decomposition.
+description: 当多步骤编码工作必须通过「先拆分再路由」的工作流执行，标准层路由为默认选择，贵价层需要显式理由，且提级不能替代拆分时使用。
 ---
 
-# Subagent-Driven Development
+# 子代理驱动开发（SDD）
 
-## Overview
+## 概述
 
-Core principle: decompose first, route economically, escalate only with evidence.
+核心原则：先拆分，经济路由，仅在证据充分时提级。
 
-## Load Conditions
+## 加载条件
 
-Use during planning when work must be split before routing, or during execution when task is no longer clearly local, low-risk, single-surface change.
+在规划阶段需要先拆分再路由时使用，或在执行阶段任务不再明显是局部的、低风险的、单文件变更时使用。
 
-## Mandatory Rules
+## 强制规则
 
-1. **Decompose First**: Split work into smallest independently executable units before routing.
-2. **Standard Tier Default**: Use standard categories (`unspecified-high`, `unspecified-low`, `quick`, `writing`) by default.
-3. **Premium Restraint**: Premium categories (`deep`, `ultrabrain`, `visual-engineering`, `artistry`) require `why_not_lower_cost` rationale.
-4. **No Escalation Instead of Decomposition**: Do not bundle multiple unrelated bugs into one premium-routed task.
-5. **Explicit Routing Surface**: Declare `category` or `subagent_type`; if deferred, use `executor_judgment` with one-line reason.
-6. **Workflow Scope**: Use for multi-step coding work, cross-file implementation, or repeated convergence loops.
-7. **Evidence Before Escalation**: Any routing upgrade must preserve task boundary and carry explicit evidence.
+1. **先拆分**：路由前将工作拆分为最小可独立执行单元。
+2. **标准层默认**：默认使用标准 category（`unspecified-high`、`unspecified-low`、`quick`、`writing`）。
+3. **贵价层克制**：贵价 category（`deep`、`ultrabrain`、`visual-engineering`、`artistry`）需要 `why_not_lower_cost` 理由。
+4. **提级不能替代拆分**：禁止将多个不相关 bug 打包到一个贵价层路由的任务中。
+5. **显式路由声明**：声明 `category` 或 `subagent_type`；若延迟声明，使用 `executor_judgment` 并附一行理由。
+6. **工作流范围**：用于多步骤编码工作、跨文件实现或需要反复验证收敛的任务。
+7. **提级前需证据**：任何路由提级必须保持任务边界不变并携带显式证据。
 
-## Failure Protocol
+## 失败协议
 
-1. If task still looks "too big" after planning, stop and decompose again.
-2. If premium route lacks `why_not_lower_cost`, downgrade or add decomposition evidence.
-3. If multiple unrelated bugs discovered, finish current bug before starting next.
-4. If runtime escalation would change scope, stop and request plan repair.
+1. 若规划后任务仍然「太大」，停下来重新拆分。
+2. 若贵价路由缺少 `why_not_lower_cost`，降级或补充拆分证据。
+3. 若发现多个不相关 bug，先完成当前 bug 再处理下一个。
+4. 若运行时提级会改变范围，停下来请求计划修复。

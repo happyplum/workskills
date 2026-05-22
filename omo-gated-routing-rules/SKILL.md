@@ -1,27 +1,27 @@
 ---
 name: omo-gated-routing-rules
-description: Use when deciding whether to work directly or delegate via task(), and when delegated work needs subagent selection or review gates.
+description: 当需要在直接操作与 task() 委托之间做决策，或委托任务需要选择子代理类型或审查门控时使用。
 ---
 
-# OMO Gated Routing Rules
+# OMO 路由门控规则
 
-## Load Conditions
+## 加载条件
 
-Load this skill when deciding between direct tools and `task()` delegation, especially when subagent choice or review gates matter.
+当需要在直接工具与 `task()` 委托之间做选择时加载，尤其是子代理选择或审查门控会影响结果时。
 
-## Core Purpose
+## 核心目的
 
-Choose the right execution path: direct tools for precise local work, delegation for research/routing work, and review for delegated output.
+选择正确的执行路径：精确的局部工作使用直接工具，研究/路由类工作使用委托，委托产出使用审查验证。
 
-## Mandatory Rules
+## 强制规则
 
-1. Decide direct vs delegated execution before acting.
-2. Delegate one atomic task per `task()` call unless tasks are truly integrated; wait for completion before dependent actions.
-3. When callable subagents exist, use `@explore` for repo discovery and `@librarian` for docs/OSS research.
-4. If routing capability is unavailable, fall back to direct repo tools plus official docs/context7/web search without fabricating capabilities or duplicating delegated exploration.
-5. For code-changing or decision-bearing delegated work, use review to validate output; prefer `metis` first for completion-status gap finding. If Metis finds plan-level gaps, use `oracle` next to deepen the analysis and produce structured plan-revision guidance, then land authoritative plan edits through the owning planning/repair path — specifically the plan owner or the `repairing-plans` skill for structural repair.
-6. Cancel disposable background tasks individually, never with all-at-once cancellation.
+1. 执行前必须先决定直接操作还是委托执行。
+2. 每次 `task()` 调用只委托一个原子任务，除非任务确实不可分割；有依赖关系的操作必须等待完成后再执行。
+3. 当可用的子代理存在时，仓库内发现使用 `@explore`，文档/OSS 研究使用 `@librarian`。
+4. 若路由能力不可用，回退到直接使用仓库工具加官方文档/context7/网络搜索，不得捏造能力或重复已委托的探索。
+5. 涉及代码变更或决策的委托任务，必须对产出进行审查验证；优先用 `metis` 进行完成状态缺口检查。若 Metis 发现计划层面缺口，再用 `oracle` 深化分析并生成结构化计划修订指引，然后通过计划所有者或 `repairing-plans` skill 实施结构性修复。
+6. 逐个取消后台任务，禁止一次性全部取消。
 
-## Failure Handling
+## 失败处理
 
-- If routing capability is unavailable, skip this skill and use direct tools with explicit verification.
+- 若路由能力不可用，跳过本 skill，使用直接工具并显式验证。

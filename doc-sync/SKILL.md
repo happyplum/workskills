@@ -1,130 +1,131 @@
 ---
 name: doc-sync
-description: Use when a significant implementation, refactor, or plan has completed and documentation, plan files, or persistent project memory may no longer match verified code reality; also use when the user says "sync docs", "update docs", "post-completion review", "audit stale docs", "文档同步", or "完成后审查".
+description: 当重大实现、重构或计划已完成，文档、计划文件或持久化项目记忆可能不再与已验证的代码现实一致时使用；也当用户说「同步文档」、「更新文档」、「完成后审查」或「审计过期文档」时使用。
 ---
 
-# Doc Sync
+# 文档同步
 
-Post-completion documentation and memory sync audit. Compares verified code reality against all context carriers, detects drift, produces prioritized sync report. Default audit-only; fixes require explicit approval.
+完成后的文档和记忆同步审计。将已验证的代码现实与所有上下文载体进行比对，检测漂移，生成优先级同步报告。默认仅审计；修复需显式批准。
 
-**Core principle:** Verified code reality beats stale documentation. Roadmap/vision material is not drift if clearly labeled aspirational.
+**核心原则：** 已验证的代码现实优先于过时文档。路线图/愿景材料若清晰标注为愿景性质，则不算漂移。
 
-**This skill SHOULD be invoked during Completion Gate when context synchronization is a gate condition.**
+**本 skill 应在完成门控期间调用，当上下文同步是门控条件时。**
 
-## Modes
+## 模式
 
-| Mode | Trigger | Behavior |
-|------|---------|----------|
-| `audit` | Default | Produce drift report only |
-| `fix` | User explicitly says "fix/apply/update" | Audit + apply verified fixes |
+| 模式 | 触发 | 行为 |
+|------|------|------|
+| `audit` | 默认 | 仅生成漂移报告 |
+| `fix` | 用户明确说「修复/应用/更新」 | 审计 + 应用已验证修复 |
 
-Optional inputs: `fix`, `range=<git-range>` (e.g. `origin/main...HEAD`), `carrier=<class>` (e.g. `readme`, `agents`, `docs`, `plans`). When carrier specified, others listed as "not audited — filtered out".
+可选输入：`fix`、`range=<git范围>`（如 `origin/main...HEAD`）、`carrier=<类别>`（如 `readme`、`agents`、`docs`、`plans`）。指定 carrier 时，其他载体列为「未审计——已过滤」。
 
-## Workflow
+## 工作流
 
-### 1. Establish Evidence Baseline
+### 1. 建立证据基线
 
-Read root + nearest local `AGENTS.md`, relevant `README.md` product spec sections. Identify plan files (common locations: `.sisyphus/plans/`, `docs/plans/`, project root `*.plan.md`, or paths named in AGENTS). Check for persistent memory system.
+读取根目录 + 最近本地 `AGENTS.md`、相关 `README.md` 产品规格章节。识别计划文件（常见位置：`.sisyphus/plans/`、`docs/plans/`、项目根 `*.plan.md`，或 AGENTS 中指明的路径）。检查持久化记忆系统。
 
-Extract: required carriers, sync rules, completion gate rules, doc boundaries.
+提取：必需载体、同步规则、完成门控规则、文档边界。
 
-### 2. Determine Implementation Surface
+### 2. 确定实现面
 
 ```
-git diff --stat <range>    # file-level change surface
+git diff --stat <range>    # 文件级变更面
 git diff --name-only <range>
 ```
 
-Identify touched packages/modules/services/routes, added/removed endpoints/workflows/pages, completed gaps. Prioritize docs for changed surface — do NOT scan whole repo.
+识别触及的包/模块/服务/路由、新增/移除的端点/工作流/页面、已完成的缺口。优先审计变更面——禁止扫描整个仓库。
 
-If no range determinable (fresh repo, single commit), audit ALL default carriers against current code state and note this in report.
+若无法确定范围（新仓库、单次提交），对所有默认载体审计当前代码状态，并在报告中注明此限制。
 
-### 3. Build Carrier Inventory
+### 3. 构建载体清单
 
-Use project-named carriers first. Defaults if none named:
+优先使用项目中命名的载体。若无命名则使用默认值：
 
-| Class | Files |
+| 类别 | 文件 |
 |-------|-------|
-| `readme` | Root + nearest package `README.md` |
-| `agents` | Root + local `AGENTS.md` |
-| `docs` | `docs/**` (roadmap, architecture, gap-analysis, requirements, API) |
-| `plans` | Plan/spec/progress files |
-| `memory` | Persistent agent memories or context stores |
+| `readme` | 根目录 + 最近包的 `README.md` |
+| `agents` | 根目录 + 本地 `AGENTS.md` |
+| `docs` | `docs/**`（路线图、架构、缺口分析、需求、API） |
+| `plans` | 计划/规格/进度文件 |
+| `memory` | 持久化代理记忆或上下文存储 |
 
-### 4. Classify Before Judging
+### 4. 先分类再判断
 
-Determine if content is **descriptive** (current truth), **normative** (rules), **aspirational** (roadmap/proposal), or **historical** (changelog). Only descriptive/normative contradicted by reality is drift. Aspirational is drift only if written as present reality.
+确定内容是**描述性的**（当前事实）、**规范性的**（规则）、**愿景性的**（路线图/提案），还是**历史性的**（变更日志）。仅描述性/规范性内容被现实推翻时才算漂移。愿景性内容仅在写为当前事实时才算漂移。
 
-### 5. Audit for Drift
+### 5. 漂移审计
 
-For each carrier, compare claims vs verified code/config/plan. Look for:
-- "not implemented"/"future"/"gap"/"TODO" statements now false
-- Missing routes/endpoints/services/workflows/config surfaces
-- Stale "Known Gaps"/"Limitations"/"Tech Debt"/"Unsupported" sections
-- Workflow descriptions no longer matching execution
-- Service tables/command lists missing new surfaces
-- Plan checkboxes not updated, evidence missing
-- Memory entries encoding overturned conclusions
+对每个载体，将声明与已验证的代码/配置/计划比对。关注：
 
-### 6. Rate Severity
+- 「未实现」/「未来」/「缺口」/「TODO」 语句现已不成立
+- 缺失的路由/端点/服务/工作流/配置面
+- 过时的「已知缺口」/「限制」/「技术债」/「不支持」章节
+- 工作流描述不再匹配执行实际
+- 服务表/命令列表缺少新功能面
+- 计划复选框未更新、证据缺失
+- 记忆条目编码了已推翻的结论
 
-| Priority | Definition |
+### 6. 评级严重程度
+
+| 优先级 | 定义 |
 |----------|------------|
-| **critical** | Wrong rules likely to mislead implementation/ops immediately |
-| **high** | Materially incorrect current-state docs; major features missing |
-| **medium** | Incomplete summaries, stale gap lists, partial drift |
-| **low** | Wording cleanup, minor omissions, cosmetic issues |
+| **critical** | 错误规则可能立即误导实现/运维 |
+| **high** | 当前状态文档实质性不正确；主要功能缺失 |
+| **medium** | 不完整摘要、过时缺口列表、部分漂移 |
+| **low** | 措辞清理、轻微遗漏、外观问题 |
 
-### 7. Produce Sync Report
+### 7. 生成同步报告
 
 ```
-## Scope — mode, git range, areas touched
-## Drift Summary — Critical/High/Medium/Low counts
-## Findings — per file: [PRIORITY] path | claim type | drift | evidence | fix | status
-## Memory Sync — backend status, actions needed (update/invalidate/delete)
-## Unresolved — items needing human judgment
-## Completion — docs/memory updated? manual follow-up needed?
+## 范围 — 模式、git 范围、触及区域
+## 漂移摘要 — Critical/High/Medium/Low 数量
+## 发现 — 按文件：[优先级] 路径 | 声明类型 | 漂移 | 证据 | 修复 | 状态
+## 记忆同步 — 后端状态、所需操作（更新/失效/删除）
+## 未解决 — 需要人工判断的条目
+## 完成状态 — 文档/记忆已更新？需人工后续？
 ```
 
-Status values: `audit-only` | `fix-ready` | `fixed` | `manual-decision-needed`
+状态值：`audit-only` | `fix-ready` | `fixed` | `manual-decision-needed`
 
-### 8. Apply Fixes (fix mode only)
+### 8. 应用修复（仅 fix 模式）
 
-Update only claims backed by evidence. Preserve document intent. AGENTS parity → both files. Plan checkboxes → only when verified. Memory writable → update; unavailable → record as pending.
+仅更新有证据支持的声明。保留文档意图。AGENTS 一致性 → 两个文件都更新。计划复选框 → 仅在验证后更新。记忆可写 → 更新；不可用 → 记录为待处理。
 
-### 9. Re-check
+### 9. 复查
 
-Verify changed docs internally consistent. No carrier still states old truth. Aspirational docs still clearly labeled.
+验证已变更文档内部一致。无载体仍陈述旧事实。愿景性文档仍清晰标注。
 
-## Carrier Checklist
+## 载体检查清单
 
-| Carrier | Check |
+| 载体 | 检查项 |
 |---------|-------|
-| README/Product Spec | Shipped status, routes/endpoints, service tables, commands/setup, gaps/tech-debt, architecture |
-| AGENTS | Workflow truths, local rules, carrier list, sync/completion rules |
-| docs/** | Roadmap state, gap analysis, requirements baseline, API docs, architecture, migrations |
-| Plan files | Checkboxes, evidence, deferred items, acceptance criteria |
-| Memory | Architecture/gap/rule conclusions current, outdated invalidated, new conventions recorded |
+| README/产品规格 | 已发布状态、路由/端点、服务表、命令/安装、缺口/技术债、架构 |
+| AGENTS | 工作流事实、本地规则、载体列表、同步/完成规则 |
+| docs/** | 路线图状态、缺口分析、需求基线、API 文档、架构、迁移 |
+| 计划文件 | 复选框、证据、延迟条目、验收标准 |
+| 记忆 | 架构/缺口/规则结论是否当前、过时是否已失效、新约定是否已记录 |
 
-## Decision Rules & Edge Cases
+## 决策规则与边界情况
 
-**Precedence:** User instruction > verified code reality > existing docs > agent inference. Ambiguity → `manual-decision-needed`.
+**优先级：** 用户指令 > 已验证代码现实 > 现有文档 > 代理推断。模糊时 → `manual-decision-needed`。
 
-| Situation | Action |
+| 情况 | 操作 |
 |-----------|--------|
-| Aspirational doc written as present reality | Flag — not drift if clearly labeled, but is drift if reads as current truth |
-| Feature behind feature flag | "implemented, gated by [flag]" — not "fully shipped" |
-| Feature partially shipped (some routes exist, some planned) | Document each surface's actual state individually |
-| Code disagrees with plan | Code reality wins for docs. Plan checkboxes need separate evidence |
-| No memory backend | Report actions as pending |
-| Multi-language AGENTS | Both must be checked. Single-language change = high finding |
-| No git range determinable | Audit all defaults, note limitation |
+| 愿景性文档写成了当前事实 | 标记——清晰标注则非漂移，但若读起来像当前事实则算漂移 |
+| 功能在 feature flag 后 | 「已实现，由 [flag] 门控」——而非「完全发布」 |
+| 功能部分发布（部分路由存在、部分计划中） | 逐个记录每个面的实际状态 |
+| 代码与计划不一致 | 代码现实优先用于文档。计划复选框需独立证据 |
+| 无记忆后端 | 报告操作为待处理 |
+| 多语言 AGENTS | 两者都必须检查。单语言变更 = high 级发现 |
+| 无法确定 git 范围 | 审计所有默认载体，注明限制 |
 
-## Red Flags
+## 红旗
 
-- "Tests passed, so docs are probably fine"
-- "README is enough"
-- "Roadmap language is close enough"
-- "Memory can be updated later"
+- 「测试通过了，文档大概没问题」
+- 「README 就够了」
+- 「路线图措辞差不多就行」
+- 「记忆以后再更新」
 
-These mean drift is being normalized. Stop and audit.
+这些意味着漂移正在被合理化。停下来审计。

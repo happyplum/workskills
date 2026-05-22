@@ -1,128 +1,128 @@
 # AGENTS.md
 
-## Global Protocols
+## 全局协议
 
-All operations must strictly follow these system constraints:
+所有操作必须严格遵守以下系统约束：
 
-- **Interaction Language**: Tool-model interactions must use **English**; user outputs must use **Chinese**.
-- **MUST ultrathink in English**
+- **交互语言**：工具-模型交互必须使用**英文**；用户输出必须使用**中文**。
+- **必须使用英文进行深度思考**
 
-## Environment
+## 环境
 
-- **System**: Windows 11
-- **Package Manager**: pnpm (parent project)
-- **Skill Type**: Documentation-only (no build/lint/test commands)
+- **系统**：Windows 11
+- **包管理器**：pnpm（父项目）
+- **Skill 类型**：纯文档（无构建/lint/测试命令）
 
-## Project Overview
+## 项目概述
 
-This is a **skill repository** for the oh-my-opencode multi-agent system. The skill (`omo-subagent-type`) provides task routing guidance for AI agents using the `task()` tool.
+这是 **oh-my-opencode** 多智能体系统的 **skill 仓库**。本 skill（`omo-subagent-type`）为使用 `task()` 工具的 AI 代理提供任务路由指引。
 
-**File Structure:**
+**文件结构：**
 ```
 omo-subagent-type/
-  SKILL.md    # Main skill document
+  SKILL.md    # 主 skill 文档
 ```
 
-## Skill Writing Conventions
+## Skill 写作约定
 
-### Frontmatter (YAML)
-- Only `name` and `description` fields supported
-- Max 1024 characters total
-- `name`: Letters, numbers, hyphens only (no special chars)
-- `description`: Third-person, starts with "Use when...", describes triggering conditions ONLY (not workflow)
+### Frontmatter（YAML）
+- 仅支持 `name` 和 `description` 两个字段
+- 总长不超过 1024 字符
+- `name`：仅字母、数字、连字符（无特殊字符）
+- `description`：以「当……时使用」开头，客观描述触发条件（不描述工作流）
 
-### Token Efficiency
-- **Target:** <200 words for frequently-loaded skills
-- Re-check the live file before making assumptions about size or token cost
-- Compress examples, eliminate redundancy
+### Token 效率
+- **目标：** 频繁加载的 skill < 200 词
+- 做大小/token 成本假设前，先重新检查实际文件
+- 压缩示例，消除冗余
 
-### Structure Pattern
+### 结构模式
 ```markdown
 ---
 name: skill-name
-description: Use when [specific triggering conditions]
+description: 当 [具体触发条件] 时使用
 ---
 
-# Skill Name
+# Skill 名称
 
-## 0. Quick Start (one rule + decision questions)
-## 1. Core Contract (≤7 MUST rules with verification)
-## 2. Routing/Decision Flow
-## 3. Failure Protocol
-## 4. Appendix (examples, anti-patterns)
+## 0. 快速入门（一条规则 + 决策问题）
+## 1. 核心契约（≤7 条必须规则，附验证方式）
+## 2. 路由/决策流程
+## 3. 失败协议
+## 4. 附录（示例、反模式）
 ```
 
-### CSO (Claude Search Optimization)
-- Description = When to use, NOT what it does
-- Keywords: errors, symptoms, tools
-- No workflow summaries in description (causes shortcut behavior)
+### CSO（Claude 搜索优化）
+- Description = 何时使用，不是做什么
+- 关键词：错误、症状、工具
+- 禁止在 description 中写工作流摘要（会导致代理走捷径跳过完整 skill）
 
-## Code Style
+## 代码风格
 
-**Style Definition**: Lean, efficient, zero-redundancy.
+**风格定义**：精简、高效、零冗余。
 
-- **Comments**: Explain "why", not "what"
-- **Targeted changes**: Do not affect unrelated sections
-- **Read before edit**: Always read current content before modifying
-- **Verification column**: Every MUST rule needs verifiable criteria
+- **注释**：解释「为什么」，而非「是什么」
+- **定向变更**：不影响无关章节
+- **先读后改**：修改前始终先读取当前内容
+- **验证列**：每条必须规则需要可验证标准
 
-## Review Process
+## 审查流程
 
 
-**After any skill modification:**
+**任何 skill 修改后：**
 
-1. Review for hidden issues, AI blind spots, over-engineering
-2. Iterate until pass
+1. 检查隐藏问题、AI 盲点、过度工程
+2. 迭代直到通过
 
-### Review Criteria
+### 审查标准
 
-| Criterion | Target |
-|-----------|--------|
-| Cognitive Load | ≤7 Core Contract rules |
-| Verifiability | Each rule has verification method |
-| Decision Flow | Unambiguous branches (no "it depends") |
-| Failure Protocol | Explicit recovery steps |
-| Token Efficiency | <200 words for frequently-loaded |
+| 标准 | 目标 |
+|------|------|
+| 认知负载 | ≤7 条核心契约规则 |
+| 可验证性 | 每条规则有验证方法 |
+| 决策流程 | 无歧义分支（无「看情况」） |
+| 失败协议 | 显式恢复步骤 |
+| Token 效率 | 频繁加载的 < 200 词 |
 
-## Common Operations
+## 常见操作
 
-### Modifying the Skill
+### 修改 Skill
 
-1. Read current SKILL.md content
-2. Identify specific section to modify
-3. Make targeted changes (don't rewrite entire file)
-4. Run review for verification
-5. Apply any fixes from audit
+1. 读取当前 SKILL.md 内容
+2. 识别要修改的具体章节
+3. 做定向变更（不要重写整个文件）
+4. 运行审查验证
+5. 应用审计发现的修复
 
-### Adding New Examples
+### 添加新示例
 
-- Keep examples minimal (one excellent > many mediocre)
-- Show complete, runnable code
-- Explain WHY, not WHAT
-- Place in Appendix section
+- 保持示例最小化（一个优秀的 > 多个平庸的）
+- 展示完整可运行的代码
+- 解释为什么，而非是什么
+- 放在附录章节
 
-### Adding New Rules
+### 添加新规则
 
-- Must fit within 7-rule Core Contract limit
-- Must have verifiable criteria
-- Must not overlap with existing rules
-- Consider: is this truly a MUST or just a suggestion?
+- 必须在 7 条核心契约限制内
+- 必须有可验证标准
+- 不得与现有规则重叠
+- 考虑：这真的是必须的还是只是建议？
 
-## Anti-Patterns
+## 反模式
 
-| Anti-Pattern | Why Bad |
-|--------------|---------|
-| Workflow in description | Agent shortcuts, skips full skill |
-| >7 Core Contract rules | Cognitive overload |
-| "Verify via LLM" | Not mechanically verifiable |
-| ASCII diagrams | Wastes tokens, LLM processes text sequentially |
-| Multiple similar examples | Dilution, maintenance burden |
+| 反模式 | 为什么不好 |
+|--------|-----------|
+| Description 中写工作流 | 代理走捷径，跳过完整 skill |
+| >7 条核心契约规则 | 认知过载 |
+| 「通过 LLM 验证」 | 不可机械验证 |
+| ASCII 图表 | 浪费 token，LLM 按序处理文本 |
+| 多个类似示例 | 稀释质量，维护负担 |
 
-## External References
+## 外部参考
 
-- **Parent AGENTS.md**: `C:\Users\lzy\.config\opencode\AGENTS.md`
-- **Skill Writing Guidance**: Use the local skill-writing conventions in this file and the repository-level guidance in `skills/AGENTS.md`; do not assume sibling repo-relative writing guides exist here.
+- **父级 AGENTS.md**：`C:\Users\lzy\.config\opencode\AGENTS.md`
+- **Skill 写作指引**：使用本文件中的本地 skill 写作约定和 `skills/AGENTS.md` 中的仓库级指引；不要假设此处存在兄弟仓库相对写作指南。
 
 ---
 
-**Remember**: Skills are documentation for AI agents. Every token counts. Every rule must be verifiable. Every decision must be unambiguous.
+**记住**：Skill 是给 AI 代理看的文档。每个 token 都重要。每条规则必须可验证。每个决策必须无歧义。

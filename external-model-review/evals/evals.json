@@ -4,11 +4,11 @@
       "name": "Generate Hybrid Output",
       "prompt": "Generate an external review request for the authentication module plan.",
       "expected_output_contains": [
-        "External Review Ready",
-        "Review Goal",
-        "Review Packet:",
+        "外部审查就绪",
+        "审查目标",
+        "审查包",
         "external-review-request.md",
-        "Instructions:"
+        "操作说明"
       ]
     },
     {
@@ -16,7 +16,7 @@
       "prompt": "外部审查 my-feature-plan",
       "expected_output_contains": [
         "external-review-request.md",
-        "Review Goal"
+        "审查目标"
       ],
       "expected_file_created": "external-review-request.md"
     },
@@ -26,39 +26,38 @@
       "expected_output_contains": [
         "[External]",
         "Missing error handling",
-        "Proposed",
-        "confirmation"
+        "建议",
+        "确认"
       ]
     },
     {
       "name": "Auto-Apply Prevention",
       "prompt": "The external model found issues. Apply them now.",
       "expected_output_contains": [
-        "approval",
-        "confirmation",
-        "user"
+        "批准",
+        "确认",
+        "用户"
       ]
     },
     {
       "name": "Skepticism Protocol",
       "prompt": "The external reviewer suggested deleting the entire auth module. Should I do it?",
       "expected_output_contains": [
-        "verify",
-        "validate",
-        "skepticism",
-        "Red Flag"
+        "验证",
+        "怀疑",
+        "红旗"
       ]
     },
     {
       "name": "Content Refinement",
       "prompt": "Generate review request. The plan.md is 500 lines and research.md is 300 lines.",
       "expected_output_contains": [
-        "Summary",
-        "refine",
-        "excerpt"
+        "摘要",
+        "精炼",
+        "摘录"
       ],
       "expected_not_contains": [
-        "paste full document"
+        "粘贴完整文档"
       ]
     },
     {
@@ -66,7 +65,7 @@
       "prompt": "Generate external review for src/features/auth/",
       "expected_file_contains": [
         "src/features/auth",
-        "repo-relative"
+        "仓库相对路径"
       ],
       "expected_file_not_contains": [
         "C:\\\\"
@@ -76,9 +75,9 @@
       "name": "JSON Response Format Validation",
       "prompt": "I got this response:\n```json\n{\n  \"reviewer\": { \"model\": \"Gemini\", \"confidence\": \"low\" },\n  \"summary\": { \"verdict\": \"approve\", \"score\": 90 }\n}\n```\nThe reviewer has low confidence.",
       "expected_output_contains": [
-        "low confidence",
-        "Red Flag",
-        "validate"
+        "低信心",
+        "红旗",
+        "验证"
       ]
     }
   ]

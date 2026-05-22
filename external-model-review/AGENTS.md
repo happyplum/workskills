@@ -1,74 +1,74 @@
-# AGENTS.md - External Model Review Skill
+# AGENTS.md - 外部模型审查 Skill
 
-## Project Overview
+## 项目概述
 
-This is an OpenCode skill repository that bridges local agents with external AI auditors (Codex, Gemini, Claude) for plan validation, architecture review, security audit, and code audit.
+这是一个 OpenCode skill 仓库，用于桥接本地代理与外部 AI 审查者（Codex、Gemini、Claude），实现计划验证、架构审查、安全审计和代码审计。
 
-**Core Principle**: External reviewers analyze only - never execute. Human-in-the-loop approval is mandatory.
+**核心原则**：外部审查者仅分析——永不执行。人工在环审批是强制性的。
 
-## Repository Structure
+## 仓库结构
 
 ```
 external-model-review/
-├── SKILL.md          # Main skill definition (YAML frontmatter + markdown)
-├── template.md       # Hybrid output templates (chat summary + file packet)
-├── examples.md       # Real-world usage examples
+├── SKILL.md          # 主 skill 定义（YAML frontmatter + markdown）
+├── template.md       # 混合输出模板（聊天摘要 + 文件包）
+├── examples.md       # 真实使用示例
 ├── evals/
-│   └── evals.json    # Test cases for skill validation
-└── AGENTS.md         # This file
+│   └── evals.json    # skill 验证测试用例
+└── AGENTS.md         # 本文件
 ```
 
-## Build/Test Commands
+## 构建/测试命令
 
-**No build system** - this is a documentation-only repository.
+**无构建系统**——这是一个纯文档仓库。
 
-### Validation
+### 验证
 
 ```bash
-# Validate JSON syntax
+# 验证 JSON 语法
 node -e "JSON.parse(require('fs').readFileSync('evals/evals.json'))"
 
-# Check markdown structure
-# - SKILL.md must have YAML frontmatter with `name` and `description`
-# - template.md must contain "Template 1" and "Template 2" sections
-# - examples.md must have at least 2 examples
+# 检查 markdown 结构
+# - SKILL.md 必须有含 `name` 和 `description` 的 YAML frontmatter
+# - template.md 必须包含 "模板 1" 和 "模板 2" 章节
+# - examples.md 必须有至少 2 个示例
 ```
 
-### Running Evals
+### 运行评测
 
-No automated test runner. Validate manually:
-1. Read each test case from `evals/evals.json`
-2. Simulate the prompt against the skill behavior
-3. Verify `expected_output_contains` strings appear in output
-4. Verify `expected_not_contains` strings do NOT appear
+无自动化测试运行器。手动验证：
+1. 从 `evals/evals.json` 读取每个测试用例
+2. 针对 skill 行为模拟提示
+3. 验证 `expected_output_contains` 字符串出现在输出中
+4. 验证 `expected_not_contains` 字符串未出现在输出中
 
-## Code Style Guidelines
+## 代码风格指南
 
-### Markdown Files
+### Markdown 文件
 
-**Headers:**
-- Use `#` for document title (one per file)
-- Use `##` for major sections
-- Use `###` for subsections
-- Maximum 3 levels of nesting
+**标题：**
+- 使用 `#` 作为文档标题（每文件一个）
+- 使用 `##` 作为主要章节
+- 使用 `###` 作为子章节
+- 最多 3 级嵌套
 
-**Tables:**
-- Always include header row
-- Use `|` with spaces: `| Column | Value |`
-- Align columns consistently
+**表格：**
+- 始终包含标题行
+- 使用 `|` 加空格：`| Column | Value |`
+- 列对齐一致
 
-**Code Blocks:**
-- Always specify language: ```markdown, ```json, ```bash
-- Use fenced blocks (```) never indented code
+**代码块：**
+- 始终指定语言：```markdown、```json、```bash
+- 使用围栏块（```）而非缩进代码
 
-**Lists:**
-- Use `-` for unordered lists
-- Use `1.` for ordered lists (not `1)`)
-- Single space after marker
+**列表：**
+- 无序列表使用 `-`
+- 有序列表使用 `1.`（而非 `1)`）
+- 标记后单个空格
 
-### JSON Files
+### JSON 文件
 
-**Structure:**
+**结构：**
 ```json
 {
   "test_cases": [
@@ -82,101 +82,99 @@ No automated test runner. Validate manually:
 }
 ```
 
-**Rules:**
-- 2-space indentation
-- No trailing commas
-- Keys in snake_case
-- String values use double quotes
+**规则：**
+- 2 空格缩进
+- 无尾随逗号
+- 键使用 snake_case
+- 字符串值使用双引号
 
-### SKILL.md Specific
+### SKILL.md 特定
 
-**Required Frontmatter:**
+**必需 Frontmatter：**
 ```yaml
 ---
 name: skill-name
-description: Trigger description with Chinese phrases
+description: 含中文触发词的触发描述
 ---
 ```
 
-**Required Sections:**
-1. `## Overview` - Purpose and scope
-2. `## File Manifest` - Table of related files
-3. `## Core Pattern` - Phase 1 and Phase 2 workflows
-4. `## Implementation` - Detailed instructions
-5. `## Common Mistakes` - Table of anti-patterns
-6. `## Testing This Skill` - Baseline vs Compliance
+**必需章节：**
+1. `## 概述` - 目的和范围
+2. `## 文件清单` - 相关文件表格
+3. `## 核心模式` - 阶段 1 和阶段 2 工作流
+4. `## 用户触发识别` - 详细说明
+5. `## 常见错误` - 反模式表格
 
-**Chinese Trigger Phrases:**
-- Keep trigger phrases in Chinese (e.g., "外部审查")
-- All other content in English
-- Exception: User-facing examples may include Chinese context
+**中文触发词：**
+- 保留中文触发词（如「外部审查」）
+- 其余内容使用中文
+- 例外：面向用户的示例可包含中文上下文
 
-### template.md Specific
+### template.md 特定
 
-**Template Structure:**
-- `# Template 1: Chat Summary` - Control plane output
-- `# Template 2: Review Request File` - Data plane output
-- `# Content Refinement Heuristics` - Size limits and rules
-- `# Usage Summary` - For each actor (agent, user, external model)
+**模板结构：**
+- `# 模板 1：聊天摘要` - 控制面输出
+- `# 模板 2：审查请求文件` - 数据面输出
+- `# 内容精炼启发式` - 大小限制和规则
+- `# 使用摘要` - 针对各角色（代理、用户、外部模型）
 
-**Path Conventions:**
-| Context | Format | Example |
-|---------|--------|---------|
-| File content | Repo-relative | `src/auth/service.ts` |
-| Chat summary | Absolute (Windows) | `C:\project\src\auth\service.ts` |
+**路径约定：**
+| 上下文 | 格式 | 示例 |
+|--------|------|------|
+| 文件内容 | 仓库相对路径 | `src/auth/service.ts` |
+| 聊天摘要 | 绝对路径（Windows） | `C:\project\src\auth\service.ts` |
 
-## Naming Conventions
+## 命名约定
 
-| Type | Convention | Example |
-|------|------------|---------|
-| File names | kebab-case | `external-model-review`, `evals.json` |
-| Section headers | Title Case | `## Skepticism Protocol` |
-| JSON keys | snake_case | `expected_output_contains` |
-| Task prefixes | `[External]` | `[External-CRITICAL] Fix issue` |
+| 类型 | 约定 | 示例 |
+|------|------|------|
+| 文件名 | kebab-case | `external-model-review`、`evals.json` |
+| 章节标题 | 中文标题 | `## 怀疑协议` |
+| JSON 键 | snake_case | `expected_output_contains` |
+| 任务前缀 | `[External]` | `[External-CRITICAL] 修复问题` |
 
-## Error Handling
+## 错误处理
 
-**In Skill Definition:**
-- Always provide "Correct Approach" for each "Common Mistake"
-- Use tables for clarity: `| Mistake | Why It Fails | Correct Approach |`
+**在 Skill 定义中：**
+- 每种「常见错误」必须提供「正确做法」
+- 使用表格提高清晰度：`| 错误 | 失败原因 | 正确做法 |`
 
-**In Templates:**
-- Include "Red Flags" section for validation
-- Provide fallback instructions when assumptions fail
+**在模板中：**
+- 包含「红旗」章节用于验证
+- 假设失败时提供回退说明
 
-## Key Constraints
+## 关键约束
 
-1. **Human-in-the-loop**: Never auto-apply external suggestions
-2. **Skepticism Protocol**: Always validate external findings before applying
-3. **Hybrid Output**: Chat summary (concise) + File packet (detailed)
-4. **JSON Response**: External models must return strict JSON format
-5. **Path Privacy**: Use repo-relative paths in files, absolute in chat
+1. **人工在环**：绝不自动应用外部建议
+2. **怀疑协议**：应用前始终验证外部发现
+3. **混合输出**：聊天摘要（简洁）+ 文件包（详细）
+4. **JSON 响应**：外部模型必须返回严格 JSON 格式
+5. **路径隐私**：文件中使用仓库相对路径，聊天中使用绝对路径
 
-## Editing This Skill
+## 编辑本 Skill
 
-When modifying skill files:
+修改 skill 文件时：
 
-1. **SKILL.md changes**: Update `File Manifest` table if adding new files
-2. **template.md changes**: Ensure both templates stay consistent
-3. **examples.md changes**: Include full request/response cycle
-4. **evals.json changes**: Add corresponding test cases for new features
+1. **SKILL.md 变更**：添加新文件时更新 `文件清单` 表格
+2. **template.md 变更**：确保两个模板保持一致
+3. **examples.md 变更**：包含完整的请求/响应周期
+4. **evals.json 变更**：为新功能添加对应测试用例
 
-### Validation Checklist
+### 验证清单
 
-- [ ] JSON syntax valid (no trailing commas)
-- [ ] Markdown renders correctly
-- [ ] All `@file` references exist
-- [ ] Chinese trigger phrases preserved
-- [ ] English for non-trigger content
-- [ ] Tables have consistent column counts
-- [ ] Code blocks have language specified
+- [ ] JSON 语法有效（无尾随逗号）
+- [ ] Markdown 渲染正确
+- [ ] 所有 `@file` 引用存在
+- [ ] 中文触发词保留
+- [ ] 表格列数一致
+- [ ] 代码块已指定语言
 
-## External Dependencies
+## 外部依赖
 
-None - this is a self-contained skill repository.
+无——这是一个自包含的 skill 仓库。
 
-## Related Skills
+## 相关 Skill
 
-- `writing-plans` - Creates reviewable implementation plans
-- `executing-plans` - Executes reviewed plans
-- `requesting-code-review` - Human expert review workflow
+- `writing-plans` - 创建可审查的实现计划
+- `executing-plans` - 执行已审查的计划
+- `requesting-code-review` - 人工专家审查工作流

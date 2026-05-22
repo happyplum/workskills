@@ -1,18 +1,18 @@
 ---
 name: superpowers-gated-rules
-description: Use at conversation start and before significant actions to enforce skill-first execution and prevent rationalizing away relevant skills.
+description: 当会话开始或执行重要操作前，需要强制执行 skill 优先加载，防止以借口跳过相关 skill 时使用。
 ---
 
-# Superpowers Gated Rules
+# Superpowers 门控规则
 
-## Mandatory Rules
+## 强制规则
 
-1. Before any response/action, check whether any skill may apply.
-2. If a relevant skill exists, invoke it before execution.
-3. Treat "simple question / gather context first / I already know" as red-flag rationalizations.
-4. Process skills (brainstorming/debugging) precede implementation skills.
-5. If uncertain, invoke the likely skill first; discard only with explicit mismatch reason.
+1. 在任何响应/操作前，检查是否有适用的 skill。
+2. 如果存在相关 skill，在执行前先调用。
+3. 将「简单问题/先收集上下文/我已经知道」视为危险的借口信号。
+4. 流程类 skill（brainstorming/debugging）优先于实现类 skill。
+5. 不确定时先调用可能的 skill；仅在明确不匹配时才跳过，并给出具体原因。
 
-## Failure Handling
+## 失败处理
 
-If `using-superpowers` is not available, skip this skill and proceed with standard local workflow.
+若 `using-superpowers` 不可用，跳过本 skill，按标准本地工作流执行。

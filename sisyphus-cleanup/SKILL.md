@@ -1,75 +1,75 @@
 ---
 name: sisyphus-cleanup
-description: Use when cleaning, auditing, pruning, or deleting a `.sisyphus` workspace or similar execution-artifact directory, especially when the request involves removing completed plans, evidence, state files, empty folders, or preserving only deduplicated long-term knowledge before deletion.
+description: 当清理、审计、修剪或删除 `.sisyphus` 工作区或类似执行产物目录时使用，尤其是涉及移除已完成计划、证据、状态文件、空文件夹，或在删除前仅保留去重后的长期知识时。
 ---
 
-# Sisyphus Cleanup
+# Sisyphus 清理
 
-## Overview
+## 概述
 
-Clean `.sisyphus` as **verification-first artifact reduction**, not blind file purge. Core rule: **inventory → verify status → deduplicate durable knowledge → delete transient artifacts → prove cleanup**.
+将 `.sisyphus` 清理视为**验证优先的执行产物清理**，而非盲目文件清除。核心规则：**盘点 → 验证状态 → 去重持久化知识 → 删除临时产物 → 证明清理结果**。
 
-## Load Conditions
+## 加载条件
 
-Load when any is true:
+以下任一条件为真时加载：
 
-- User asks to clean, prune, archive, reset, or remove `.sisyphus` content
-- Directory contains plans, notepads, evidence, state files, or empty folders that may be obsolete
-- User wants to keep only useful architecture notes while deleting completed execution artifacts
-- Cleanup decision depends on whether items are completed, active, duplicated in memory, or safe to delete
+- 用户要求清理、修剪、归档、重置或移除 `.sisyphus` 内容
+- 目录包含可能已过期的计划、便签、证据、状态文件或空文件夹
+- 用户希望仅保留有用的架构笔记，同时删除已完成的执行产物
+- 清理决策取决于条目是否已完成、活跃、已在记忆中重复或可安全删除
 
-## Mandatory Rules
+## 强制规则
 
-1. Start from full inventory. Do NOT classify from filenames alone.
-2. Verify completion in code/repo reality before deleting plans or notepads.
-3. Treat `boulder.json`, plan files, evidence, notes as **state-bearing** until proven disposable.
-4. Preserve durable architecture knowledge only after checking existing memories for overlap.
-5. Do not mirror task logs into memory. Keep only durable `guardrails`, `reference`, `topology`, `contract` knowledge.
-6. Delete transient artifacts only after unique value disproven or preserved elsewhere.
-7. Remove empty directories only after confirming truly empty.
-8. End with proof: show remaining directory state or verify directory no longer exists.
+1. 从完整盘点开始。禁止仅凭文件名分类。
+2. 在删除计划或便签前，先在代码/仓库现实中验证完成状态。
+3. 将 `boulder.json`、计划文件、证据、笔记视为**有状态载体**，直到证明可废弃。
+4. 仅在检查已有记忆确认无重叠后，才保留持久化架构知识。
+5. 禁止将任务日志镜像到记忆。仅保留持久化的 `guardrails`（防回归）、`reference`（参考）、`topology`（拓扑）、`contract`（契约）知识。
+6. 仅在唯一价值被证伪或已保存到其他位置后，才删除临时产物。
+7. 仅在确认真正为空后才移除空目录。
+8. 以证据结束：展示剩余目录状态或验证目录已不存在。
 
-## Classification Pass
+## 分类检查
 
-Classify each item **after verification**:
+**验证后**对每个条目分类：
 
-- **Active state** — current plan/session state, live checkpoint, in-use artifact → keep
-- **Completed transient artifact** — finished plan, evidence output, execution log, stale tracker → delete
-- **Durable knowledge** — architecture, anti-regression lesson, topology, reusable rule → preserve via existing/updated memory
-- **Unknown** — cannot prove status yet → keep until verified
+- **活跃状态** — 当前计划/会话状态、活跃检查点、使用中的产物 → 保留
+- **已完成临时产物** — 已结束的计划、证据输出、执行日志、过期追踪器 → 删除
+- **持久化知识** — 架构、防回归经验、拓扑、可复用规则 → 通过已有/更新记忆保留
+- **未知** — 无法证明状态 → 保留至验证完成
 
-## Execution Order
+## 执行顺序
 
-1. **Inventory**: List full `.sisyphus` tree; identify plans, notepads, evidence, state files, empty directories
+1. **盘点**：列出完整 `.sisyphus` 树；识别计划、便签、证据、状态文件、空目录
 
-2. **Verify status, don't infer**: Confirm work actually complete in code/repo; check if `boulder.json` still points at active work; even if user says "completed", still verify
+2. **验证状态，而非推断**：确认工作在代码/仓库中确实已完成；检查 `boulder.json` 是否仍指向活跃工作；即使用户说「已完成」，仍需验证
 
-3. **Review durable knowledge before deletion**: Read existing memories first; if durable knowledge exists, do NOT duplicate; if notes contain unique long-term value, compress into focused memory updates; use `memory-restructuring` principles: one memory = one dominant responsibility
+3. **删除前审查持久化知识**：先读取已有记忆；若持久化知识已存在，禁止重复；若笔记包含独特长期价值，压缩为聚焦的记忆更新；使用 `memory-restructuring` 原则：一条记忆 = 一个主要职责
 
-4. **Delete only verified transient artifacts**: Delete completed plans, stale notepads, evidence outputs, disposable state files only after steps 2-3; remove empty directories after confirming empty; if `.sisyphus` becomes empty, remove root directory too
+4. **仅删除已验证的临时产物**：仅在步骤 2-3 完成后删除已完成计划、过期便签、证据输出、可废弃状态文件；确认空后移除空目录；若 `.sisyphus` 变空，一并移除根目录
 
-5. **Prove result**: List remaining contents of `.sisyphus`, or verify `.sisyphus` no longer exists; report deleted, preserved, why no durable knowledge lost
+5. **证明结果**：列出 `.sisyphus` 剩余内容，或验证 `.sisyphus` 已不存在；报告已删除项、已保留项、为何无持久化知识丢失
 
-## Deletion Checklist
+## 删除检查清单
 
-Delete only if **all** are true:
+仅在以下**全部**为真时才删除：
 
-- Status verified, not assumed
-- Not current source of active execution state
-- Any unique durable knowledge preserved or proven redundant
-- Removal reduces noise without creating second source of truth
-- Post-cleanup state verifiable immediately
+- 状态已验证，非假定
+- 不是当前活跃执行状态的来源
+- 任何独特持久化知识已保留或证明确属冗余
+- 移除减少噪音而不产生第二事实来源
+- 清理后状态可立即验证
 
-If uncertain, keep and mark for follow-up.
+不确定时，保留并标记待后续处理。
 
-## Memory Handling Protocol
+## 记忆处理协议
 
-Sequence before preserving note-derived knowledge: `list_memories` → `read_memory` overlapping → decide (keep existing/update existing/write new/write nothing) → execute → only then delete source
+保留笔记衍生知识前的顺序：`list_memories` → `read_memory` 检查重叠 → 决定（保留已有/更新已有/新建/不操作）→ 执行 → 然后才删除来源
 
-**Do not store**: session IDs, one-off execution logs, temporary audit notes, verification output text, giant copied plan histories
+**禁止存储**：会话 ID、一次性执行日志、临时审计笔记、验证输出文本、大量复制的计划历史
 
-## Report Structure
+## 报告结构
 
-Report when complete: verified before deletion → deleted → durable knowledge preserved/intentionally not preserved → final proof (`remaining tree` or `path does not exist`)
+完成时报告：删除前已验证 → 已删除 → 持久化知识已保留/有意不保留 → 最终证据（`剩余目录树` 或 `路径不存在`）
 
-**Boundary**: Use memory-restructuring for store-level reorganization across multiple memories; use sisyphus-cleanup for .sisyphus artifact reduction. When cleanup reveals durable knowledge gaps, use memory-restructuring principles for preservation step.
+**边界**：使用 `memory-restructuring` 处理跨多条记忆的存储级重组；使用 `sisyphus-cleanup` 处理 `.sisyphus` 执行产物清理。当清理发现持久化知识缺口时，使用 `memory-restructuring` 原则进行保留步骤。
