@@ -53,7 +53,7 @@ skills/
 - `memory-restructuring`、`sisyphus-cleanup`、`repairing-plans` 属于手动触发/显式点名优先的治理型 skill
 - 这三者仍必须保留完整 `description` frontmatter，供索引、README 与人工审计使用
 - 若展示层出现 description 为空，先检查索引/渲染链路，不要先假设 `SKILL.md` 正文缺字段
-- 若需要真正的手动 `/command` 入口，命令定义、命令目录说明与 command-first workflow 文档应维护在同级独立子仓库 `../commands/` 中；本仓库仅保留与这些命令配套的治理知识、边界说明与可复用参考，不承担 command catalog 的主文档职责
+- 若需要真正的手动 `/command` 入口，命令定义应维护在同级独立子仓库 `../commands/` 中；为避免 `commands/README.md` 被命令加载器误识别，命令目录说明与 command-first workflow 文档维护在 `../commands/docs/README.md`。本仓库仅保留与这些命令配套的治理知识、边界说明与可复用参考，不承担 command catalog 的主文档职责
 
 ### 文件命名
 - 目录: kebab-case
