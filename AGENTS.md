@@ -45,9 +45,15 @@ skills/
 - `## 最小 CSO 触发词`（含主要 + 次要关键词）
 
 ### 常见章节标题变体
-- `repairing-plans`: 无标准 frontmatter（使用 `***` 分隔），节标题含 `## 必需检查`、`## 检查点审计模型`
+- `repairing-plans`: 使用标准 YAML frontmatter，节标题含 `## 必需检查`、`## 检查点审计模型`
 - `atlas-execution-constraints`: 含 `## 必需预加载链`、`## 验证与关卡顺序`
 - `subagent-driven-development`: 含共享的拆分、路由、贵价层约束与提级边界规则
+
+### 手动触发 skill 约定
+- `memory-restructuring`、`sisyphus-cleanup`、`repairing-plans` 属于手动触发/显式点名优先的治理型 skill
+- 这三者仍必须保留完整 `description` frontmatter，供索引、README 与人工审计使用
+- 若展示层出现 description 为空，先检查索引/渲染链路，不要先假设 `SKILL.md` 正文缺字段
+- 若需要真正的手动 `/command` 入口，命令定义、命令目录说明与 command-first workflow 文档应维护在同级独立子仓库 `../commands/` 中；本仓库仅保留与这些命令配套的治理知识、边界说明与可复用参考，不承担 command catalog 的主文档职责
 
 ### 文件命名
 - 目录: kebab-case
