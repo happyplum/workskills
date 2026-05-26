@@ -11,6 +11,12 @@ description: 当调用 task() 进行工作路由时使用。涵盖 subagent_type
 
 **一条规则：** `task()` 需要且仅需要 `subagent_type` 异或 `category` 之一，加上 `run_in_background`、`load_skills`、`description` 和 `prompt`。
 
+### 平台事实 vs 本地治理边界
+
+- 上游 OMO 平台文档把 `task(category="...")` 解释为路由到 category-spawned executor（如 `sisyphus-junior`）。这是**平台运行时事实**。
+- 本仓库的计划、prompt 与 skill 属于**本地治理 authoring surface**：作者应只写 `category`，或本 skill 标准化的 `subagent_type`（`explore` / `librarian` / `metis` / `oracle` / `momus`），而不是把 `Sisyphus-Junior` 直接写成作者侧 `subagent_type`。
+- 若 imported / copied plan 带入上游 runtime 名称、额外 category 或弱路由形状，先规范化到本地治理子集，再进入执行。
+
 ### 提级阶梯
 
 **Category 成本顺序（默认从低到高）：** 直接工具 → `quick` → `unspecified-low` → `unspecified-high` → `deep` → `ultrabrain`。领域 category（`visual-engineering`、`artistry`、`writing`）覆盖成本层级——见 Q4。仅当低成本层级明显不足时才提级。
@@ -62,6 +68,8 @@ task({
 
 **提示词字段：** `[CONTEXT]`/`[GOAL]`/`[RETURN]` 必填。仅在需要时添加 `[SCOPE]`/`[SKIP]`/`[WHY_NOT_LOWER_COST]`/`[INPUT-ORIGINAL]`。
 
+**延迟路由约定：** 若 author-time 还不能确定实现类路由，可使用 `executor_judgment` 或 `routing_by_executor`，但必须附一行理由，并确保执行前已规范化为本地治理认可的路由形状。
+
 ---
 
 ## 1. 核心契约（必须——7 条规则）
@@ -107,11 +115,12 @@ task({
 
 ## 3. 失败协议
 
-1. **读取错误** — 模式验证？修复参数。子代理失败？用更多上下文重试。
-2. **补充上下文** — 重试前扩展提示词章节。
-3. **最多 2 次重试** — 然后切换策略：`explore` 失败 → `librarian`；`category` 失败 → 审查代理。
-4. **提级** — 总计 3 次失败后，提级或询问用户。
-5. **异步纪律** — 在系统提醒到达前，禁止规划依赖后续操作。
+1. **输入先规范化** — 若 imported / copied plan 带入上游 runtime 标签或不属于本地 authoring subset 的路由写法，先做 `normalize-before-execute` 或转入 `repairing-plans`，不要把原始输入直接当成本地合法路由。
+2. **读取错误** — 模式验证？修复参数。子代理失败？用更多上下文重试。
+3. **补充上下文** — 重试前扩展提示词章节。
+4. **最多 2 次重试** — 然后切换策略：`explore` 失败 → `librarian`；`category` 失败 → 审查代理。
+5. **提级** — 总计 3 次失败后，提级或询问用户。
+6. **异步纪律** — 在系统提醒到达前，禁止规划依赖后续操作。
 
 ### 禁止行为
 
