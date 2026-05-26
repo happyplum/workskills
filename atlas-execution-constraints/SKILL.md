@@ -29,7 +29,7 @@ Atlas 执行时约束的权威来源。Atlas 提示保持精简；`subagent-driv
 
 ## 强制规则
 
-1. 执行前强制加载预加载链；缺少必需 skill 则停止。
+1. 执行前强制加载预加载链；缺少必需 skill 则停止。该停止点发生在任何 `task()` 委托、路由判断、或执行 TODO surface 展开之前。
 2. 仅对已审查的现有计划执行；若缺失、矛盾或未就绪，停止并请求上游修复。
 3. 可将已批准的计划转换为仅用于执行的 TODO 清单作为编排视图，但不重新定义为计划编写。
 4. 编码工作始终以 `subagent-driven-development` 为执行核心；不得静默切换为顺序执行。
@@ -50,6 +50,7 @@ Atlas 执行时约束的权威来源。Atlas 提示保持精简；`subagent-driv
 ## 必需预加载链
 
 1. `omo-subagent-type` → 2. `subagent-driven-development` → 3. `atlas-execution-constraints`（本 skill）。缺少任一 → 停止并先加载。
+2. 该链是 Atlas 的执行起点门禁，不是执行中可补的建议项；若在未闭合状态下已经开始委托或展开执行面，按路由失效处理并退回修复。
 
 ## 执行 Skill 头部契约
 
