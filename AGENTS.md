@@ -10,6 +10,7 @@ oh-my-opencode 多智能体系统的自定义 Skill 仓库。每个 skill 是独
 ```
 skills/
 ├── README.md                        # 项目总览 + 分类索引 + 依赖关系图
+├── doc-sync/                        # Maintenance: 文档同步审计
 ├── omo-gated-routing-rules/         # Core: 路由决策
 ├── omo-subagent-type/               # Core: task() 配置 (has AGENTS.md)
 ├── superpowers-gated-rules/         # Core: skill-first 规范
@@ -23,7 +24,7 @@ skills/
 |------|----------|-------|
 | Skill 定义 | `<skill-name>/SKILL.md` | YAML frontmatter + markdown |
 | 子目录 AGENTS.md | `omo-subagent-type/` | 另有详细约定文档 |
-| 分类与依赖 | `README.md` | 4 分类 + ASCII 依赖图 |
+| 分类与依赖 | `README.md` | 3 分类 + ASCII 依赖图 |
 
 ## 约定
 
