@@ -78,5 +78,3 @@ skills/
 ## 备注
 
 - `omo-subagent-type/AGENTS.md` 包含完整的 skill 写作规范，是新增 skill 的参考文档
-- `sisyphus-cleanup` 与 `memory-restructuring` 有明确边界：前者仅处理 `.sisyphus` 工作区临时产物，后者处理持久化记忆的结构性重组；清理时先 sisyphus-cleanup 再按需 memory-restructuring
-- 计划修复能力已迁至 `../commands/` 仓库的 `/repair-plan` command；本仓库不再保留 `repairing-plans` skill
