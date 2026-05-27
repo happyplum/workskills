@@ -9,16 +9,12 @@ oh-my-opencode 多智能体系统的自定义 Skill 仓库。每个 skill 是独
 
 ```
 skills/
-├── README.md                        # 项目总览 + 4 分类索引 + 依赖关系图
+├── README.md                        # 项目总览 + 分类索引 + 依赖关系图
 ├── omo-gated-routing-rules/         # Core: 路由决策
 ├── omo-subagent-type/               # Core: task() 配置 (has AGENTS.md)
 ├── superpowers-gated-rules/         # Core: skill-first 规范
 ├── subagent-driven-development/     # Execution: SDD 共享治理
 ├── atlas-execution-constraints/     # Execution: 执行时约束
-├── repairing-plans/                 # Execution: 计划验证与结构修复
-├── codex-gemini-collab-rules/       # External: 模型协作规则
-├── external-model-review/           # External: 外部审查桥接 (has AGENTS.md, evals/)
-├── serena-gated-rules/              # Maintenance: Serena 集成
 ├── memory-restructuring/            # Maintenance: 记忆重组
 └── sisyphus-cleanup/                # Maintenance: 工作区清理
 ```
@@ -28,8 +24,7 @@ skills/
 | 任务 | 位置 | 备注 |
 |------|----------|-------|
 | Skill 定义 | `<skill-name>/SKILL.md` | YAML frontmatter + markdown |
-| 补充文件 | `external-model-review/{template,examples}.md`, `evals/evals.json` | 如需查看补充模板、示例和评测，优先从这里开始 |
-| 子目录 AGENTS.md | `omo-subagent-type/`, `external-model-review/` | 另有详细约定文档 |
+| 子目录 AGENTS.md | `omo-subagent-type/` | 另有详细约定文档 |
 | 分类与依赖 | `README.md` | 4 分类 + ASCII 依赖图 |
 
 ## 约定
@@ -45,13 +40,12 @@ skills/
 - `## 最小 CSO 触发词`（含主要 + 次要关键词）
 
 ### 常见章节标题变体
-- `repairing-plans`: 使用标准 YAML frontmatter，节标题含 `## 必需检查`、`## 检查点审计模型`
 - `atlas-execution-constraints`: 含 `## 必需预加载链`、`## 验证与关卡顺序`
 - `subagent-driven-development`: 含共享的拆分、路由、贵价层约束与提级边界规则
 
 ### 手动触发 skill 约定
-- `memory-restructuring`、`sisyphus-cleanup`、`repairing-plans` 属于手动触发/显式点名优先的治理型 skill
-- 这三者仍必须保留完整 `description` frontmatter，供索引、README 与人工审计使用
+- `memory-restructuring`、`sisyphus-cleanup` 属于手动触发/显式点名优先的治理型 skill
+- 两者仍必须保留完整 `description` frontmatter，供索引、README 与人工审计使用
 - 若展示层出现 description 为空，先检查索引/渲染链路，不要先假设 `SKILL.md` 正文缺字段
 - 若需要真正的手动 `/command` 入口，命令定义应维护在同级独立子仓库 `../commands/` 中；为避免 `commands/README.md` 被命令加载器误识别，命令目录说明与 command-first workflow 文档维护在 `../commands/docs/README.md`。本仓库仅保留与这些命令配套的治理知识、边界说明与可复用参考，不承担 command catalog 的主文档职责
 
@@ -83,7 +77,6 @@ skills/
 
 ## 备注
 
-- `repairing-plans`（172行）和 `omo-subagent-type`（159行）是仓库里最大的两个 skill，分别包含检查点审计模型（CP0-CP3）和 task() 路由决策树
 - `omo-subagent-type/AGENTS.md` 包含完整的 skill 写作规范，是新增 skill 的参考文档
-- `external-model-review` 提供模板、示例与 `evals/evals.json`，是查看外部审查配套材料的首选入口
 - `sisyphus-cleanup` 与 `memory-restructuring` 有明确边界：前者仅处理 `.sisyphus` 工作区临时产物，后者处理持久化记忆的结构性重组；清理时先 sisyphus-cleanup 再按需 memory-restructuring
+- 计划修复能力已迁至 `../commands/` 仓库的 `/repair-plan` command；本仓库不再保留 `repairing-plans` skill
