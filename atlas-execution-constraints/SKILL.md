@@ -7,7 +7,7 @@ description: 当 Atlas 需要确定性执行治理以实现可靠的大任务执
 
 ## 概述
 
-Atlas 执行时约束的权威来源。Atlas 提示保持精简；`subagent-driven-development`（SDD）处理拆分/路由/提级；`repairing-plans` 是独立的计划修复 skill。核心原则：仅执行结构有效、可验证、有证据支撑的内容。
+Atlas 执行时约束的权威来源。Atlas 提示保持精简；`subagent-driven-development`（SDD）处理拆分/路由/提级；`/repair-plan` 是独立的计划修复 command。核心原则：仅执行结构有效、可验证、有证据支撑的内容。
 
 ## 加载条件
 
@@ -23,7 +23,7 @@ Atlas 执行时约束的权威来源。Atlas 提示保持精简；`subagent-driv
 | 输入模式 | 原因 |
 |---|---|
 | 「生成计划」 / "write a plan" | 计划阶段，应使用 `writing-plans`。 |
-| 「修复计划结构错误」 | 文档修复，应使用 `repairing-plans`。 |
+| 「修复计划结构错误」 | 文档修复，应使用 `/repair-plan`。 |
 | 「只要解释流程，不执行」 | 纯解释无需执行治理。 |
 | 「单文件微小文本修正」 | 琐碎编辑无需完整约束栈。 |
 
@@ -43,7 +43,7 @@ Atlas 执行时约束的权威来源。Atlas 提示保持精简；`subagent-driv
 - 头部契约缺失/矛盾 → 停止，退回计划修复。
 - 验证失败 ≥2 次重跑或证据矛盾 → 提级。
 - 阶段关卡证据缺失 → 保持状态不变，循环修复+重新验证。
-- 文档级可修复 → 停止，请求显式 `repairing-plans` 处理。
+- 文档级可修复 → 停止，请求显式 `/repair-plan` 处理。
 - 任务或验证重新开启 → 重置受影响的 Phase/Wave 复选框直到恢复闭合。
 - 提级会改变任务边界/意图/交付物 → 拒绝，请求修复/重规划。
 

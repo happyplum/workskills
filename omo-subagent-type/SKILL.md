@@ -115,7 +115,7 @@ task({
 
 ## 3. 失败协议
 
-1. **输入先规范化** — 若 imported / copied plan 带入上游 runtime 标签或不属于本地 authoring subset 的路由写法，先做 `normalize-before-execute` 或转入 `repairing-plans`，不要把原始输入直接当成本地合法路由。
+1. **输入先规范化** — 若 imported / copied plan 带入上游 runtime 标签或不属于本地 authoring subset 的路由写法，先做 `normalize-before-execute` 或转入 `/repair-plan`，不要把原始输入直接当成本地合法路由。
 2. **读取错误** — 模式验证？修复参数。子代理失败？用更多上下文重试。
 3. **补充上下文** — 重试前扩展提示词章节。
 4. **最多 2 次重试** — 然后切换策略：`explore` 失败 → `librarian`；`category` 失败 → 审查代理。
