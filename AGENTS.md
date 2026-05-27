@@ -14,9 +14,7 @@ skills/
 ├── omo-subagent-type/               # Core: task() 配置 (has AGENTS.md)
 ├── superpowers-gated-rules/         # Core: skill-first 规范
 ├── subagent-driven-development/     # Execution: SDD 共享治理
-├── atlas-execution-constraints/     # Execution: 执行时约束
-├── memory-restructuring/            # Maintenance: 记忆重组
-└── sisyphus-cleanup/                # Maintenance: 工作区清理
+└── atlas-execution-constraints/     # Execution: 执行时约束
 ```
 
 ## 查找位置
@@ -44,10 +42,8 @@ skills/
 - `subagent-driven-development`: 含共享的拆分、路由、贵价层约束与提级边界规则
 
 ### 手动触发 skill 约定
-- `memory-restructuring`、`sisyphus-cleanup` 属于手动触发/显式点名优先的治理型 skill
-- 两者仍必须保留完整 `description` frontmatter，供索引、README 与人工审计使用
-- 若展示层出现 description 为空，先检查索引/渲染链路，不要先假设 `SKILL.md` 正文缺字段
-- 若需要真正的手动 `/command` 入口，命令定义应维护在同级独立子仓库 `../commands/` 中；为避免 `commands/README.md` 被命令加载器误识别，命令目录说明与 command-first workflow 文档维护在 `../commands/docs/README.md`。本仓库仅保留与这些命令配套的治理知识、边界说明与可复用参考，不承担 command catalog 的主文档职责
+- 治理型 skill（如已迁至 `/command` 入口的记忆重组、工作区清理、计划修复）已迁移至同级独立子仓库 `../commands/`；为避免 `commands/README.md` 被命令加载器误识别，命令目录说明与 command-first workflow 文档维护在 `../commands/docs/README.md`
+- 本仓库仅保留与这些命令配套的治理知识、边界说明与可复用参考，不承担 command catalog 的主文档职责
 
 ### 文件命名
 - 目录: kebab-case
