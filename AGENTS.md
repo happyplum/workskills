@@ -43,7 +43,7 @@ skills/
 - `subagent-driven-development`: 含共享的拆分、路由、贵价层约束与提级边界规则
 
 ### 手动触发 skill 约定
-- 治理型 skill（如已迁至 `/command` 入口的记忆重组、工作区清理、计划修复）已迁移至同级独立子仓库 `../commands/`；为避免 `commands/README.md` 被命令加载器误识别，命令目录说明与 command-first workflow 文档维护在 `../commands/docs/README.md`
+- 记忆重组、工作区清理、计划结构修复等手动治理能力已迁移至同级独立子仓库 `../commands/`；为避免 `commands/README.md` 被命令加载器误识别，命令目录说明与手动治理工作流文档维护在 `../commands/docs/README.md`
 - 本仓库仅保留与这些命令配套的治理知识、边界说明与可复用参考，不承担 command catalog 的主文档职责
 
 ### 文件命名
