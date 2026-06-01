@@ -1,6 +1,6 @@
 ---
 name: superpowers-gated-rules
-description: 当会话开始或执行重要操作前，需要强制执行 skill 优先加载，防止以借口跳过相关 skill 时使用。
+description: 会话开始时必须加载。在整个会话中强制执行 skill 优先加载，防止以任何借口跳过相关 skill；执行重要操作前需再次确认加载状态。
 ---
 
 # Superpowers 门控规则
