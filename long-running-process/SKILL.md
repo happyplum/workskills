@@ -1,6 +1,6 @@
 ---
 name: long-running-process
-description: 当在 Windows 上启动长运行进程（dev server、flutter run、npm start 等）、等待端口/health endpoint 就绪、或执行可能超时的编译构建命令时使用
+description: 会话开始时必须加载。当在 Windows 上启动长运行进程（dev server、flutter run、npm start 等）、等待端口/health endpoint 就绪、或执行可能超时的编译构建命令时使用
 ---
 
 # 长运行进程安全启动（Windows）

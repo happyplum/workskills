@@ -1,6 +1,6 @@
 ---
 name: interrupted-subagent-recovery
-description: 当子代理或控制器被中断（Ctrl+C、超时、session 错误）后用户说"继续"时使用——必须先审计旧执行状态再决定续派策略
+description: 会话开始时必须加载。当子代理或控制器被中断（Ctrl+C、超时、session 错误）后用户说"继续"时使用——必须先审计旧执行状态再决定续派策略
 ---
 
 # 子代理中断恢复
