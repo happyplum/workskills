@@ -80,25 +80,35 @@ try {
 $stdoutLog = "$env:TEMP\${LOGPREFIX}-stdout-$PID.log"
 $stderrLog = "$env:TEMP\${LOGPREFIX}-stderr-$PID.log"
 
-# 关键：不要用 Start-Process -RedirectStandardOutput/-RedirectStandardError
-# 那会让 OpenCode 的 stdout/stderr pipe 句柄泄漏给长运行孙进程（node.exe），
-# 导致 bash tool 永远等不到 pipe EOF，tool call 永不返回。
-# 改用 cmd.exe /c 内部重定向，让日志重定向发生在子进程 shell 内。
-$cmd = "/d /s /c `"$exe $ARGS 1> `"$stdoutLog`" 2> `"$stderrLog`"`""
-$proc = Start-Process -FilePath "$env:ComSpec" `
-    -ArgumentList $cmd `
-    -WorkingDirectory $DIR `
-    -PassThru -WindowStyle Hidden
+# 关键：不要用 Start-Process 启动长运行进程（无论是否加 -RedirectStandardOutput）。
+# OpenCode bash tool 等待 Node 'close' 事件（cross-spawn-spawner.ts 用 proc.on('close')），
+# 而 Start-Process 创建的进程会继承 PowerShell 的 stdout/stderr pipe 句柄，
+# 即使 PowerShell 退出，长运行孙进程（node.exe）仍持有 pipe 写端，'close' 永不触发。
+# 必须用 WMI Win32_Process.Create 创建独立进程，不继承 OpenCode pipe。
+$launcher = "$env:TEMP\${LOGPREFIX}-launch-$PID.cmd"
+@"
+@echo off
+cd /d "$DIR" || exit /b 1
+call "$exe" $ARGS 1>"$stdoutLog" 2>"$stderrLog" <NUL
+"@ | Set-Content -LiteralPath $launcher -Encoding ASCII
 
-# 2s liveness check — 进程可能立即崩溃
-Start-Sleep 2
-if (-not (Get-Process -Id $proc.Id -ErrorAction SilentlyContinue)) {
-    $errLog = Get-Content $stderrLog -Tail 10 -ErrorAction SilentlyContinue
-    Write-Output "ERROR: Process $($proc.Id) died immediately.`nLast stderr:`n$errLog"
+$startup = ([wmiclass]'Win32_ProcessStartup').CreateInstance()
+$startup.ShowWindow = 0
+$result = ([wmiclass]'Win32_Process').Create("$env:ComSpec /d /c `"$launcher`"", $DIR, $startup)
+if ($result.ReturnValue -ne 0) {
+    Write-Output "ERROR: Win32_Process.Create failed with code $($result.ReturnValue)"
     exit 1
 }
 
-Write-Output "Started PID: $($proc.Id)"
+# 2s liveness check — 进程可能立即崩溃
+Start-Sleep 2
+if (-not (Get-Process -Id $result.ProcessId -ErrorAction SilentlyContinue)) {
+    $errLog = Get-Content $stderrLog -Tail 10 -ErrorAction SilentlyContinue
+    Write-Output "ERROR: Process $($result.ProcessId) died immediately.`nLast stderr:`n$errLog"
+    exit 1
+}
+
+Write-Output "Started PID: $($result.ProcessId)"
 Write-Output "Logs: $stdoutLog / $stderrLog"
 ```
 
@@ -152,18 +162,35 @@ try {
     Write-Output "ERROR: $EXE not found"; exit 1
 }
 
-# 用 cmd.exe /c 内部重定向，避免 pipe 句柄泄漏给长运行进程
-$cmd = "/d /s /c `"$resolved $($ARGS -join ' ') 1> `"$stdoutLog`" 2> `"$stderrLog`"`""
-$proc = Start-Process -FilePath "$env:ComSpec" `
-    -ArgumentList $cmd `
-    -PassThru -WindowStyle Hidden
-Write-Output "PID: $($proc.Id)"
-$proc.WaitForExit($TIMEOUT * 1000)
-if (-not $proc.HasExited) {
-    taskkill /pid $proc.Id /T /F 2>$null
+# 用 WMI 启动避免 pipe 句柄泄漏（同模板 1 原因）
+$launcher = "$env:TEMP\${LOGPREFIX}-launch-$PID.cmd"
+@"
+@echo off
+"$resolved" $($ARGS -join ' ') 1>"$stdoutLog" 2>"$stderrLog" <NUL
+"@ | Set-Content -LiteralPath $launcher -Encoding ASCII
+
+$startup = ([wmiclass]'Win32_ProcessStartup').CreateInstance()
+$startup.ShowWindow = 0
+$result = ([wmiclass]'Win32_Process').Create("$env:ComSpec /d /c `"$launcher`"", ".", $startup)
+if ($result.ReturnValue -ne 0) {
+    Write-Output "ERROR: Win32_Process.Create failed with code $($result.ReturnValue)"; exit 1
+}
+$procId = $result.ProcessId
+Write-Output "PID: $procId"
+
+# 有界等待
+$elapsed = 0
+while ($elapsed -lt $TIMEOUT) {
+    $p = Get-Process -Id $procId -ErrorAction SilentlyContinue
+    if (-not $p) {
+        Write-Output "Process exited naturally"
+        break
+    }
+    Start-Sleep 2; $elapsed += 2
+}
+if ($elapsed -ge $TIMEOUT) {
+    taskkill /pid $procId /T /F 2>$null
     Write-Output "Process tree killed after ${TIMEOUT}s"
-} else {
-    Write-Output "Process exited with code $($proc.ExitCode)"
 }
 ```
 
@@ -231,13 +258,15 @@ $proc = Start-Process ...; Write-Output "Started PID: $($proc.Id)"
 # ❌ 缺失二进制时 PS 原生异常而非可控错误
 $exe = (Get-Command nonexistent.cmd -ErrorAction Stop).Source
 
-# ❌ Start-Process -RedirectStandardOutput/Error 导致 pipe 句柄泄漏给孙进程
-# bash tool 永远等不到 pipe EOF，tool call 永不返回
+# ❌ Start-Process（任何形式）启动长运行进程 — pipe 句柄继承问题
+# OpenCode bash tool 等待 Node 'close' 事件（proc.on('close')），
+# Start-Process 创建的进程继承 PowerShell 的 stdout/stderr pipe 写端，
+# 即使 PowerShell 退出，node.exe 仍持有 pipe，'close' 永不触发，tool call 永不返回。
+# 以下所有变体都受影响：
 $proc = Start-Process -FilePath "pnpm" -RedirectStandardOutput $log -RedirectStandardError $err ...
-# ✅ 改用 cmd.exe /c 内部重定向（见模板 1）
-
-# ❌ 硬编码框架/端口
-$proc = Start-Process -FilePath "pnpm" -ArgumentList "dev" ... -LocalPort 3000
+$proc = Start-Process -FilePath "$env:ComSpec" -ArgumentList "/c pnpm dev" ...
+$proc = Start-Process -FilePath "pnpm" -ArgumentList "dev" ...  # 即使不加 -RedirectStandard*
+# ✅ 唯一可靠方案：WMI Win32_Process.Create（见模板 1）
 ```
 
 ## 最小 CSO 触发词
