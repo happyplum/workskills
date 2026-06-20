@@ -79,9 +79,16 @@ try {
 
 $stdoutLog = "$env:TEMP\${LOGPREFIX}-stdout-$PID.log"
 $stderrLog = "$env:TEMP\${LOGPREFIX}-stderr-$PID.log"
-$proc = Start-Process -FilePath $exe -ArgumentList $ARGS -WorkingDirectory $DIR `
-    -PassThru -WindowStyle Hidden `
-    -RedirectStandardOutput $stdoutLog -RedirectStandardError $stderrLog
+
+# 关键：不要用 Start-Process -RedirectStandardOutput/-RedirectStandardError
+# 那会让 OpenCode 的 stdout/stderr pipe 句柄泄漏给长运行孙进程（node.exe），
+# 导致 bash tool 永远等不到 pipe EOF，tool call 永不返回。
+# 改用 cmd.exe /c 内部重定向，让日志重定向发生在子进程 shell 内。
+$cmd = "/d /s /c `"$exe $ARGS 1> `"$stdoutLog`" 2> `"$stderrLog`"`""
+$proc = Start-Process -FilePath "$env:ComSpec" `
+    -ArgumentList $cmd `
+    -WorkingDirectory $DIR `
+    -PassThru -WindowStyle Hidden
 
 # 2s liveness check — 进程可能立即崩溃
 Start-Sleep 2
@@ -145,9 +152,11 @@ try {
     Write-Output "ERROR: $EXE not found"; exit 1
 }
 
-$proc = Start-Process -FilePath $resolved -ArgumentList $ARGS `
-    -PassThru -NoNewWindow `
-    -RedirectStandardOutput $stdoutLog -RedirectStandardError $stderrLog
+# 用 cmd.exe /c 内部重定向，避免 pipe 句柄泄漏给长运行进程
+$cmd = "/d /s /c `"$resolved $($ARGS -join ' ') 1> `"$stdoutLog`" 2> `"$stderrLog`"`""
+$proc = Start-Process -FilePath "$env:ComSpec" `
+    -ArgumentList $cmd `
+    -PassThru -WindowStyle Hidden
 Write-Output "PID: $($proc.Id)"
 $proc.WaitForExit($TIMEOUT * 1000)
 if (-not $proc.HasExited) {
@@ -221,6 +230,11 @@ $proc = Start-Process ...; Write-Output "Started PID: $($proc.Id)"
 
 # ❌ 缺失二进制时 PS 原生异常而非可控错误
 $exe = (Get-Command nonexistent.cmd -ErrorAction Stop).Source
+
+# ❌ Start-Process -RedirectStandardOutput/Error 导致 pipe 句柄泄漏给孙进程
+# bash tool 永远等不到 pipe EOF，tool call 永不返回
+$proc = Start-Process -FilePath "pnpm" -RedirectStandardOutput $log -RedirectStandardError $err ...
+# ✅ 改用 cmd.exe /c 内部重定向（见模板 1）
 
 # ❌ 硬编码框架/端口
 $proc = Start-Process -FilePath "pnpm" -ArgumentList "dev" ... -LocalPort 3000
