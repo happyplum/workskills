@@ -42,7 +42,7 @@ description: 会话开始时必须加载。当子代理或控制器被中断（C
 
 通过 `session_read(session_id=<old_session>)` 或 `background_output(task_id=<old_bg_id>)` 检查：
 
-> **协调 `omo-subagent-type` 规则 7**：若旧子代理是后台任务（`bg_...`），**不要**轮询 `background_output`；等系统通知。若需检查仍在运行的后台任务，用非阻塞的端口探测或 `session_info` 代替。
+> **后台任务纪律**：若旧子代理是后台任务（`bg_...`），**不要**轮询 `background_output`；等系统通知。若需检查仍在运行的后台任务，用非阻塞的端口探测或 `session_info` 代替。
 
 1. **tool call 状态**：哪些已完成（status=completed）、哪个卡住/失败（status=running/error）
 2. **TODO 完成度**：对比原计划，标注实际完成状态
@@ -101,7 +101,7 @@ task(category="quick", prompt="[CONTEXT]: Run QA screenshots\n[GOAL]: Capture al
 # ❌ 假设 session_id 存在 — 全新会话中无旧 ID
 session_read(session_id="ses_from_memory")
 
-# ❌ 轮询仍在运行的后台任务 — 违反 omo-subagent-type 规则 7
+# ❌ 轮询仍在运行的后台任务 — 违反后台任务纪律
 background_output(task_id="bg_still_running")
 ```
 
@@ -123,4 +123,4 @@ task(category="quick", prompt="[CONTEXT]: Run QA screenshots\n[PREVIOUS-PROGRESS
 |------|-----|
 | 适用角色 | 控制器（Sisyphus/Atlas） |
 | 触发条件 | 子代理或控制器被中断后用户说"继续" |
-| 依赖 skill | `long-running-process`（进程启动/清理）、`omo-subagent-type`（后台任务轮询协调） |
+| 依赖 skill | `long-running-process`（进程启动/清理） |
