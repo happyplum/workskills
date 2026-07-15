@@ -1,6 +1,6 @@
 ---
 name: long-running-process
-description: 会话开始时必须加载。当在 Windows 上启动长运行进程（dev server、flutter run、npm start 等）、等待端口/health endpoint 就绪、执行可能超时的构建命令，或排查 agent-browser/Chrome 残留导致 OpenCode tool call 卡住时使用
+description: 会话开始时必须加载。当在 Windows 上启动长运行进程（dev server、flutter run、npm start 等）、等待端口/health endpoint 就绪、执行可能超时的构建命令，或排查应用进程导致 OpenCode tool call 卡住时使用
 ---
 
 # 长运行进程安全启动（Windows）
@@ -13,11 +13,10 @@ OpenCode 的 bash 工具有超时机制（默认 120 秒，环境变量 `OPENCOD
 
 - 在 bash 命令内写无限轮询循环（`while (-not $ready) { sleep 1 }` 无超时上限），会导致命令永远不返回，最终被平台强制杀死，session 丢失。
 - 在 OpenCode Windows bash tool 内用 `Start-Process` 启动长运行进程，可能让子/孙进程继承 stdout/stderr pipe 句柄，导致 Node `close` 事件迟迟不触发。
-- 浏览器工具（如 `agent-browser`）即使命令输出已经足够，也可能因 browser session、daemon 或 Chrome 子进程未关闭而让 tool call 保持 `running`。
 
 `WMI Win32_Process.Create` 只是长运行后台进程启动的推荐隔离方式，用来降低 pipe 继承风险；它不是所有卡住问题的根治方案，也不适合需要直接捕获 stdout 的普通短命令。
 
-**范围**：本 skill 仅覆盖 Windows（PowerShell 7+）。Unix/macOS 进程管理超出范围——使用 `ss`/`lsof`/`pkill` 的原生 shell 模式。
+**范围**：本 skill 覆盖 Windows（PowerShell 7+）下的**应用进程**管理——dev server、构建命令、编译任务、任何需要后台运行并等待就绪的进程。浏览器自动化工具（`agent-browser`）有自己的 daemon 架构和独立的问题域，不在本 skill 范围内。Unix/macOS 进程管理也超出范围——使用 `ss`/`lsof`/`pkill` 的原生 shell 模式。
 
 ## 加载条件
 
@@ -25,8 +24,8 @@ OpenCode 的 bash 工具有超时机制（默认 120 秒，环境变量 `OPENCOD
 |------|--------|
 | 启动 dev server、等待端口就绪、运行编译/构建、限时前台捕获 | 普通短命令（<10s）、纯解释、Unix/macOS 环境 |
 | `pnpm dev`、`npm start`、`flutter run`、`cargo run`、`next dev`、`vite dev` | 与进程管理无关的文件编辑、搜索、lint |
-| `agent-browser`、Chrome、浏览器 smoke test、tool call 卡 `running`、需要清理残留 PID | 不涉及浏览器/进程/timeout 的普通 CLI 查询 |
-| 慢但会退出的一次性命令（`pnpm build`、`cargo build`）——仅适用规则 4 | 子代理中断恢复——使用 `interrupted-subagent-recovery` skill |
+| 慢但会退出的一次性命令（`pnpm build`、`cargo build`）——仅适用规则 4 | 浏览器自动化（`agent-browser`、Chrome、snapshot）——不在本 skill 范围 |
+| | 子代理中断恢复——使用 `interrupted-subagent-recovery` skill |
 
 ## 框架冷启动预算
 
@@ -51,7 +50,6 @@ OpenCode 的 bash 工具有超时机制（默认 120 秒，环境变量 `OPENCOD
 | 3 | **就绪检查必须独立、有界、失败 `exit 1`**：用独立 bash 调用检查端口/health endpoint，基于框架预算设超时 | 两个独立 bash call；检查脚本含 `exit 1` |
 | 4 | **bash tool 必须设置外层 `timeout`**：预期可能长时间运行的命令必须显式设置 `timeout`（毫秒），最大 600,000ms | 工具参数中 `timeout` 字段存在且 ≤ 600000 |
 | 5 | **端口占用不得默认成功**：必须验证占用进程的命令行或工作目录属于本任务；无法验证时 `exit 1` 并输出 owning PID/路径 | 输出含 `Get-CimInstance Win32_Process` 命令行信息 |
-| 6 | **浏览器工具必须显式收尾**：`agent-browser` 使用命名 session，完成后执行 `close`；若 OpenCode part 仍卡 `running`，先定位 part/PID/端口再精确清理 | 命令含 `--session <name>` 和收尾 `close`；清理前有 session/part/PID 证据 |
 
 ## PowerShell 模板
 
@@ -273,28 +271,6 @@ Write-Output "WARNING: No known error pattern matched. Raw last 20 lines:`n$(($t
 exit 1
 ```
 
-## agent-browser 检查规则
-
-`agent-browser` 不是 dev server，但在 Windows/OpenCode bash tool 下也可能留下 `agent-browser-win32-x64.exe`、Chrome 子进程或本地调试端口，使 tool part 长时间停在 `running`。这类问题不要用 WMI 包一层来掩盖；先让浏览器命令自身可收敛。
-
-推荐形状：
-
-```powershell
-agent-browser --session settings-smoke open http://127.0.0.1:3000/settings
-agent-browser --session settings-smoke wait --url "**/auth/login"
-agent-browser --session settings-smoke get url
-agent-browser --session settings-smoke snapshot -i -d 4
-agent-browser --session settings-smoke close
-```
-
-规则：
-
-- 使用可追踪的命名 session，不复用不明来源的浏览器 session。
-- redirect 或路由验证优先等待具体 URL、文本或元素；`networkidle` 只作为兜底，不作为默认等待条件。
-- 命令链输出已经足够时仍要显式 `close`，避免浏览器工具进程和 Chrome 子进程残留。
-- 如果 OpenCode part 仍卡 `running`，先使用 `opencode-subagent-log-triage` 定位 `session`/`part`/PID/端口，再对已证明为残留的工具 PID 执行 `taskkill /pid <PID> /T /F`。
-- 不要因为浏览器工具卡住而直接杀 dev server；先用 `Get-NetTCPConnection` 和 `Get-CimInstance Win32_Process` 区分 app server PID 与工具 PID。
-
 ## 反例
 
 ```powershell
@@ -326,8 +302,8 @@ $proc = Start-Process -FilePath "pnpm" -ArgumentList "dev" ...  # 即使不加 -
 
 ## 最小 CSO 触发词
 
-- 主要：`pnpm dev`、`npm start`、`flutter run`、`cargo run`、`next dev`、`vite dev`、`dev server`、`agent-browser`、`Chrome`、`Start-Process`、`port 3000`、`Get-NetTCPConnection`、`taskkill`、`waiting for port`
-- 次要：`hang`、`卡住`、`超时`、`running`、`close event`、`networkidle`、`detached`、`background process`、`long-running`、`cargo build`、`pnpm build`、`timeout`
+- 主要：`pnpm dev`、`npm start`、`flutter run`、`cargo run`、`next dev`、`vite dev`、`dev server`、`Start-Process`、`port 3000`、`Get-NetTCPConnection`、`taskkill`、`waiting for port`
+- 次要：`hang`、`卡住`、`超时`、`running`、`close event`、`detached`、`background process`、`long-running`、`cargo build`、`pnpm build`、`timeout`
 
 ## 平台事实
 
