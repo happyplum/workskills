@@ -58,7 +58,7 @@ atlas-execution-constraints
         │
         └──→ Atlas 执行门禁: 加载本 skill 后，任何 task() 委托或执行面展开前先确认 subagent-driven-development 已加载
 
-interrupted-subagent-recovery ──→ long-running-process（进程清理）、atlas-execution-constraints（恢复边界处的原子提交）
-
 long-running-process ──→ subagent-driven-development（SDD 工作流引用模板）
+
+interrupted-subagent-recovery ──→ 按需加载（触发词驱动）；审计发现的残留进程/端口清理与原子提交边界由控制器按需路由到对应能力，不硬绑定具体 skill
 ```
