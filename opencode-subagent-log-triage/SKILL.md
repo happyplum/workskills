@@ -1,64 +1,64 @@
 ---
 name: opencode-subagent-log-triage
-description: Use when an OpenCode subagent, child session, tool call, background task, or agent-browser check appears stuck, especially when the user provides a session ID, child-session title, tool description, worktree path, or asks to inspect OpenCode local logs/session data before deciding whether to terminate a process.
+description: 当 OpenCode 子代理、子会话、工具调用、后台任务或 agent-browser 检查看起来卡住时使用——尤其是用户提供 session ID、子会话标题、工具描述、worktree 路径，或要求在决定是否终止进程前检查 OpenCode 本地日志/会话数据时。
 ---
 
-# OpenCode Subagent Log Triage
+# OpenCode 子代理日志排查
 
-## Overview
+## 概述
 
-Use this skill to turn a vague stuck-subagent report into evidence: locate the real session/tool part, determine whether the tool is still running or only stale in storage, and recommend the smallest safe intervention.
+本 skill 把模糊的「子代理卡住」报告转化为证据：定位真正的 session/工具 part，判断工具是否仍在运行还是仅存储陈旧，并推荐最小安全干预。
 
-Core principle: never kill or edit anything until the stuck session, tool call, process tree, and user-visible outcome have been correlated from independent evidence.
+**核心原则**：在从独立证据关联起卡住的 session、工具调用、进程树和用户可见结果之前，绝不杀进程或编辑任何东西。
 
-## Inputs to Collect
+## 收集输入
 
-Accept any of these as starting points:
+接受以下任一作为起点：
 
-- Session ID: `ses_...`
-- Background task ID: `bg_...`
-- Message or part ID: `msg_...`, `prt_...`
-- Tool description/title, such as `Checks browser settings redirect`
-- Worktree or project path
-- Port, process name, URL, or browser session name
+- Session ID：`ses_...`
+- 后台任务 ID：`bg_...`
+- 消息或 part ID：`msg_...`、`prt_...`
+- 工具描述/标题，如 `Checks browser settings redirect`
+- Worktree 或项目路径
+- 端口、进程名、URL 或浏览器 session 名
 
-If the user only gives prose, search by distinctive substrings first. Tool descriptions are often stored inside part JSON and may not appear in normal session search results.
+若用户只给文字描述，先用特征子串搜索。工具描述常存储在 part JSON 内，可能不出现在常规 session 搜索结果中。
 
-## Evidence Workflow
+## 证据工作流
 
-1. Search high-level session APIs first when available:
-   - `session_info(session_id)` if an ID is known.
-   - `session_search(query)` for distinctive titles, tool descriptions, worktree names, URLs, or ports.
-   - `session_list(project_path)` when the project/worktree path is known.
-2. If high-level APIs miss the target or disagree, inspect local OpenCode storage:
-   - Logs: `%USERPROFILE%\.local\share\opencode\log`
-   - SQLite DB: `%USERPROFILE%\.local\share\opencode\opencode.db`
-   - WAL can contain fresher events than the main DB: `opencode.db-wal`
-   - Tool output: `%USERPROFILE%\.local\share\opencode\tool-output`
-3. Use SQLite to identify the actual parent/child session and tool part:
+1. 优先用高层 session API：
+   - 已知 ID 时用 `session_info(session_id)`
+   - 用 `session_search(query)` 搜索特征标题、工具描述、worktree 名、URL 或端口
+   - 已知项目/worktree 路径时用 `session_list(project_path)`
+2. 若高层 API 未命中或不一致，检查本地 OpenCode 存储：
+   - 日志：`%USERPROFILE%\.local\share\opencode\log`
+   - SQLite DB：`%USERPROFILE%\.local\share\opencode\opencode.db`
+   - WAL 可能比主 DB 有更新鲜的事件：`opencode.db-wal`
+   - 工具输出：`%USERPROFILE%\.local\share\opencode\tool-output`
+3. 用 SQLite 识别真正的父/子 session 和工具 part：
    - `session(id, parent_id, title, directory, agent, model, time_created, time_updated)`
    - `message(id, session_id, data)`
    - `part(id, message_id, session_id, time_created, time_updated, data)`
-4. For each suspect tool part, extract:
-   - `status`, `exit`, `tool`, `description`, `command`, `workdir`, `timeout`
-   - captured output, stdout/stderr, and last update time
-   - matching `step-start`/`step-finish` parts around the same message
-5. Correlate process state before recommending action:
-   - Find exact tool process PID, parent PID, child PIDs, command line, and creation time.
-   - Check relevant ports with owning PID.
-   - Confirm which process owns the application server versus the stuck tool.
-6. Only after process correlation, choose one recommendation:
-   - No action: command completed and session state already closed.
-   - Wait/retry: process is active and producing output.
-   - Resume/read: use `background_output` or `session_read` if the abstraction still works.
-   - Precise cleanup: terminate only the proven orphaned/stuck tool process tree.
-   - Escalate: if DB state, logs, and process tree conflict in a way that risks data loss.
+4. 对每个可疑工具 part，提取：
+   - `status`、`exit`、`tool`、`description`、`command`、`workdir`、`timeout`
+   - 捕获的输出、stdout/stderr 和最后更新时间
+   - 同一消息周围匹配的 `step-start`/`step-finish` part
+5. 推荐操作前先关联进程状态：
+   - 找到精确的工具进程 PID、父 PID、子 PID、命令行和创建时间
+   - 用拥有者 PID 检查相关端口
+   - 确认哪个进程拥有应用服务器 vs 卡住的工具
+6. 仅在进程关联后，选择一种建议：
+   - **无需操作**：命令已完成且 session 状态已关闭
+   - **等待/重试**：进程活跃且在产生输出
+   - **恢复/读取**：若抽象仍可用，用 `background_output` 或 `session_read`
+   - **精确清理**：仅终止已证实的孤儿/卡住工具进程树
+   - **提级**：若 DB 状态、日志和进程树冲突到有数据丢失风险
 
-## SQLite Query Patterns
+## SQLite 查询模式
 
-Use `sqlite3 "%USERPROFILE%\.local\share\opencode\opencode.db"` or an equivalent read-only query path.
+用 `sqlite3 "%USERPROFILE%\.local\share\opencode\opencode.db"` 或等价只读查询路径。
 
-Find a session:
+查找 session：
 
 ```sql
 select id, parent_id, title, directory, agent, model, time_created, time_updated
@@ -68,7 +68,7 @@ where id = 'ses_TARGET'
    or directory like '%worktree-or-project%';
 ```
 
-List child sessions:
+列出子 session：
 
 ```sql
 select id, title, agent, time_created, time_updated
@@ -77,7 +77,7 @@ where parent_id = 'ses_PARENT'
 order by time_created;
 ```
 
-Inspect tool parts in a target session:
+检查目标 session 的工具 part：
 
 ```sql
 select id, message_id, time_created, time_updated,
@@ -91,7 +91,7 @@ where session_id = 'ses_TARGET'
 order by time_created;
 ```
 
-Search part JSON by tool description:
+按工具描述搜索 part JSON：
 
 ```sql
 select session_id, message_id, id, time_created, time_updated, substr(data, 1, 1000)
@@ -100,9 +100,9 @@ where data like '%distinctive tool description%'
 order by time_updated desc;
 ```
 
-## Windows Process Checks
+## Windows 进程检查
 
-Use exact PIDs and command lines. Do not terminate by broad process name.
+用精确 PID 和命令行。不要按宽泛进程名终止。
 
 ```powershell
 $targets = @(60132,26560,35088)
@@ -115,17 +115,17 @@ Get-NetTCPConnection -LocalPort 3104 -ErrorAction SilentlyContinue |
   Select-Object LocalAddress,LocalPort,State,OwningProcess
 ```
 
-If cleanup is justified, terminate the exact orphaned tool PID tree only:
+若清理有据，仅终止精确的孤儿工具 PID 树：
 
 ```powershell
 taskkill /PID <exact-tool-pid> /T /F
 ```
 
-Immediately verify the tool PID disappeared and the application server PID/port remains alive.
+立即验证工具 PID 消失且应用服务器 PID/端口仍存活。
 
-## Report Format
+## 报告格式
 
-Return a concise report in this shape:
+返回简洁报告，结构如下：
 
 ```text
 理由：一句话说明核心依据。
@@ -150,11 +150,16 @@ Return a concise report in this shape:
 - 不要动：...
 ```
 
-## Common Mistakes
+## 常见错误
 
-- Treating a tool description as a session title. Search `part.data` when `session_search` misses it.
-- Trusting `session_read` alone. It may fail even when `session_info` and SQLite have the session.
-- Ignoring `opencode.db-wal`. Fresh running tool events can be visible there before normal abstractions index them.
-- Killing all `chrome.exe` or all `agent-browser` processes. Always correlate parent/child PIDs and command lines first.
-- Killing the app server that the stuck browser check was testing. Confirm port ownership before cleanup.
-- Calling a session resolved just because captured output looks complete. Verify the tool part has `status` closed and an exit code.
+- **把工具描述当 session 标题**。`session_search` 未命中时搜 `part.data`。
+- **只信 `session_read`**。它可能失败，即使 `session_info` 和 SQLite 有该 session。
+- **忽略 `opencode.db-wal`**。运行中的工具事件可能先出现在那里，早于正常抽象索引。
+- **杀掉所有 `chrome.exe` 或所有 `agent-browser` 进程**。始终先关联父/子 PID 和命令行。
+- **杀掉卡住浏览器检查正在测试的应用服务器**。清理前确认端口归属。
+- **仅因捕获的输出看起来完整就认为 session 已解决**。验证工具 part 有 `status` closed 和 exit code。
+
+## 最小触发词
+
+- 主要：`子代理卡住`、`tool call 卡 running`、`session ID`、`卡住`、`stuck`、`孤儿进程`、`杀进程`、`bg_`
+- 次要：`ses_`、`prt_`、`opencode.db`、`worktree`、`超时`、`background_output`、`session_read`、`子会话`
