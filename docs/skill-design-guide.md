@@ -88,6 +88,7 @@ skill 不应一次性倾倒所有信息，而应分层按需加载：
 - 写「❌ 错误 → ✅ 正确」对
 - **优先表格化**（无代码块），除非坏命令本身值得展示
 - 聚焦「看似合理但错误」的陷阱，不写显而易见的常识
+- **「## 红旗」**（如 doc-sync）是 anti-rationalization 短语（agent 用来跳过审计的内心独白），区别于「## 反例」的 ❌→✅ 对；两者都是高信号内容，按 skill 性质选用
 
 ## 标准目录结构
 
@@ -122,11 +123,11 @@ skill-name/
 |---|---|---|---|
 | omo-gated-routing-rules | ~120 | 单文件 | 健康 |
 | long-running-process | 113 | SKILL.md + 5 scripts | 健康（已脚本化） |
-| agent-browser-windows | 184 | SKILL.md + 6 scripts | 健康（已脚本化） |
+| agent-browser-windows | 181 | SKILL.md + 6 scripts | 健康（已脚本化） |
 | atlas-execution-constraints | 108 | 单文件 | 健康 |
 | interrupted-subagent-recovery | 95 | 单文件 | 健康 |
-| doc-sync | 131 | 单文件 | 健康 |
-| opencode-subagent-log-triage | 160 | 单文件 | 健康 |
+| doc-sync | 168 | 单文件 | 健康 |
+| opencode-subagent-log-triage | 165 | 单文件 | 健康 |
 
 ## 参考来源
 
