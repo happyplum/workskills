@@ -126,7 +126,7 @@ skill-name/
 | agent-browser-windows | 181 | SKILL.md + 6 scripts | 健康（已脚本化） |
 | atlas-execution-constraints | 108 | 单文件 | 健康 |
 | interrupted-subagent-recovery | 95 | 单文件 | 健康 |
-| doc-sync | 168 | 单文件 | 健康 |
+| doc-sync | 170 | 单文件 | 健康 |
 | opencode-subagent-log-triage | 165 | 单文件 | 健康 |
 
 ## 参考来源
