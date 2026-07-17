@@ -27,6 +27,8 @@ skills/
 
 ## 约定
 
+> **详细设计参照见 [`docs/skill-design-guide.md`](docs/skill-design-guide.md)**（渐进式披露分层、description 写法、长度红线与拆分信号、脚本化原则、反模式清单、本仓库 skill 现状速查）。维护任何 skill 前先读。
+
 ### SKILL.md 结构（YAML frontmatter + markdown）
 - Frontmatter 仅 `name` + `description` 两个字段
 - `description` 中文描述，以「当……时使用」格式，仅描述触发条件
