@@ -1,6 +1,6 @@
 ---
 name: agent-browser-windows
-description: 会话开始时必须加载。当在 Windows 上使用 agent-browser（浏览器自动化、打开网页、填表、点击、截图、抓取数据、QA smoke test、E2E 验证）或排查 agent-browser/Chrome 残留导致 OpenCode tool call 卡 running 时使用。提供防卡死调用规则、强制收尾机制、基于 sidecar 文件的精确孤儿进程清理。
+description: 当在 Windows 上使用 agent-browser（open、snapshot、click、screenshot、wait、浏览器 smoke test、E2E 验证、抓取页面），或排查 agent-browser/Chrome 残留、tool call 卡 running、.agent-browser engine 堆积时使用。
 allowed-tools: Bash(agent-browser:*), Bash(powershell:*), Bash(taskkill:*), Bash(where:*), Bash(ls:*), Bash(mkdir:*)
 ---
 
@@ -39,15 +39,6 @@ chrome.exe --remote-debugging-port=0
 **一句话结论**：**防卡住超时 wrapper（优先级最高）→ 全局串行化锁 → 主动 `close` → sidecar 验证零残留 → 必要时精确 `taskkill`**。场景脚本是事前预防/事后清理工具，不是卡住自救工具。idle timeout 是额外安全网，不替代主动 close。
 
 **范围**：本 skill 仅覆盖 Windows（PowerShell 7+ / Git Bash）。agent-browser 的命令用法（snapshot、ref、click、fill 等）见 CLI 自带的 `agent-browser skills get core`——本 skill 不重复，只管 Windows 下的进程安全。
-
-## 加载条件
-
-| 使用 | 不使用 |
-|------|--------|
-| 任何 `agent-browser` 命令（open、snapshot、click、screenshot、wait、QA） | 应用进程管理（dev server 启动、端口等待、构建） |
-| tool call 卡在 `running`、怀疑浏览器残留 | 与浏览器无关的文件编辑、搜索、lint |
-| 发现 `agent-browser-win32-x64.exe`、chrome 孤儿、`.agent-browser\*.engine` 堆积 | Unix/macOS 浏览器自动化 |
-| 浏览器 smoke test、E2E 验证、抓取页面 | |
 
 ## sidecar 文件机制（清理的数据源）
 
