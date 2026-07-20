@@ -10,7 +10,6 @@ oh-my-opencode 多智能体系统的自定义 Skill 仓库。每个 skill 是独
 ```
 skills/
 ├── README.md                        # 项目总览 + 分类索引 + 依赖关系图
-├── doc-sync/                        # Maintenance: 文档同步审计
 ├── interrupted-subagent-recovery/   # Global: 子代理中断恢复
 ├── long-running-process/            # Global: Windows 长运行进程治理
 ├── omo-gated-routing-rules/         # Core: 路由决策
@@ -36,8 +35,9 @@ skills/
 - Frontmatter 总长 ≤1024 字符
 
 ### 标准章节标题
-- `## 概述` / `## 加载条件` / `## 强制规则` / `## 反例`
+- `## 概述` / `## 强制规则` / `## 反例`
 - `## 最小 CSO 触发词`（含主要 + 次要关键词）
+- 不在正文保留加载条件章节；触发条件必须提前融合到 frontmatter `description` 中。
 
 ### 常见章节标题变体
 - `atlas-execution-constraints`: 含 `## 必需外部依赖`、`## 验证与关卡顺序`
