@@ -143,11 +143,6 @@ Invoke-AB -Session wallet-qa -ABArgs @('snapshot','-i','-d','4') -TimeoutSec 15 
 
 浏览器操作常涉及访问某个本地端口上的应用。收尾时必须**先 close 浏览器，再由该应用自身的进程管理停止应用**——顺序反了会导致浏览器 `wait` 命令卡在已关闭的端口上，制造新的卡住。本 skill 只负责浏览器侧的 close + 验证 + 锁释放，应用进程的启停不在本 skill 范围。
 
-## 最小触发词
-
-- 主要：`agent-browser`、`open url`、`snapshot`、`click @e`、`screenshot`、`浏览器`、`Chrome 残留`、`tool call 卡 running`、`close --all`、`session list`、`smoke test`、`E2E`、`QA`
-- 次要：`daemon`、`sidecar`、`.engine`、`.pid`、`agent-browser-win32-x64`、`agent-browser-chrome-`、`orphan`、`孤儿进程`、`headless chrome`
-
 ## 平台事实
 
 | 参数 | 值 |

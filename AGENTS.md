@@ -17,27 +17,28 @@ skills/
 └── atlas-execution-constraints/     # Execution: 执行时约束
 ```
 
-## 查找位置
-
-| 任务 | 位置 | 备注 |
-|------|----------|-------|
-| Skill 定义 | `<skill-name>/SKILL.md` | YAML frontmatter + markdown |
-| 分类与依赖 | `README.md` | 3 分类 + ASCII 依赖图 |
+> 经济路由规则已合并到 `omo-gated-routing-rules`；新增路由规则优先维护该 skill，不再创建独立路由 skill。
 
 ## 约定
 
 > **详细设计参照见 [`docs/skill-design-guide.md`](docs/skill-design-guide.md)**（渐进式披露分层、description 写法、长度红线与拆分信号、脚本化原则、反模式清单、本仓库 skill 现状速查）。维护任何 skill 前先读。
 
-### SKILL.md 结构（YAML frontmatter + markdown）
-- Frontmatter 仅 `name` + `description` 两个字段
-- `description` 中文描述，以「当……时使用」格式，仅描述触发条件
-- `name` 仅字母、数字、连字符
-- Frontmatter 总长 ≤1024 字符
+### SKILL.md 结构（按渐进式披露分层）
 
-### 标准章节标题
-- `## 概述` / `## 强制规则` / `## 反例`
-- `## 最小 CSO 触发词`（含主要 + 次要关键词）
-- 不在正文保留加载条件章节；触发条件必须提前融合到 frontmatter `description` 中。
+详细分层与设计原则以 [`docs/skill-design-guide.md`](docs/skill-design-guide.md) 为权威参照；本节仅给出快速约束。
+
+| 层 | 位置 | 内容 |
+|---|---|---|
+| **L0 触发** | frontmatter `description` | 「当……时使用」格式的触发条件 + 触发词；纯触发，**不写工作流/能力清单** |
+| **L1 规范** | SKILL.md 正文 | 概述、强制规则、决策树、反例；**不写触发词或加载条件** |
+| **L2 详情** | `references/*.md` | 仅域知识密集型 skill 需要，按正文显式指令加载 |
+| **L3 执行** | `scripts/*`、`assets/*` | 确定性脚本/模板，执行不进 context |
+
+**Frontmatter 约束**：仅 `name` + `description` 两个字段；`name` 仅字母/数字/连字符；Frontmatter 总长 ≤1024 字符；`description` 中文。
+
+**正文常用章节**：`## 概述` / `## 强制规则` / `## 反例`。
+
+> **触发词归 L0，不进正文**：触发词属于 `description`（始终全量注入），不应在正文以章节形式重复——重复既浪费 L1 加载成本，也与 L0 触发器职责冲突。
 
 ### 常见章节标题变体
 - `atlas-execution-constraints`: 含 `## 必需外部依赖`、`## 验证与关卡顺序`
@@ -60,22 +61,10 @@ skills/
 - 触发词: 中文（如 external-model-review 的「外部审查」）
 - 用户输出: 中文
 
-## 反模式
+## skills 开发常见错误积累
 
-| 反模式 | 为什么不好 |
-|---------|---------|
-| 在 Description 中展开工作流 | Agent 会跳过完整 skill，直接按描述执行 |
-| >7 条强制规则 | 认知过载，保持 ≤7 条 |
-| "Verify via LLM" | 不可简单验证，每条规则需可验证标准 |
-| ASCII 流程图 | 浪费 token，LLM 按序处理文本 |
-| 同类多例 | 稀释质量，维护负担 |
+历次维护 skill 时实际犯过的错误。新增一条要求：现象 + 为什么错 + 如何避免。
 
-## 审查流程
-
-修改 skill 后进行审查：
-1. 检测隐藏问题、AI 盲点、过度工程
-2. 迭代直到通过
-
-## 备注
-
-- 经济路由规则已合并到 `omo-gated-routing-rules`；新增路由规则优先维护该 skill。
+| # | 现象 | 为什么错 | 如何避免 |
+|---|------|---------|---------|
+| 1 | 在 SKILL.md 正文写 `## 最小 CSO 触发词` / `## 最小触发词` 章节 | 触发词属 L0 description（始终全量注入），正文重复既浪费 L1 加载成本，又与 L0 触发器职责冲突；同义变体命名（CSO 触发词 vs 触发词）还制造 grep 漏检 | 触发词只融合进 frontmatter `description`；维护时 grep 多种命名变体确认无残留 |

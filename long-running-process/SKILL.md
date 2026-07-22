@@ -87,11 +87,6 @@ $proc = Start-Process ...; Write-Output "Started PID: $($proc.Id)"
 # ✅ 用 start-background.ps1（WMI Win32_Process.Create 隔离）
 ```
 
-## 最小 CSO 触发词
-
-- 主要：`pnpm dev`、`npm start`、`flutter run`、`cargo run`、`next dev`、`vite dev`、`dev server`、`Start-Process`、`port 3000`、`Get-NetTCPConnection`、`taskkill`、`waiting for port`
-- 次要：`hang`、`卡住`、`超时`、`running`、`close event`、`detached`、`background process`、`long-running`、`cargo build`、`pnpm build`、`timeout`
-
 ## 平台事实
 
 | 参数 | 值 |

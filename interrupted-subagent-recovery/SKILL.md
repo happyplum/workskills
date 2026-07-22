@@ -1,6 +1,6 @@
 ---
 name: interrupted-subagent-recovery
-description: 当子代理或控制器被中断（Ctrl+C、超时、session 错误）后用户说"继续"时按需加载。必须先审计旧执行状态再决定续派策略
+description: 当子代理或控制器被中断（Ctrl+C、超时、session 错误、background task 失败）后，用户说"继续"、"resume"、"超时后继续"、"Ctrl+C 后继续"或需从中断的 subagent session 恢复时按需加载
 ---
 
 # 子代理中断恢复
@@ -87,8 +87,3 @@ session_list(from_date="2026-06-19", limit=5)  → 找到 ses_xxx
 session_read(session_id="ses_xxx")  → 审计 tool call、TODO、workspace
 task(category="quick", prompt="[CONTEXT]: Run QA screenshots\n[PREVIOUS-PROGRESS]: ses_xxx interrupted at step 6. Steps 1-5 done. Step 6 failed: infinite polling.\n[DO-NOT-REPEAT]: Steps 1-5.\n[CONTINUATION-CONSTRAINTS]: Use bounded-wait + liveness-check launch pattern for dev server. Resume from step 6.\n[GOAL]: Capture remaining screenshots\n[RETURN]: paths")
 ```
-
-## 最小 CSO 触发词
-
-- 主要：`继续`（中断后）、`resume`、`timeout 后继续`、`Ctrl+C 后继续`、`subagent interrupted`
-- 次要：`中断`、`卡住后继续`、`超时恢复`、`session_read`、`background_output`、`重新开始`

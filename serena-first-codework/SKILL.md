@@ -1,6 +1,6 @@
 ---
 name: serena-first-codework
-description: 当 Serena 可用时必须加载。
+description: 当 Serena MCP 可用且做代码语义工作（symbol、references、refactor、rename、LSP/AST-grep 回退）时必须加载
 ---
 
 # Serena 优先代码工作
@@ -64,12 +64,6 @@ description: 当 Serena 可用时必须加载。
 - ❌ 用文本替换做可语义 rename/delete 的重构 → ✅ 先用 Serena 或 LSP 的语义重构能力。
 - ❌ 把 Serena diagnostics 当作“已验证通过” → ✅ 仍运行相关诊断、测试、构建或实际验证。
 - ❌ 把临时调试结论写进 memory → ✅ 只写已验证的长期事实。
-
-## 最小 CSO 触发词
-
-**主要关键词：** Serena、symbol、symbols、semantic code、reference、references、implementation、call graph、LSP、AST-grep、refactor、rename、safe delete、diagnostics、memory、replace_symbol_body、insert_after_symbol、find_symbol
-
-**次要关键词：** MCP、代码语义、跨文件、影响面、大文件、局部插入、精确编辑、调用链、定义、声明、实现、删除、项目记忆、续接、符号级编辑
 
 ## 记住一句话
 

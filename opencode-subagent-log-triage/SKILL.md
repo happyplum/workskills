@@ -158,8 +158,3 @@ taskkill /PID <exact-tool-pid> /T /F
 - **杀掉所有 `chrome.exe` 或所有 `agent-browser` 进程**。始终先关联父/子 PID 和命令行。
 - **杀掉卡住浏览器检查正在测试的应用服务器**。清理前确认端口归属。
 - **仅因捕获的输出看起来完整就认为 session 已解决**。验证工具 part 有 `status` closed 和 exit code。
-
-## 最小触发词
-
-- 主要：`子代理卡住`、`tool call 卡 running`、`session ID`、`卡住`、`stuck`、`孤儿进程`、`杀进程`、`bg_`
-- 次要：`ses_`、`prt_`、`opencode.db`、`worktree`、`超时`、`background_output`、`session_read`、`子会话`
