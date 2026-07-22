@@ -66,13 +66,13 @@ Resume from: Step 3
 | 已完成步骤占比 < 30% 且无有用产出 | 重新开始（保留对原失败原因的认知） |
 | 产出不可靠（部分写入文件） | 审计完整性，必要时清理后重做 |
 
-续派 prompt 必须包含：原始任务描述 + `[PREVIOUS-PROGRESS]` + `[DO-NOT-REPEAT]`（来自步骤 2）+ `[CONTINUATION-CONSTRAINTS]`（跳过已完成步骤、避免重复失败）。
+续派 prompt 遵守六段委托契约，并在 `[CONTEXT]` / `[REQUEST]` 中包含原始任务、`[PREVIOUS-PROGRESS]`、`[DO-NOT-REPEAT]` 和 `[CONTINUATION-CONSTRAINTS]`。
 
 ## 反例
 
 ```
 # ❌ 无脑续派 — 丢失所有已完成工作
-task(category="quick", prompt="[CONTEXT]: Run QA screenshots\n[GOAL]: Capture all\n[RETURN]: paths")
+task(category="quick", prompt="[CONTEXT]: Run QA screenshots\n[GOAL]: Capture all")
 
 # ❌ 假设 session_id 存在 — 全新会话中无旧 ID
 session_read(session_id="ses_from_memory")
@@ -85,5 +85,5 @@ background_output(task_id="bg_still_running")
 # ✅ 完整恢复流程
 session_list(from_date="2026-06-19", limit=5)  → 找到 ses_xxx
 session_read(session_id="ses_xxx")  → 审计 tool call、TODO、workspace
-task(category="quick", prompt="[CONTEXT]: Run QA screenshots\n[PREVIOUS-PROGRESS]: ses_xxx interrupted at step 6. Steps 1-5 done. Step 6 failed: infinite polling.\n[DO-NOT-REPEAT]: Steps 1-5.\n[CONTINUATION-CONSTRAINTS]: Use bounded-wait + liveness-check launch pattern for dev server. Resume from step 6.\n[GOAL]: Capture remaining screenshots\n[RETURN]: paths")
+task(task_id="ses_xxx", prompt="[CONTEXT]: Run QA screenshots. [PREVIOUS-PROGRESS]: Steps 1-5 done; step 6 failed from infinite polling.\n[GOAL]: Capture the remaining screenshots.\n[STOP WHEN]: Every remaining route has one readable screenshot.\n[EVIDENCE]: Return screenshot paths and the route represented by each file.\n[DOWNSTREAM]: Parent will perform visual QA.\n[REQUEST]: [DO-NOT-REPEAT]: Steps 1-5. [CONTINUATION-CONSTRAINTS]: Resume at step 6 with bounded wait and liveness checks.")
 ```
