@@ -11,13 +11,15 @@ oh-my-opencode 多智能体系统的自定义 Skill 仓库。每个 skill 是独
 skills/
 ├── README.md                        # 项目总览 + 分类索引 + 依赖关系图
 ├── interrupted-subagent-recovery/   # Global: 子代理中断恢复
+├── agent-browser-windows/            # Global: Windows 浏览器自动化治理
 ├── long-running-process/            # Global: Windows 长运行进程治理
-├── omo-gated-routing-rules/         # Core: 路由决策
+├── omo-adaptive-execution/          # Core: OMO 执行与路由
 ├── opencode-subagent-log-triage/    # Global: OpenCode 子代理日志排查
-└── atlas-execution-constraints/     # Execution: 执行时约束
+├── serena-first-codework/            # Core: Serena 优先代码语义工作
+└── omo-atlas-execution-constraints/ # Execution: OMO Atlas 治理
 ```
 
-> 经济路由规则已合并到 `omo-gated-routing-rules`；新增路由规则优先维护该 skill，不再创建独立路由 skill。
+> OMO 执行规则维护在 `omo-adaptive-execution/SKILL.md`，路由策略维护在同目录 `routing.md`；其它 prompt 和治理 skill 不复制两者内容。
 
 ## 约定
 
@@ -40,12 +42,8 @@ skills/
 
 > **触发词归 L0，不进正文**：触发词属于 `description`（始终全量注入），不应在正文以章节形式重复——重复既浪费 L1 加载成本，也与 L0 触发器职责冲突。
 
-### 常见章节标题变体
-- `atlas-execution-constraints`: 含 `## 必需外部依赖`、`## 验证与关卡顺序`
-
-### 外部 skill 依赖
-- `subagent-driven-development` 是运行时外部 skill 依赖，当前由 `C:\Users\lzy\.agents\skills\subagent-driven-development\SKILL.md` 提供，不在本仓库 `skills/` 下维护副本。
-- 本仓库中的 skill 可以引用 `subagent-driven-development`，但不得在这里重新创建、复制或改写其 `SKILL.md`。
+### 外部 skill 触发边界
+- 特殊执行方式由外部 skill 的 description 自行触发；本地 prompt 和治理 skill 不重复枚举或强绑外部执行 skill。
 
 ### 手动触发 skill 约定
 - 记忆重组、工作区清理、计划结构修复等手动治理能力已迁移至同级独立子仓库 `../commands/`；为避免 `commands/README.md` 被命令加载器误识别，命令目录说明与手动治理工作流文档维护在 `../commands/docs/README.md`
@@ -58,7 +56,7 @@ skills/
 ### 语言
 - Skill 内容: 中文（章节标题、正文、表格内容均已中文化）
 - 系统标识符: 英文（`name` 字段、代码块、命令、文件路径、技术术语）
-- 触发词: 中文（如 external-model-review 的「外部审查」）
+- 触发词: 中文（如 `omo-adaptive-execution` 的「多步骤委托」）
 - 用户输出: 中文
 
 ## skills 开发常见错误积累

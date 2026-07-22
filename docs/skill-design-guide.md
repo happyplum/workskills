@@ -121,12 +121,13 @@ skill-name/
 
 | skill | 行数 | 结构 | 状态 |
 |---|---|---|---|
-| omo-gated-routing-rules | ~120 | 单文件 | 健康 |
+| omo-adaptive-execution | ~145 | SKILL.md + routing.md | 健康 |
 | long-running-process | 113 | SKILL.md + 5 scripts | 健康（已脚本化） |
 | agent-browser-windows | 181 | SKILL.md + 6 scripts | 健康（已脚本化） |
-| atlas-execution-constraints | 108 | 单文件 | 健康 |
+| omo-atlas-execution-constraints | ~75 | 单文件 | 健康 |
 | interrupted-subagent-recovery | 95 | 单文件 | 健康 |
 | opencode-subagent-log-triage | 165 | 单文件 | 健康 |
+| serena-first-codework | 70 | 单文件 | 健康 |
 
 ## 参考来源
 
