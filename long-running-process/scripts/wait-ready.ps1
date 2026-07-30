@@ -1,41 +1,107 @@
 <#
 .SYNOPSIS
-  就绪检查（端口 / health endpoint，有界超时）
+  就绪检查（端口 / health，有界；可选 RunId 归属校验）
 .DESCRIPTION
-  独立 bash 调用，有界轮询端口或 health endpoint。就绪 exit 0，超时 exit 1。
-  必须与 start-background 分两个独立 bash 调用（规则 3）。
-  来自 long-running-process skill 模板 2。
+  与 start-background 分两个独立 shell tool 调用。提供 -RunId 时，端口 listener 必须属于该 run 的 control 树。
 .PARAMETER Port
-  待检查端口
+  待检查端口（无 HealthUrl 时必填；有 RunId 时可从 state 读取）
 .PARAMETER MaxWait
-  最大等待秒数（查框架预算表选择，须 < bash tool timeout）
+  最大等待秒数；须满足 MaxWait + cleanup margin < 本次显式 outer timeout
 .PARAMETER HealthUrl
-  可选 health endpoint URL；提供时优先用它而非端口检查
+  可选 health endpoint
+.PARAMETER RunId
+  可选；提供时校验 listener 归属本 run
 .EXAMPLE
+  .\wait-ready.ps1 -RunId dev-20260101-1 -MaxWait 60
   .\wait-ready.ps1 -Port 3000 -MaxWait 60
-  .\wait-ready.ps1 -Port 8080 -MaxWait 120 -HealthUrl http://localhost:8080/health
 #>
 param(
-    [Parameter(Mandatory)][int]$Port,
+    [int]$Port = 0,
     [Parameter(Mandatory)][int]$MaxWait,
-    [string]$HealthUrl
+    [string]$HealthUrl = '',
+    [string]$RunId = ''
 )
 Set-StrictMode -Version Latest
-$ErrorActionPreference = "Stop"
+$ErrorActionPreference = 'Stop'
+
+. "$PSScriptRoot\common.ps1"
+
+$controlPid = 0
+$appPid = 0
+if (-not [string]::IsNullOrWhiteSpace($RunId)) {
+    $state = Read-LrpState -RunId $RunId
+    $controlPid = [int]$state.ControlPid
+    $appPid = [int]$state.AppPid
+    if ($Port -le 0 -and $state.Port) { $Port = [int]$state.Port }
+    if (-not (Test-LrpProcessAlive -ProcessId $controlPid) -and -not (Test-LrpProcessAlive -ProcessId $appPid)) {
+        Write-Output "ERROR: RunId=$RunId process tree is not alive (ControlPid=$controlPid AppPid=$appPid)"
+        exit 1
+    }
+}
+
+if ($Port -le 0 -and [string]::IsNullOrWhiteSpace($HealthUrl)) {
+    Write-Output 'ERROR: Provide -Port and/or -HealthUrl (or -RunId with Port in state)'
+    exit 1
+}
 
 $timer = 0
 while ($timer -lt $MaxWait) {
-    if ($HealthUrl) {
+    $healthOk = $false
+    if (-not [string]::IsNullOrWhiteSpace($HealthUrl)) {
         try {
             $r = Invoke-WebRequest -Uri $HealthUrl -UseBasicParsing -TimeoutSec 2 -ErrorAction Stop
-            Write-Output "Health check passed (status $($r.StatusCode))"; exit 0
+            if ($r.StatusCode -ge 200 -and $r.StatusCode -lt 500) {
+                $healthOk = $true
+            }
         } catch { }
-    } else {
-        $conn = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue |
-            Select-Object -First 1
-        if ($conn) { Write-Output "Port $Port ready (PID $($conn.OwningProcess))"; exit 0 }
     }
-    Start-Sleep 2; $timer += 2
+
+    $portOk = $true
+    $ownerInfo = ''
+    if ($Port -gt 0) {
+        $owners = Get-LrpListenersOnPort -Port $Port
+        if ($owners.Count -eq 0) {
+            $portOk = $false
+        } elseif ($controlPid -gt 0) {
+            $foreign = [System.Collections.Generic.List[int]]::new()
+            $owned = [System.Collections.Generic.List[int]]::new()
+            foreach ($op in $owners) {
+                $opId = [int]$op
+                if (Test-LrpPidInControlTree -CandidatePid $opId -ControlPid $controlPid -AppPid $appPid) {
+                    $owned.Add($opId) | Out-Null
+                } else {
+                    $foreign.Add($opId) | Out-Null
+                }
+            }
+            if ($foreign.Count -gt 0 -or $owned.Count -eq 0) {
+                $portOk = $false
+                if ($foreign.Count -gt 0 -and $timer -ge ($MaxWait - 2)) {
+                    Write-Output "ERROR: Port $Port has listener(s) not owned by RunId=$RunId : $($foreign -join ',')"
+                    exit 1
+                }
+            } else {
+                $ownerInfo = "owned PIDs $($owned -join ',')"
+            }
+        } else {
+            # 无 RunId：仅报告首个 listener，不能证明归属
+            $ownerInfo = "PID $($owners[0]) (ownership not verified — pass -RunId)"
+        }
+    }
+
+    if ($portOk -and ([string]::IsNullOrWhiteSpace($HealthUrl) -or $healthOk)) {
+        if ($healthOk -and $Port -gt 0) {
+            Write-Output "Ready: health ok; port $Port ($ownerInfo)"
+        } elseif ($healthOk) {
+            Write-Output 'Ready: health check passed'
+        } else {
+            Write-Output "Ready: port $Port ($ownerInfo)"
+        }
+        exit 0
+    }
+
+    Start-Sleep 2
+    $timer += 2
 }
-Write-Output "ERROR: Port $Port not ready after ${MaxWait}s"
+
+Write-Output "ERROR: Not ready after ${MaxWait}s (Port=$Port RunId=$RunId)"
 exit 1
