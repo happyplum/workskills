@@ -1,89 +1,105 @@
 ---
 name: interrupted-subagent-recovery
-description: 当子代理或控制器被中断（Ctrl+C、超时、session 错误、background task 失败）后，用户说"继续"、"resume"、"超时后继续"、"Ctrl+C 后继续"或需从中断的 subagent session 恢复时按需加载
+description: 当子代理或控制器被中断（Ctrl+C、超时、session 错误、background task 失败）后，用户说"继续"、"resume"、"超时后继续"、"Ctrl+C 后继续"或需从中断的 subagent session 恢复执行时按需加载
 ---
 
 # 子代理中断恢复
 
 ## 概述
 
-子代理被中断或超时终止后，直接用原始 prompt 开新子代理会导致已完成工作全部丢失，且大概率在同一位置再次卡住。本 skill 规范中断后恢复前的必选流程：发现并审计旧状态 → 构建恢复上下文 → 决策续派或重做。
+中断后直接用原始 prompt 开新子代理会丢失进度并可能在同一点再卡住。本 skill **唯一负责**恢复派发决策：发现并审计旧状态 → 证明 single-writer 与副作用可续 → `HOLD` / `CONTINUE_*` / `NEW`。
+
+**共享 invariant（派发前）**：旧 writer 已证实停止；外部副作用不是 `unknown`；残留资源已证明可复用、已停止或不存在。证据不足 → `HOLD`，禁止第二个 writer。
 
 ## 强制规则
 
 | # | 规则 | 验证 |
 |---|------|------|
-| 1 | **必须先发现旧 session**：不凭记忆假设 session_id；通过 `session_list`/`session_search`/git 日志找到旧执行记录 | 已执行会话发现 |
-| 2 | **必须审计 workspace 现实**：通过 `session_read`/`background_output`/`git status`/`git diff` 核对已完成工作、产出完整性与残留信号（文件、端口、后台任务） | 审计清单已执行 |
-| 3 | **续派必须携带恢复上下文**：prompt 含 `[PREVIOUS-PROGRESS]` + `[DO-NOT-REPEAT]`；不得复用原始 prompt | prompt 含两个段且非原始复用 |
+| 1 | **必须先发现旧 session**：不凭记忆假设 session_id；用 `session_list`/`session_search`/git 日志 | 已执行会话发现 |
+| 2 | **必须审计 workspace + 副作用 + writer**：`session_read`/`background_output`/`git status`/`git diff`；writer 与残留按路由表取证 | 审计清单已执行；writer ∈ {ACTIVE,INACTIVE,UNKNOWN} |
+| 3 | **派发前 single-writer gate**：ACTIVE 或 UNKNOWN 不得 `task()`；先等待、triage 或停残留 | 无并行第二 writer |
+| 4 | **续派必须携带恢复上下文**：`[PREVIOUS-PROGRESS]` + `[DO-NOT-REPEAT]` + 四字段约束；不得复用原始 prompt | prompt 含上述段 |
+
+## 路由（本 skill 唯一派发）
+
+| 域 | Owner | 本 skill 做什么 | 不做什么 |
+|---|---|---|---|
+| writer / session 状态不明 | `opencode-subagent-log-triage` | 要 `ACTIVE`/`INACTIVE`/`UNKNOWN` 证据 | 不让 triage 调用 `task()` |
+| 应用 dev server / 端口 / RunId | `long-running-process` | 要 stop/cleanup/ready 证据后再派发 | 不手写 taskkill 清应用 |
+| agent-browser / Chrome | `agent-browser-windows` | 需要时路由清理浏览器域 | 不清应用端口、不决定续派 |
+| 最终 `task()` | **本 skill** | `HOLD` / `CONTINUE_*` / `NEW` | — |
 
 ## 恢复协议
 
-### 步骤 0：会话发现（无旧 session_id 时）
+### 步骤 0：会话发现
 
-1. `session_list(from_date=<中断日期>, limit=10)` + `session_search(query="<任务关键词>")` 查找旧会话
-2. 找到 → 步骤 1；未找到 → 回退 workspace 现实（`git log`/`git status`/产物/端口扫描），这是唯一真相来源
+1. `session_list(from_date=…, limit=10)` + `session_search(query=关键词)`
+2. 找到 → 步骤 1；未找到 → workspace 现实（`git log`/`git status`/产物/端口/RunId state）为唯一真相
 
-### 步骤 1：审计旧状态
+### 步骤 1：审计
 
-通过 `session_read`/`background_output` 检查（后台任务不轮询，等系统通知）：
+1. **tool / TODO**：completed vs running/error；计划步骤实际状态
+2. **workspace**：`git status`/`git diff`/产物；diff 可能混用户编辑，交叉 mtime，模糊则问用户
+3. **writer**：session 显示 running ≠ 真有 writer。不确定时加载 triage，只接受三态结论
+4. **副作用**：对 migration/push/发布/付款等标 `committed` / `rolled-back` / `unknown`
+5. **残留**：端口、`%TEMP%\opencode-long-running\*.json`、后台 `bg_…`——记录后按路由表处理，不默认忽略
+6. **并发**：同级子代理仍写共享资源则合并进度，不并行重派
 
-1. **tool call 状态**：已完成（completed）/ 卡住或失败（running/error）
-2. **TODO 完成度**：对比原计划标注实际状态
-3. **workspace 现实**：`git status`/`git diff`/新建修改文件/测试产物/日志。`git diff` 可能混合子代理与用户编辑，交叉引用时间戳与 mtime，模糊时询问用户
-4. **残留信号**：端口占用、后台任务状态——作为环境信号记录；具体清理按需路由
-5. **并发检查**（并行调度）：枚举同级子代理，确认无同级仍写入共享资源；存活则合并进度
-
-### 步骤 2：构建恢复上下文
+### 步骤 2：恢复上下文
 
 ```
 [PREVIOUS-PROGRESS]
-Previous subagent session: <session_id>
-Status: INTERRUPTED at step "<step name>"
+Previous subagent session: <session_id or none>
+Status: INTERRUPTED at "<step>"
 Completed steps:
-  - Step 1: <description> — DONE (evidence: <files/git commits>)
-  - Step 2: <description> — DONE (evidence: <output summary>)
+  - … — DONE (evidence: …)
 Failed/Interrupted step:
-  - Step 3: <description> — FAILED/INTERRUPTED
-    Command: <exact command that failed>
-    Error: <error message or "interrupted by user">
-    Fix required: <what the new subagent should do differently>
-Residual signals: <port/PID/background markers>
-Resume from: Step 3
+  - … — FAILED/INTERRUPTED
+    Command/Error/Fix required: …
+Writer: ACTIVE|INACTIVE|UNKNOWN (evidence: …)
+Side effects: <name>=committed|rolled-back|unknown
+Residual: <RunId/port/bg/…>
+Resume checkpoint: <step or file>
 [/PREVIOUS-PROGRESS]
 
 [DO-NOT-REPEAT]
-- Step 1: <already done, files at ...>
-- Step 2: <already done, output: ...>
+- <already done with evidence>
 [/DO-NOT-REPEAT]
+
+[CONTINUATION-CONSTRAINTS]
+Resume checkpoint: <…>
+Allowed writes: <paths/modules>
+Side effects already committed: <…>
+Resources to reuse/stop: <RunId/port/none>
+[/CONTINUATION-CONSTRAINTS]
 ```
 
-### 步骤 3：决策与续派
+### 步骤 3：决策（可验证）
 
-| 条件 | 决策 |
-|------|------|
-| 卡住步骤可修复（超时、端口冲突等环境信号） | 续派，携带恢复上下文 |
-| 已完成步骤占比 < 30% 且无有用产出 | 重新开始（保留对原失败原因的认知） |
-| 产出不可靠（部分写入文件） | 审计完整性，必要时清理后重做 |
+| 决策 | 条件 | 动作 |
+|---|---|---|
+| **HOLD** | writer=ACTIVE/UNKNOWN，或任一侧作用=unknown，或残留归属不清 | 不调用 `task()`；等待 / triage / 外部核对 / 按路由 stop |
+| **CONTINUE_SYNC** | 同目标+同 workspace；session 可 `session_info`/`session_read`；writer=INACTIVE；agent 仍适合 | 默认同步 `task(task_id="ses_…")`。**terminal/completed 不否决** |
+| **CONTINUE_BACKGROUND** | 旧 `bg_…` 仍被 manager 识别且**不是** running | `task`/`background` 续接；manager 报 Task not found 或 running 拒绝 → 改 HOLD/NEW |
+| **NEW** | session 不可寻址，或 continuation **显式拒绝**，或目标/角色已变 | 新 `task(...)`，仍带旧 ses id（若有）与完整恢复上下文 |
 
-续派 prompt 遵守六段委托契约，并在 `[CONTEXT]` / `[REQUEST]` 中包含原始任务、`[PREVIOUS-PROGRESS]`、`[DO-NOT-REPEAT]` 和 `[CONTINUATION-CONSTRAINTS]`。
+删除「完成不足 30% 则重来」——用 **可验证 checkpoint** 与 **副作用状态** 决定起点，不用完成比例。
+
+续派 prompt 遵守六段委托契约；`[CONTEXT]`/`[REQUEST]` 含原始目标与上述三段。
 
 ## 反例
 
-```
-# ❌ 无脑续派 — 丢失所有已完成工作
-task(category="quick", prompt="[CONTEXT]: Run QA screenshots\n[GOAL]: Capture all")
-
-# ❌ 假设 session_id 存在 — 全新会话中无旧 ID
-session_read(session_id="ses_from_memory")
-
-# ❌ 轮询仍在运行的后台任务
-background_output(task_id="bg_still_running")
-```
+| ❌ | ✅ |
+|---|---|
+| 无审计直接 `task(prompt=原始任务)` | 先发现 session → 审计 → 决策表 |
+| session 显示 running 就续派 | writer 未证 INACTIVE → HOLD；需要时 triage |
+| 假定 terminal session 不能 `task_id` | 默认可 CONTINUE_SYNC；仅不可寻址或显式拒绝才 NEW |
+| readiness 失败后立刻再 start server | 先 `stop-background`/`cleanup-port` 或证明可复用 |
+| triage 里直接 `task()` 恢复 | triage 只出三态；本 skill 派发 |
+| 副作用 unknown 时 NEW 重做 migration | HOLD，先查外部系统 |
 
 ```
-# ✅ 完整恢复流程
-session_list(from_date="2026-06-19", limit=5)  → 找到 ses_xxx
-session_read(session_id="ses_xxx")  → 审计 tool call、TODO、workspace
-task(task_id="ses_xxx", prompt="[CONTEXT]: Run QA screenshots. [PREVIOUS-PROGRESS]: Steps 1-5 done; step 6 failed from infinite polling.\n[GOAL]: Capture the remaining screenshots.\n[STOP WHEN]: Every remaining route has one readable screenshot.\n[EVIDENCE]: Return screenshot paths and the route represented by each file.\n[DOWNSTREAM]: Parent will perform visual QA.\n[REQUEST]: [DO-NOT-REPEAT]: Steps 1-5. [CONTINUATION-CONSTRAINTS]: Resume at step 6 with bounded wait and liveness checks.")
+# ✅ 决策骨架
+# writer=INACTIVE, side effects known, session 可寻址
+task(task_id="ses_xxx", prompt="[CONTEXT]: … [PREVIOUS-PROGRESS]: …\n[GOAL]: …\n[STOP WHEN]: …\n[EVIDENCE]: …\n[DOWNSTREAM]: …\n[REQUEST]: [DO-NOT-REPEAT]: … [CONTINUATION-CONSTRAINTS]: …")
 ```
