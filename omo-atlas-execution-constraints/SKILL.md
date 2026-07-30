@@ -1,6 +1,6 @@
 ---
 name: omo-atlas-execution-constraints
-description: 当运行于 oh-my-openagent，且 Atlas 开始理解、准备或协调中大型目标时必须加载，包括尚未进入实际执行的拆分与就绪阶段。
+description: 当当前代理承担 Atlas 角色，开始理解、准备、拆分或协调目标（含尚未进入实际执行的阶段）时必须加载；纯解释、问答及不涉及协调的只读分析不加载。
 ---
 
 # OMO Atlas 执行约束
