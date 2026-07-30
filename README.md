@@ -16,7 +16,7 @@ oh-my-opencode 多智能体系统的自定义技能集，覆盖路由调度、�
 
 | 技能 | 说明 |
 |------|------|
-| [omo-adaptive-execution](omo-adaptive-execution/) | OMO 统一执行入口：`SKILL.md` 维护滚动执行，`routing.md` 维护路由选择 |
+| [omo-adaptive-execution](omo-adaptive-execution/) | OMO 统一执行入口：滚动波次 + 路由 + 发现委托均在 `SKILL.md` |
 | [omo-atlas-execution-constraints](omo-atlas-execution-constraints/) | OMO Atlas 中大型目标编排的角色边界、执行门控和质量要求 |
 
 ### 代码语义与外部工具
@@ -42,7 +42,7 @@ oh-my-opencode 多智能体系统的自定义技能集，覆盖路由调度、�
 ## 技能依赖关系
 
 ```
-omo-adaptive-execution ──→ OMO 执行状态机 + routing.md 路由策略
+omo-adaptive-execution ──→ OMO 执行状态机 + 路由 + 发现委托（单文件）
 
 omo-atlas-execution-constraints ──→ omo-adaptive-execution（统一规则源）
 

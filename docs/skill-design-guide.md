@@ -121,7 +121,7 @@ skill-name/
 
 | skill | 行数 | 结构 | 状态 |
 |---|---|---|---|
-| omo-adaptive-execution | ~145 | SKILL.md + routing.md | 健康 |
+| omo-adaptive-execution | ~168 | 单文件 SKILL.md（路由已合并） | 健康 |
 | long-running-process | 113 | SKILL.md + 5 scripts | 健康（已脚本化） |
 | agent-browser-windows | 181 | SKILL.md + 6 scripts | 健康（已脚本化） |
 | omo-atlas-execution-constraints | ~75 | 单文件 | 健康 |

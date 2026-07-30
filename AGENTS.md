@@ -20,7 +20,7 @@ skills/
 └── omo-atlas-execution-constraints/ # Execution: OMO Atlas 治理
 ```
 
-> OMO 执行规则维护在 `omo-adaptive-execution/SKILL.md`，路由策略维护在同目录 `routing.md`；其它 prompt 和治理 skill 不复制两者内容。
+> OMO 执行与路由规则统一维护在 `omo-adaptive-execution/SKILL.md`（含发现委托、路由顺序、Category）。其它 prompt 和治理 skill 不复制其内容。
 
 ## 约定
 
