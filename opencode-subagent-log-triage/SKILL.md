@@ -43,16 +43,21 @@ description: 当 OpenCode 子代理、子会话、工具调用、后台任务或
    - `status`、`exit`、`tool`、`description`、`command`、`workdir`、`timeout`
    - 捕获的输出、stdout/stderr 和最后更新时间
    - 同一消息周围匹配的 `step-start`/`step-finish` part
-5. 推荐操作前先关联进程状态：
-   - 找到精确的工具进程 PID、父 PID、子 PID、命令行和创建时间
-   - 用拥有者 PID 检查相关端口
-   - 确认哪个进程拥有应用服务器 vs 卡住的工具
-6. 仅在进程关联后，选择一种建议：
-   - **无需操作**：命令已完成且 session 状态已关闭
-   - **等待/重试**：进程活跃且在产生输出
-   - **恢复/读取**：若抽象仍可用，用 `background_output` 或 `session_read`
-   - **精确清理**：仅终止已证实的孤儿/卡住工具进程树
-   - **提级**：若 DB 状态、日志和进程树冲突到有数据丢失风险
+  5. 推荐操作前先关联进程状态：
+    - 找到精确的工具进程 PID、父 PID、子 PID、命令行和创建时间
+    - 用拥有者 PID 检查相关端口
+    - 确认哪个进程拥有应用服务器 vs 卡住的工具
+    - 区分 **OpenCode tool 进程** vs **应用 server**（后者若由 long-running-process 启动，查 `%TEMP%\opencode-long-running\*.json`）
+  6. 产出 **writer 三态**（供 recovery 消费；本 skill **不**调用 `task()` 续派）：
+    - **ACTIVE**：已关联到仍存活且有进展（或合理 CPU/IO）的 writer/tool 进程
+    - **INACTIVE**：session/tool 已结束，或 running 状态无对应活进程（陈旧存储）
+    - **UNKNOWN**：DB/日志/进程树冲突，或无法关联 PID
+  7. 仅在进程关联后，附加一种处置建议（仍不派发子代理）：
+    - **无需操作**：命令已完成且 session 状态已关闭
+    - **等待/重试**：writer=ACTIVE 且在产生输出
+    - **交还 recovery**：用户目标是继续执行时，加载 `interrupted-subagent-recovery` 做 HOLD/CONTINUE/NEW
+    - **精确清理**：仅终止已证实的 **OpenCode tool** 孤儿进程树；应用 server 用 `long-running-process` 的 `stop-background`/`cleanup-port`
+    - **提级**：writer=UNKNOWN 且有数据丢失风险
 
 ## SQLite 查询模式
 
