@@ -15,7 +15,6 @@ skills/
 ├── long-running-process/            # Global: Windows 长运行进程治理
 ├── omo-adaptive-execution/          # Core: OMO 执行与路由
 ├── opencode-subagent-log-triage/    # Global: OpenCode 子代理日志排查
-├── serena-first-codework/            # Core: Serena 优先代码语义工作
 └── omo-atlas-execution-constraints/ # Execution: OMO Atlas 治理
 ```
 

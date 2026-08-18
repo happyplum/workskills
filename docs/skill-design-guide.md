@@ -126,7 +126,6 @@ skill-name/
 | agent-browser-windows | 181 | SKILL.md + 6 scripts | 健康（已脚本化） |
 | omo-atlas-execution-constraints | ~75 | 单文件 | 健康 |
 | opencode-subagent-log-triage | 165 | 单文件 | 健康 |
-| serena-first-codework | 70 | 单文件 | 健康 |
 
 ## 参考来源
 

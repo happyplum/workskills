@@ -19,14 +19,6 @@ oh-my-opencode 多智能体系统的自定义技能集，覆盖路由调度、�
 | [omo-adaptive-execution](omo-adaptive-execution/) | OMO 统一执行入口：滚动波次 + 路由 + 发现委托均在 `SKILL.md` |
 | [omo-atlas-execution-constraints](omo-atlas-execution-constraints/) | OMO Atlas 中大型目标编排的角色边界、执行门控和质量要求 |
 
-### 代码语义与外部工具
-
-符号级代码理解与回退链路——优先 Serena，失效时降级到 LSP / AST-grep / search-read。
-
-| 技能 | 说明 |
-|------|------|
-| [serena-first-codework](serena-first-codework/) | 当 Serena 可用时必须加载。 |
-
 ### 全局约束
 
 跨项目、跨子代理生效的通用约束。
