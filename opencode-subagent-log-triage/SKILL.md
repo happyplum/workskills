@@ -55,7 +55,6 @@ description: 当 OpenCode 子代理、子会话、工具调用、后台任务或
   7. 仅在进程关联后，附加一种处置建议（仍不派发子代理）：
     - **无需操作**：命令已完成且 session 状态已关闭
     - **等待/重试**：writer=ACTIVE 且在产生输出
-    - **交还 recovery**：用户目标是继续执行时，加载 `interrupted-subagent-recovery` 做 HOLD/CONTINUE/NEW
     - **精确清理**：仅终止已证实的 **OpenCode tool** 孤儿进程树；应用 server 用 `long-running-process` 的 `stop-background`/`cleanup-port`
     - **提级**：writer=UNKNOWN 且有数据丢失风险
 

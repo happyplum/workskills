@@ -19,7 +19,7 @@ OpenCode shell 在 Windows 上跑 PowerShell，并有**可配置**超时；超�
 
 **范围**：Windows（PowerShell 7+）**应用进程**（dev server、构建、watcher）。`agent-browser` 不在范围。Unix/macOS 不在范围。
 
-**与恢复 skill**：中断后续派前须证明旧 writer 已停且残留可复用/已停；应用侧 stop/cleanup 由本 skill 脚本完成，派发决策见 `interrupted-subagent-recovery`。
+**与恢复 skill**：中断后续派前须证明旧 writer 已停且残留可复用/已停；应用侧 stop/cleanup 由本 skill 脚本完成。
 
 ## 强制规则
 

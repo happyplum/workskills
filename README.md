@@ -35,7 +35,6 @@ oh-my-opencode 多智能体系统的自定义技能集，覆盖路由调度、�
 |------|------|
 | [long-running-process](long-running-process/) | Windows + PowerShell 应用进程：WMI supervisor、RunId ownership、wait-ready 归属校验、stop-background；禁止无界等待与 OpenCode shell 内 Start-Process |
 | [deep-thinking](deep-thinking/) | 显式触发的深度分析模式；默认仍保持简洁优先，仅在 `ult`、`ulw` 或“深度思考 / 帮我思考 / 超级思考 / 深度分析”等触发时使用 |
-| [interrupted-subagent-recovery](interrupted-subagent-recovery/) | 中断后**唯一派发**恢复：single-writer gate、HOLD/CONTINUE_SYNC/CONTINUE_BACKGROUND/NEW、恢复上下文三段 |
 | [opencode-subagent-log-triage](opencode-subagent-log-triage/) | 卡住取证：session/tool/进程树 → writer 三态 ACTIVE/INACTIVE/UNKNOWN；不 `task()` 续派，应用进程清理交 long-running-process |
 | [agent-browser-windows](agent-browser-windows/) | Windows 上 agent-browser 浏览器自动化的进程安全：串行化锁、超时 wrapper、强制 close、孤儿进程清理。范围仅 Windows PowerShell 7+ |
 
@@ -47,9 +46,4 @@ omo-adaptive-execution ──→ OMO 执行状态机 + 路由 + 发现委托（�
 omo-atlas-execution-constraints ──→ omo-adaptive-execution（统一规则源）
 
 其它特殊执行方式由各 skill 的 description 自行触发，不在本地依赖图重复枚举
-
-interrupted-subagent-recovery ──→ 唯一派发 HOLD/CONTINUE/NEW
-  ├─ writer 不明 ──→ opencode-subagent-log-triage（三态，不 task）
-  ├─ 应用进程/端口/RunId ──→ long-running-process（stop/cleanup/ready）
-  └─ 浏览器域 ──→ agent-browser-windows
 ```
