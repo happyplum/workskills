@@ -10,11 +10,13 @@ oh-my-opencode 多智能体系统的自定义 Skill 仓库。每个 skill 是独
 ```
 skills/
 ├── README.md                        # 项目总览 + 分类索引 + 依赖关系图
-├── deep-thinking/                    # Global: 深度思考模式
+├── AGENTS.md                        # 项目知识库
+├── docs/                            # 设计参照（skill-design-guide.md）
+├── deep-thinking/                   # Global: 深度思考模式
 ├── long-running-process/            # Global: Windows 长运行进程治理
 ├── omo-adaptive-execution/          # Core: OMO 执行与路由
-├── opencode-subagent-log-triage/    # Global: OpenCode 子代理日志排查
-└── omo-atlas-execution-constraints/ # Execution: OMO Atlas 治理
+├── omo-atlas-execution-constraints/ # Execution: OMO Atlas 治理
+└── opencode-subagent-log-triage/    # Global: OpenCode 子代理日志排查
 ```
 
 > OMO 执行与路由规则统一维护在 `omo-adaptive-execution/SKILL.md`（含发现委托、路由顺序、Category）。其它 prompt 和治理 skill 不复制其内容。
