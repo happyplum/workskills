@@ -123,7 +123,6 @@ skill-name/
 |---|---|---|---|
 | omo-adaptive-execution | ~168 | 单文件 SKILL.md（路由已合并） | 健康 |
 | long-running-process | 113 | SKILL.md + 5 scripts | 健康（已脚本化） |
-| agent-browser-windows | 181 | SKILL.md + 6 scripts | 健康（已脚本化） |
 | omo-atlas-execution-constraints | ~75 | 单文件 | 健康 |
 | opencode-subagent-log-triage | 165 | 单文件 | 健康 |
 

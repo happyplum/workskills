@@ -11,7 +11,6 @@ oh-my-opencode 多智能体系统的自定义 Skill 仓库。每个 skill 是独
 skills/
 ├── README.md                        # 项目总览 + 分类索引 + 依赖关系图
 ├── deep-thinking/                    # Global: 深度思考模式
-├── agent-browser-windows/            # Global: Windows 浏览器自动化治理
 ├── long-running-process/            # Global: Windows 长运行进程治理
 ├── omo-adaptive-execution/          # Core: OMO 执行与路由
 ├── opencode-subagent-log-triage/    # Global: OpenCode 子代理日志排查

@@ -28,7 +28,6 @@ oh-my-opencode 多智能体系统的自定义技能集，覆盖路由调度、�
 | [long-running-process](long-running-process/) | Windows + PowerShell 应用进程：WMI supervisor、RunId ownership、wait-ready 归属校验、stop-background；禁止无界等待与 OpenCode shell 内 Start-Process |
 | [deep-thinking](deep-thinking/) | 显式触发的深度分析模式；默认仍保持简洁优先，仅在 `ult`、`ulw` 或“深度思考 / 帮我思考 / 超级思考 / 深度分析”等触发时使用 |
 | [opencode-subagent-log-triage](opencode-subagent-log-triage/) | 卡住取证：session/tool/进程树 → writer 三态 ACTIVE/INACTIVE/UNKNOWN；不 `task()` 续派，应用进程清理交 long-running-process |
-| [agent-browser-windows](agent-browser-windows/) | Windows 上 agent-browser 浏览器自动化的进程安全：串行化锁、超时 wrapper、强制 close、孤儿进程清理。范围仅 Windows PowerShell 7+ |
 
 ## 技能依赖关系
 
