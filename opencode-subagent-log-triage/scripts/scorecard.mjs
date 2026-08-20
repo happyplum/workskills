@@ -11,7 +11,8 @@
 //   1. 同回合突发 fan-out：按 message_id 分组 task 派发，报告 max_burst 与 burst≥2 次数
 //      （parallel_ratio=bg=true 占比 ≠ C1 的同回合并发派发，两者并列输出）
 //   2. oracle 复审模式归因：按 dispatch prompt 正则 INITIAL/DELTA/ACCEPTANCE_REVIEW_V1 分类计数
-//   3. baseline 顺序断言：树内最早 plan-linter baseline 调用是否早于首个 task 派发（BASELINE_FIRST）
+//   3. baseline 顺序断言（启发式）：树内最早的基线类命令（plan-linter baseline / verify / 全量测试）
+//      是否早于首个 task 派发（BASELINE_FIRST，D-013 基线预验）
 //   4. per-agent 成本表
 //   5. promptHash 标注「度量时刻值」，--expect-hash 对账派发时刻盖印值（执行后改过 prompt 即 MISMATCH）
 //   6. gap 分角色：父会话（协调者）与子会话分开统计——父高 gap=健康并行信号，子高 gap=stall 信号
@@ -127,7 +128,7 @@ for (const s of tree) {
         else reviewModes.legacy++
       }
     }
-    if (p.type === 'tool' && p.tool === 'bash' && p.cmd && /plan-linter/.test(p.cmd) && /baseline/.test(p.cmd)) {
+    if (p.type === 'tool' && p.tool === 'bash' && p.cmd && /plan-linter.*baseline|verify|pnpm\s+(run\s+)?(test|verify|-r\s+verify)|全量|整链/i.test(p.cmd)) {
       if (!earliestBaselineMs || p.time_created < earliestBaselineMs) earliestBaselineMs = p.time_created
     }
     if (i > 0) {
@@ -160,9 +161,9 @@ const burstSizes = [...bursts.values()]
 const maxBurst = burstSizes.length ? Math.max(...burstSizes) : 0
 const burstMulti = burstSizes.filter((n) => n >= 2).length
 const oracleTotal = reviewModes.initial + reviewModes.delta + reviewModes.legacy
-const baselineFirst = !earliestBaselineMs ? 'absent（树内未见 plan-linter baseline 调用）'
+const baselineFirst = !earliestBaselineMs ? 'absent（树内未见基线预验/verify 类命令）'
   : !earliestDispatchMs ? 'n/a（无 task 派发）'
-  : earliestBaselineMs < earliestDispatchMs ? 'yes' : 'NO（baseline 晚于首个 task 派发，违反 C3/D-013）'
+  : earliestBaselineMs < earliestDispatchMs ? 'yes' : 'NO（基线命令晚于首个 task 派发，违反 D-013）'
 
 console.log('---')
 console.log('SCORECARD v1.1')
