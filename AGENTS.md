@@ -16,6 +16,7 @@ skills/
 ├── long-running-process/            # Global: Windows 长运行进程治理
 ├── omo-adaptive-execution/          # Core: OMO 执行与路由
 ├── omo-atlas-execution-constraints/ # Execution: OMO Atlas 治理
+├── review-work/                      # Review: 风险路由的完成工作审查
 └── opencode-subagent-log-triage/    # Global: OpenCode 子代理日志排查
 ```
 
@@ -66,3 +67,4 @@ skills/
 | # | 现象 | 为什么错 | 如何避免 |
 |---|------|---------|---------|
 | 1 | 在 SKILL.md 正文写 `## 最小 CSO 触发词` / `## 最小触发词` 章节 | 触发词属 L0 description（始终全量注入），正文重复既浪费 L1 加载成本，又与 L0 触发器职责冲突；同义变体命名（CSO 触发词 vs 触发词）还制造 grep 漏检 | 触发词只融合进 frontmatter `description`；维护时 grep 多种命名变体确认无残留 |
+| 2 | 固定审查代理数量并默认调用高价 Oracle | 普通 QA、代码质量和上下文核对不需要架构推理；固定 lane 会重复验证、放大 token 与时延 | 按风险选择最少充分 lane，普通审查走 `unspecified-low`，仅未决结构决策使用 Oracle |
