@@ -28,6 +28,7 @@ description: 当用户明确要求 review work、审查已完成实现、QA 改�
 
 ## 并发与路由
 
+- 若需启动任何审查 lane，首次调用 `task()` 前先加载 `omo-adaptive-execution`；其成功返回是 category 与并发预算生效的顺序证据，不凭记忆路由。
 - 先按 `omo-adaptive-execution` 确认最低足够 category；普通 reviewer 使用本地 `unspecified-low`（Luna-max）。
 - 相互独立的 QA、代码质量、安全和上下文 lane 在同一轮 `run_in_background=true` 启动，受统一并发预算约束。
 - 只有下一个审查决策立即依赖某 lane 时才前台等待；否则需要 `WHY_NOT_PARALLEL`。

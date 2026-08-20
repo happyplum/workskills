@@ -33,11 +33,11 @@ oh-my-opencode 多智能体系统的自定义技能集，覆盖路由调度、�
 ## 技能依赖关系
 
 ```
-omo-adaptive-execution ──→ OMO 执行状态机 + 路由 + 发现委托（单文件）
+omo-adaptive-execution ──→ OMO 执行状态机 + 路由 + 发现委托 + Atlas 顺序引导（单文件）
 
 omo-atlas-execution-constraints ──→ omo-adaptive-execution（统一规则源）
 
-review-work ──→ omo-adaptive-execution（最低足够路由与并发预算）
+review-work ──→ omo-adaptive-execution（启动审查 lane 前加载；最低足够路由与并发预算）
 
 其它特殊执行方式由各 skill 的 description 自行触发，不在本地依赖图重复枚举
 ```
