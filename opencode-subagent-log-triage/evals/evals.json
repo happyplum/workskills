@@ -15,7 +15,7 @@
     },
     {
       "id": 3,
-      "prompt": "agent-browser 检查已经输出页面快照，但 OpenCode 里还是 running，我想解除卡住。",
+      "prompt": "playwright-cli 检查已经输出页面快照，但 OpenCode 里还是 running，我想解除卡住。",
       "expected_output": "要求先复核 exact PID、父子进程、端口归属和工具 part 状态，只终止证明为孤儿的工具进程树。",
       "files": []
     }

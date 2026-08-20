@@ -1,6 +1,6 @@
 ---
 name: opencode-subagent-log-triage
-description: 当 OpenCode 子代理、子会话、工具调用、后台任务或 agent-browser 检查看起来卡住时使用——尤其是用户提供 session ID、子会话标题、工具描述、worktree 路径，或要求在决定是否终止进程前检查 OpenCode 本地日志/会话数据时。
+description: 当 OpenCode 子代理、子会话、工具调用、后台任务或 Playwright 浏览器检查看起来卡住时使用——尤其是用户提供 session ID、子会话标题、工具描述、worktree 路径，或要求在决定是否终止进程前检查 OpenCode 本地日志/会话数据时。
 ---
 
 # OpenCode 子代理日志排查
@@ -159,6 +159,6 @@ taskkill /PID <exact-tool-pid> /T /F
 - **把工具描述当 session 标题**。`session_search` 未命中时搜 `part.data`。
 - **只信 `session_read`**。它可能失败，即使 `session_info` 和 SQLite 有该 session。
 - **忽略 `opencode.db-wal`**。运行中的工具事件可能先出现在那里，早于正常抽象索引。
-- **杀掉所有 `chrome.exe` 或所有 `agent-browser` 进程**。始终先关联父/子 PID 和命令行。
+- **杀掉所有 `chrome.exe` 或所有 Playwright/浏览器自动化进程**。始终先关联父/子 PID 和命令行。
 - **杀掉卡住浏览器检查正在测试的应用服务器**。清理前确认端口归属。
 - **仅因捕获的输出看起来完整就认为 session 已解决**。验证工具 part 有 `status` closed 和 exit code。

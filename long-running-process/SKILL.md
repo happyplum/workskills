@@ -17,7 +17,7 @@ OpenCode shell 在 Windows 上跑 PowerShell，并有**可配置**超时；超�
 
 **推荐模型**：`WMI` → ASCII-only `cmd` launcher（仅含 pwsh/supervisor/config 的 ASCII 路径）→ **PowerShell supervisor** → `ProcessStartInfo.ArgumentList` 启应用（AppPid）。用户参数与 Unicode 工作目录只在 UTF-8 JSON config 中。ControlPid 为 cmd 树根。State：`%TEMP%\opencode-long-running\<RunId>.json`。
 
-**范围**：Windows（PowerShell 7+）**应用进程**（dev server、构建、watcher）。`agent-browser` 不在范围。Unix/macOS 不在范围。
+**范围**：Windows（PowerShell 7+）**应用进程**（dev server、构建、watcher）。浏览器自动化工具进程不在范围。Unix/macOS 不在范围。
 
 **与恢复 skill**：中断后续派前须证明旧 writer 已停且残留可复用/已停；应用侧 stop/cleanup 由本 skill 脚本完成。
 
