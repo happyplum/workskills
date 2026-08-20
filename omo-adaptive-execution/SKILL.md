@@ -84,7 +84,7 @@ description: 当当前代理承担 OMO 协调者角色（Sisyphus 或 Atlas）�
 - 共享契约由一个强 owner 先冻结，消费方在契约稳定后可按 owner 并发；不要把所有消费者并入契约 task。
 - 根 typecheck、workspace verify、最终构建或全量回归属于 integration/checkpoint；中间 owner task 只需通过足以证伪其行为的定向检查。
 - 声称「非原子」时必须点名共享不变量或未冻结接口，并说明拆分后哪个中间产物无法独立发布、回退或验收；否则按可拆处理。
-- remediation 按独立 failure family 重建 ready 图；不得把来自不同 owner 的失败捆成一个高价同步任务。
+- remediation 按独立 failure family 重建 ready 图；不得把来自不同 owner 的失败捆成一个高价同步任务；确不可拆、且同时需要跨 package 推理、多 lane 汇合诊断或多 gate 根因裁决的任务，路由不得低于 `unspecified-high`，机械汇合与固定命令执行可保持 low/quick。
 
 ## task() 规则
 
