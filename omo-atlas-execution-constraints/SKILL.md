@@ -48,7 +48,7 @@ Atlas 负责协调、状态和验收，不修改产品代码，也不把执行�
 - 用户目标、非目标和可观察验收明确；
 - 当前 task 有单一结果、owner、依赖和验证方式；
 - 写入资源和公共接口不会被同波争用；
-- worker 路由来自统一 routing 规则；计划中的 route 或串并行标记不能覆盖当前规则；
+- worker 路由来自统一 routing 规则；计划中的 route 或串并行标记不能覆盖当前规则；例外：并发矩阵声明的 `concurrency_budget` 是预算体制的唯一覆盖入口，以计划值为准（canary 爬坡依赖此字段）；
 - 普通有界实现优先 `unspecified-low`（Luna-max），机械改动优先 `quick`；高价路由有 `WHY_NOT_LOWER_COST`，独立 ready 写入任务前台执行有 `WHY_NOT_PARALLEL`；
 - 父级知道如何验证结果，而非只接收总结。
 

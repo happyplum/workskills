@@ -126,7 +126,7 @@ description: 当当前代理承担 OMO 协调者角色（Sisyphus 或 Atlas）�
 1. **INTAKE**：确认目标、约束、非目标和验收。
 2. **ANALYZE**：生成当前最小执行图并核对 owner、依赖和路由。
 3. **WAVE-READY**：选择依赖满足、写入隔离且接口决策明确的 task。
-4. **DISPATCH**：按关键路径派发写入 task（默认并发预算 3；隔离充分时不设固定数量上限），其余 pending。
+4. **DISPATCH**：按关键路径派发写入 task（并发预算以强制规则 5 为准：默认 3、隔离充分至 4、计划声明 `concurrency_budget` 时以计划值为唯一覆盖入口），其余 pending。
 5. **COLLECT**：读取产物与证据；同一目标优先续用原 `task_id`。
 6. **VERIFY**：按风险执行父级检查和必要的独立审查。
 7. **REMAP**：仅根据证据更新粒度、依赖、owner、路由和下一波。
