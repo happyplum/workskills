@@ -126,7 +126,7 @@ skill-name/
 | omo-atlas-execution-constraints | 78 | 单文件 | 健康 |
 | review-work | 55 | 单文件 | 健康 |
 | deep-thinking | 57 | 单文件 | 健康 |
-| opencode-subagent-log-triage | 164 | SKILL.md + evals | 健康 |
+| opencode-subagent-log-triage | ~210 | SKILL.md + 2 scripts + evals | 健康（已脚本化） |
 
 ## 参考来源
 
