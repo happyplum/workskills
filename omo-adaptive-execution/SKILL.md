@@ -21,7 +21,7 @@ description: 当当前代理承担 OMO 协调者角色（Sisyphus 或 Atlas）�
 | 产品代码：单一机械实现或修复 | **恰好 1** 个 `quick`（或等价）worker；协调者只验收，不写产品代码 |
 | 多步骤、隐藏依赖、混合能力或 ≥2 独立可验收产品改动 | 滚动波次 / 有界并发派发（上限不是配额） |
 | 产品边界、验收或架构方向需要用户决定 | 停止并提出一个定向问题 |
-| 现有稳定计划已经规定专用执行方式 | 交由其触发条件接管 |
+| 现有计划已规定 task、route 或串并行方式 | 先按本 skill 复核；符合则执行，边界或路由失效则 REMAP，计划稳定性不构成豁免 |
 
 ## 发现委托（上下文节约）
 
@@ -46,8 +46,8 @@ description: 当当前代理承担 OMO 协调者角色（Sisyphus 或 Atlas）�
 1. **固定完成条件**：记录目标、硬约束、非目标和可观察验收；未知项保持未知。
 2. **先按本文件路由**：首次直接操作或调用 `task()` 前按下方「路由决策顺序」选择执行者；无需再读其他路由文件。
 3. **先分析后派发**：边界不明显时由前台 `metis` 生成首波最小执行图；简单明确任务由父协调者直接拆分。
-4. **保持任务内聚**：每个 task 交付一个可独立验收的结果；共享接口、不变量或验证面的工作保持同一 owner，不按文件机械拆分。
-5. **限制写入并发**：写入 worker **上限**默认 3、隔离充分时最多 4——是 **cap 不是配额**；有几个独立 ready 流就派几个。额外 ready 保持 pending。只读发现不计入写入上限。预算口径为运行中写入 worker 与已完成未验收产物之和；同一 ready cohort 的独立 task 按预算分批物理派发，cohort 归属不受分批影响。
+4. **保持任务内聚**：每个 task 交付一个可独立验收的结果；共享接口、不变量或验证面的工作保持同一 owner，不按文件机械拆分。包含两个以上可独立失败、独立回退或独立验收的 owner / failure family 时必须拆分；workspace 全量门禁只在 integration/checkpoint 通过，不证明 owner task 不可拆。
+5. **限制写入并发**：写入 worker **上限**默认 3、隔离充分时最多 4——是 **cap 不是配额**；有几个独立 ready 流就派几个。额外 ready 保持 pending。只读发现不计入写入上限。预算口径为运行中写入 worker 与已完成未验收产物之和；同一 ready cohort 的独立 task 按预算分批物理派发，cohort 归属不受分批影响。独立 ready 写入任务默认后台并发；只有立即后继依赖其结论时才同步等待。
 6. **父级持有验收**：worker 报告只是候选证据；父协调者核对产物、diff、诊断、测试、调用方和实际使用结果。
 7. **仅凭证据重排**：依赖、共享契约、验证或 task 有效性变化时局部拆分、合并、换 owner 或重排；不改变用户目标。
 
@@ -57,7 +57,7 @@ description: 当当前代理承担 OMO 协调者角色（Sisyphus 或 Atlas）�
 2. 需要仓库发现：`subagent_type="explore"`，只读后台（见「发现委托」）。
 3. 需要外部文档、SDK 或 OSS 证据：`subagent_type="librarian"`，只读后台。
 4. 多步骤且边界不明：前台 `metis` 生成首波最小图。
-5. 实现任务按最低足够 category 派发；领域 category 按任务性质优先。
+5. 实现任务按最低足够 category 派发：机械局部改动用 `quick`，模式已知且范围有界的普通产品实现用 `unspecified-low`（本地配置为 Luna-max）；只有低档无法覆盖的证据成立时才提级。领域 category 按任务性质优先。
 6. 架构、高风险判断、失败策略或 Metis 发现的结构缺口：前台 `oracle`。
 7. 显式计划审查：`momus`。
 
@@ -68,15 +68,23 @@ description: 当当前代理承担 OMO 协调者角色（Sisyphus 或 Atlas）�
 | 路由 | 使用条件 | 不应使用 |
 |---|---|---|
 | `quick` | 机械、完全明确、局部、集成成本极低 | 共享接口或连续推理 |
-| `unspecified-low` | 模式已知的常规功能或修复，范围有界 | 架构判断或广泛未知 |
-| `unspecified-high` | 跨文件内聚实现、生命周期、集成和连续上下文判断 | 开放式研究或硬算法 |
+| `unspecified-low` | 模式已知的常规功能或修复，范围有界；允许跨文件，只要 owner 与验收清晰 | 架构判断或广泛未知 |
+| `unspecified-high` | 存在已举证的非局部不变量、复杂生命周期或不可拆集成，需要连续上下文判断 | 仅因跨文件、测试多、根门禁失败或 prompt 很长 |
 | `deep` | 陌生子系统、研究与实现迭代、广泛不确定性 | 多个无关目标 |
 | `ultrabrain` | 复杂算法、并发、状态机、非局部不变量和架构级推理 | 可由常规模式完成的工作 |
 | `visual-engineering` | UI、UX、布局、样式、动画和视觉验证 | 非视觉实现 |
 | `writing` | 文档和文案交付 | 产品代码实现 |
 | `artistry` | 需要非常规创意探索的目标 | 常规工程工作 |
 
-选择 category 时保持任务内聚。不要为了使用便宜模型拆散共享不变量，也不要用高价模型掩盖无效任务边界。`deep`、`ultrabrain` 和高价领域路由需给出 `WHY_NOT_LOWER_COST`。
+选择 category 时保持任务内聚。不要为了使用便宜模型拆散共享不变量，也不要用高价模型掩盖无效任务边界。`unspecified-high`、`deep`、`ultrabrain`、`artistry` 及实际会落到高价模型的领域路由必须给出 `WHY_NOT_LOWER_COST`：点名低一档缺失的能力和当前证据；“跨文件”“测试多”“更稳妥”或“计划已这样写”不成立。缺失该字段时不得派发，先降档或 REMAP。
+
+## 原子性裁决
+
+- 先按产品 owner、failure family、独立回退与定向验收切分，再冻结共享契约；实现与直接测试默认同 task。
+- 共享契约由一个强 owner 先冻结，消费方在契约稳定后可按 owner 并发；不要把所有消费者并入契约 task。
+- 根 typecheck、workspace verify、最终构建或全量回归属于 integration/checkpoint；中间 owner task 只需通过足以证伪其行为的定向检查。
+- 声称「非原子」时必须点名共享不变量或未冻结接口，并说明拆分后哪个中间产物无法独立发布、回退或验收；否则按可拆处理。
+- remediation 按独立 failure family 重建 ready 图；不得把来自不同 owner 的失败捆成一个高价同步任务。
 
 ## task() 规则
 
@@ -84,6 +92,7 @@ description: 当当前代理承担 OMO 协调者角色（Sisyphus 或 Atlas）�
 - 同一目标继续执行时使用原 `task_id`，不重新选择路由。
 - explore/librarian 适合后台；Metis/Oracle 及依赖其结论的任务使用前台。
 - 每次委托一个内聚可验收结果，不混合搜索和实现，不混合无关目标。
+- 独立 ready 实现任务默认 `run_in_background=true`；使用前台执行必须写 `WHY_NOT_PARALLEL`，说明哪个立即后继必须等待该结论。验证命令长或输出多不是同步理由。
 - 路由能力不可用时回退到直接工具、官方文档或 Context7，不捏造能力。
 
 ## 失败分类
@@ -106,6 +115,7 @@ description: 当当前代理承担 OMO 协调者角色（Sisyphus 或 Atlas）�
 - task 的单一结果、范围、owner 和验证；
 - 依赖边与共享接口；
 - 推荐路由及理由；
+- 高价路由的 `WHY_NOT_LOWER_COST` 与前台执行的 `WHY_NOT_PARALLEL`；
 - ready、实际 dispatch、pending；
 - 重排触发器和停止条件。
 
@@ -142,10 +152,10 @@ worker 返回 `completed`、`blocked`、`needs-continuation` 或 `invalid-task`�
 | 风险 | 完成要求 |
 |---|---|
 | 低风险机械实现 | worker 自检 + 父级 diff、诊断、定向测试 |
-| 跨文件或判断性实现 | 上述证据 + 调用方与集成检查；高影响判断增加 1 个 reviewer |
-| 公共接口、并发、迁移、安全或高难任务 | 默认 1 个独立 reviewer + 集成或压力验证 |
+| 跨文件或判断性实现 | 上述证据 + 调用方与集成检查；普通有界改动不因跨文件自动增加 reviewer |
+| 公共接口、并发、迁移、安全或高难任务 | 默认 1 个 `unspecified-low` 独立 reviewer + 对应集成或压力验证 |
 
-测试、构建、race detector 和压力脚本是证据，不是 reviewer。仅安全对抗、证据冲突或首个 reviewer 无法裁决时增加第二审查者。完成状态先由前台 `metis` 查遗漏；只有结构缺口再由前台 `oracle` 深化。
+测试、构建、race detector 和压力脚本是证据，不是 reviewer。仅安全对抗、证据冲突或首个 reviewer 无法裁决时增加第二审查者。完成状态先由前台 `metis` 查遗漏；Oracle 只用于无法由代码、测试、Metis 或普通 reviewer 裁决的架构、安全、并发、迁移结构决策，不承担通用 QA、代码质量或“再完整看一遍”。
 
 ## 回退与停止
 
@@ -160,6 +170,8 @@ worker 返回 `completed`、`blocked`、`needs-continuation` 或 `invalid-task`�
 |---|---|
 | 为制造蜂群感拆散同一接口 | 一个 owner 交付内聚接口，其余任务依赖它 |
 | 所有实现都派给同一高层 category | 按本文件 Category 表匹配最低足够能力 |
+| 计划写了 high/串行就原样执行 | dispatch 前复核；无 `WHY_NOT_*` 则降档、并发或 REMAP |
+| 根 verify 在中间态不绿，所以所有 owner 必须合并 | owner 定向验收并行，根 verify 留给 integration/checkpoint |
 | ready 即全部派发 | 区分 ready、dispatch 和 pending |
 | worker 声称完成就推进 | 父级验证后才解锁后继 |
 | 失败就新开会话 | 同一目标优先续用原 `task_id` |
