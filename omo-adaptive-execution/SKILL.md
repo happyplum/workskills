@@ -95,17 +95,25 @@ description: 当当前代理承担 OMO 协调者角色（Sisyphus 或 Atlas）�
 - 独立 ready 实现任务默认 `run_in_background=true`；使用前台执行必须写 `WHY_NOT_PARALLEL`，说明哪个立即后继必须等待该结论。验证命令长或输出多不是同步理由。
 - 路由能力不可用时回退到直接工具、官方文档或 Context7，不捏造能力。
 
-## 失败分类
+## 失败分类与升档
 
 | 失败 | 动作 |
 |---|---|
 | 缺少上下文 | 补证据并续用原 `task_id` |
 | 隐藏依赖或共享契约 | 回到 REMAP，更新图 |
-| worker 能力不足 | 有证据地提级 |
+| worker 能力不足 | 按下方升档协议处理 |
 | task 边界无效 | 合并或拆分任务 |
 | 局部实现缺陷 | 原会话定向修复 |
 
 提级不能替代拆分；拆分不能成为降低模型层级的借口。
+
+**升档协议**（仅归因为 worker 能力不足时）：
+
+1. 归因前置：先按上表排除缺少上下文、依赖与环境因素，失败证据须指向推理或边界处理能力（方案错误、边界遗漏、修复方向反复）；环境、上下文、依赖问题走各自通道，不得误归因为能力不足。
+2. 升档前按任务原子性契约复核可拆性：可拆先拆（按 owner / failure family），不得因「想升档」跳过拆分。
+3. 阶梯：`quick → unspecified-low → unspecified-high` 线性升档；`unspecified-high` 之上按失败性质选 `deep`（陌生领域探索失败）或 `ultrabrain`（推理复杂度失败），不串档。
+4. 升档重派：新会话注入断点胶囊、续用原 `task_id`；委托补 `WHY_NOT_LOWER_COST`，点名失败证据中低一档无法覆盖的具体能力。
+5. 预算封口：每次升档计入该 task 的补救预算（默认 2 次），不与 continuation 上限叠加无限重试；升至顶档仍失败即转 `blocked`（附断点胶囊）、咨询 `oracle` 或报告用户，不再升档。路由变化走既有 REMAP 记入账本。
 
 ## 强分析输出
 
@@ -145,7 +153,7 @@ description: 当当前代理承担 OMO 协调者角色（Sisyphus 或 Atlas）�
 - `[DOWNSTREAM]`：后继消费者或关卡；
 - `[REQUEST]`：允许范围、禁止项和返回格式。
 
-worker 返回 `completed`、`blocked`、`needs-continuation` 或 `invalid-task`，不得扩大范围或宣称全局完成。
+worker 返回 `completed`、`blocked`、`needs-continuation` 或 `invalid-task`，不得扩大范围或宣称全局完成；返回 `blocked` 时必须附断点胶囊（已验证结论、已排除路径、卡点描述），供父级不重读旧会话即可重派。
 
 ## 质量门
 
