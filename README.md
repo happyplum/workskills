@@ -18,6 +18,7 @@ oh-my-opencode 多智能体系统的自定义技能集，覆盖路由调度、�
 |------|------|
 | [omo-adaptive-execution](omo-adaptive-execution/) | OMO 统一执行入口：滚动波次 + 路由 + 发现委托均在 `SKILL.md` |
 | [omo-atlas-execution-constraints](omo-atlas-execution-constraints/) | OMO Atlas 中大型目标编排的角色边界、执行门控和质量要求 |
+| [omo-plan-structure](omo-plan-structure/) | OMO 计划结构单一标准：五区块 schema、矩阵结构约束、Task 契约字段与计划/账本分离；Prometheus 编写与 Momus 审查前必须加载 |
 | [review-work](review-work/) | 基于风险选择最少充分审查 lane；普通 QA/代码审查走 Luna-max，Oracle 仅裁决未决结构问题 |
 
 ### 全局约束
@@ -36,6 +37,8 @@ oh-my-opencode 多智能体系统的自定义技能集，覆盖路由调度、�
 omo-adaptive-execution ──→ OMO 执行状态机 + 路由 + 发现委托 + Atlas 顺序引导（单文件）
 
 omo-atlas-execution-constraints ──→ omo-adaptive-execution（统一规则源）
+
+omo-plan-structure ──→ 计划结构单一标准（Prometheus 编写 / Momus 审查前加载，prompt 不复制结构定义）
 
 review-work ──→ omo-adaptive-execution（启动审查 lane 前加载；最低足够路由与并发预算）
 
