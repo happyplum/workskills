@@ -7,7 +7,9 @@ description: 当当前代理承担 Prometheus（编写或修订计划）或 Momu
 
 ## 概述
 
-本 skill 是 OMO 计划文件结构的**单一标准**：计划正文的区块构成、各区块必需内容、结构约束、任务原子性契约与计划/账本分离体制均以本文件为准。编写方（Prometheus）与审查方（Momus）共用本标准，任何一方不得另行复制或改写结构定义；结构类不一致以本文件裁决。生成方法与审查裁决规则由各自 prompt 承载，不在此复制。
+本 skill 是 OMO 计划文件结构的**单一标准**：计划分级、区块构成、Task 字段、验收条目语法、结构约束与计划/账本分离体制均以本文件为准。编写方（Prometheus）与审查方（Momus）共用本标准，任何一方不得另行复制或改写结构定义；结构类不一致以本文件裁决。生成方法与审查裁决规则由各自 prompt 承载，不在此复制。
+
+本地计划不经上游 `ulw-plan` scaffold 生成，上游 producer contract 的模板结构自检不适用于本地计划；task 行保留上游 checkbox 语法与 `Recommended task executor category:` 字面前缀作为路由锚。
 
 ## 反例（不应触发）
 
@@ -16,7 +18,21 @@ description: 当当前代理承担 Prometheus（编写或修订计划）或 Momu
 | "解释一下计划结构规则" | 不产出或核对具体计划 |
 | 讨论需求、未开始写计划 | 无结构产出对象 |
 
-## 正文区块
+## 计划分级
+
+编写前先判级，结论写入计划首行（`级别：轻量 | 完整`）：
+
+- **轻量计划**：task 数 ≤3、全部 task 单 lane（或全部 `mode: current`）、未命中高风险特征；命中任一即用完整结构。
+- **高风险特征**（分级判定的唯一判源）：公共接口或公共契约变化、架构或数据结构变化、不可逆动作（迁移、删除、发布）、权限/安全边界。
+- 执行期 REMAP 使轻量计划超出判据（出现第 4 个 task、需要第二 lane、新增高风险）时，以一次 `topology_remap` 事件升格并按完整结构重排；既有验收条目 `ID` 与 `checklist_hash` 不变。
+
+### 轻量结构（三节）
+
+1. `## 摘要`：3-5 行——目标与方向依据、core 需求二元清单（轻量计划未分级标注的需求**全部视为 core**）、`假设：` 子行（隔离不可验证事实与边界）、`不做的事：` 子行。节尾一行 Workspaces 声明：`vcs`、`mode`；`git` 时含主分支与计划/账本存放路径，`mode: current` 时含 `authorization_source`，`mode: worktree` 时含 lane 路径与分支（按 worktree 命名规则）。
+2. `## 任务清单`：节首引言按「Task 契约区块」的计划级通用约定一次承载；每 task 按其字段书写；免写矩阵与 `cohorts` 字样（单 lane 豁免自动成立）。
+3. `## 终态验收`：具名收尾 gate（gate 名 + 命令）、`- [ ] F1. 终态：<命令>` 行、基线预验单行（涉及整链命令时）、可选一行提交意图（`验证通过后以 <commit 主题> 原子提交`）。轻量默认 `checkpoints: none`——本节即唯一验收节点，Atlas 按依赖解锁与终态排水触发器验收。
+
+### 完整结构（五区块）
 
 计划正文**只含以下五个静态区块**，均以二级标题组织并保持结构可机械判定：
 
@@ -51,7 +67,7 @@ description: 当当前代理承担 Prometheus（编写或修订计划）或 Momu
 
 ## Workspaces 区块
 
-- 含仓库写入的计划必须定义 `workspaces`，标注 `vcs: git | none` 和 `mode: current | worktree`，每个写入 task 引用唯一 `workspace_lane`。
+- 含仓库写入的完整计划必须定义 `workspaces`，标注 `vcs: git | none` 和 `mode: current | worktree`，每个写入 task 引用唯一 `workspace_lane`；轻量计划按「计划分级」的节尾一行声明。
 - `vcs: git` 时必须标明**主分支**（项目默认分支，如 `main`）及**计划文件与账本在主分支下的存放路径**（如 `docs/plans/<plan-name>.md`、`docs/plans/<plan-name>.ledger.md`）；所有 worktree lane 自该主分支创建，计划与账本的权威版本只保留在主工作区（主分支检出）的该路径下，lane worktree 内不得另建计划或账本副本。`vcs: none` 时改标计划与账本所在目录的绝对路径。
 - `mode: current` **必须记录 `authorization_source`**，指向用户对使用当前工作区的明确授权；普通计划批准、工作区看似干净或规划者判断**均不算授权**，且保留现有分支。
 - 新建 worktree 命名：单 lane 主 workspace 或多 lane integration workspace 使用 `<plan-name>--main` 与分支 `work/<plan-name>/main`；实施 lane 使用 `<plan-name>--<task-key>` 与分支 `work/<plan-name>/<task-key>`。
@@ -60,10 +76,10 @@ description: 当当前代理承担 Prometheus（编写或修订计划）或 Momu
 
 ## 并发矩阵区块
 
-- 表格逐 task 列出 cohort 归属、硬前驱、互斥写入与可变资源、workspace lane 与 route。
+- 表格逐 task 列出 cohort 归属、硬前驱、仅集成关联（跨 lane 生产/消费协同，非硬依赖）、owner、互斥写入与可变资源、workspace lane 与 route；矩阵是**唯一拓扑事实源**——Task 契约不重复拓扑字段，执行账本的 `owner` 取矩阵值。
 - cohort 是并行归属而非物理派发批次：实际分批由 Atlas 按并发预算执行，分批不改变归属。
 - 预算口径：运行中写入 worker 与未验收积压之和**默认 ≤ 3**，**隔离充分时可至 4**；矩阵可声明 `concurrency_budget: N`，声明时以计划值为准（预算体制的**唯一覆盖入口**，与 shared skills、atlas 三方一致）。
-- 拓扑豁免：单 writer 单 lane（允许串行多个写入 task）可写 `cohorts: none` 代替表格。
+- 拓扑豁免：单 writer 单 lane（允许串行多个写入 task）可写 `cohorts: none` 代替表格；轻量计划免写矩阵。
 - lane 数 ≤ 可独立验收 owner 数 + 唯一 integration lane；机械任务共享 lane，不得因文件多或任务多开 lane。
 
 矩阵结构约束：
@@ -73,26 +89,20 @@ description: 当当前代理承担 Prometheus（编写或修订计划）或 Momu
 
 ## Task 契约区块
 
-每个实施 task 必须写明：
+区块引言写**计划级通用约定**（整个计划写一次，task 只写差异）：通用禁止范围、终止状态（`blocked` 必须附断点胶囊：已验证结论、已排除路径、卡点描述）、package_manager、默认 `load_skills`。
 
-- `step_type`：`test-freeze` | `impl` | `test-supplement` | `integration`——测试先行三段组织的步骤类型；非测试先行任务为 `impl`。
-- `目的`：一行内聚意图——本 task 交付什么可观察结果、直接服务哪个下游（消费者 task 或用户可见行为），用户可读语言，不用实现术语堆叠。
-- `硬前驱` 与 `仅集成关联`
-- `owner`
-- 验收契约 `acceptance_contract`（初始基线 `contract_revision: 0`）：
-  - 每条含稳定 `ID`、二元条件、证据取得方式与证据作用域文件清单；稳定 `ID` 从不复用，语义替换以 `supersedes` 关系表达（新条目 `supersedes` 旧条目，旧条目不原地改写）；
-  - 计划批准后计算 `checklist_hash`；
-  - 执行期修订一律 append-only，经执行侧分级裁决后以账本 `plan_revision` 事件生效；
-  - 新增条目用新 `ID`，既有条目 `ID` 与 `hash` 不变。
-- `写域`：唯一可写产物清单，附与写域互斥的关键禁止项；读取范围由 `上下文胶囊` 承载。
-- `上下文胶囊`：相关文件清单、关键符号与行区间、规划期已验证结论、无需重复探索的范围，并记录生成时的代码 revision 锚（commit hash 或文件摘要），供 Atlas 注入前校验时效；落点已知且为单点修改的 task 豁免行区间与结论摘录，胶囊只写目标路径与符号名
-- `验证命令`
-- `环境 preflight`（条件字段）：存在运行时前置（服务启动、手动视觉巡查所需的 env 文件复制等）时必填，逐项列明步骤与来源路径
-- `reviewer 安排`（条件字段）：命中独立 reviewer 条件时必填（何时命中的裁决规则由 Prometheus 规则承载）
+每个实施 task 写以下字段（标题/路由/写域等固定字段合计 ≤5 行，条件字段另计；胶囊与验收条目密度不设上限——decision-complete 是北极星）：
+
+- **标题行**：`- [ ] N. <标题>`——标题即一行内聚意图（交付什么可观察结果、服务哪个下游），用户可读语言；前置红测试用 `[test-freeze]`、后置补测试用 `[test-supplement]`、集成用 `[integration]` 标题前缀，普通实现无前缀。
+- **路由行**：`Recommended task executor category: <route>`（字面前缀保留，取值限上游 category 词表，不与 execution_mode 合并），使用专用子代理时改写 `subagent_type=<name>`（二者选一）；execution_mode 以同行括注（如 `(background)`），无法预定时写 `executor_judgment` 及原因。
+- **上下文胶囊**：相关文件清单、关键符号与行区间、规划期已验证结论、无需重复探索的范围，并记录生成时的代码 revision 锚（commit hash 或文件摘要），供 Atlas 注入前校验时效；落点已知且为单点修改的 task 豁免行区间与结论摘录，胶囊只写目标路径与符号名。
+- **验收条目**（acceptance_contract，初始基线 `contract_revision: 0`）：逐条一行，机械语法 `- <ID>：<二元条件> → 命令=<命令> 预期=<结果>`，`ID` 惯例 `T<n>-A<m>`（task 序号-条目序号）；高风险 task 在同条目行尾追加 `scope=<作用域文件清单>`（Tier 1 scope 扩展裁决的参照落点）。条目 `ID` 从不复用、既有条目不原地改写，语义替换以新条目 `supersedes` 旧条目表达；`checklist_hash` = 当前生效条目（未被 supersedes）按 `ID` 排序的原文行（去首尾空白）串接计算；执行期修订一律 append-only，经执行侧分级裁决后以账本 `plan_revision` 事件生效。
+- **写域**：完整计划 = 矩阵清单引用 + 增量禁止项一行；轻量计划 = 唯一可写产物完整清单；读取范围由上下文胶囊承载。
+- 条件字段：`环境 preflight`（存在运行时前置时：服务启动、手动视觉巡查所需的 env 文件复制源 → 目标等）；`reviewer 安排`（命中独立 reviewer 条件时）；`放弃/风险判据`（高风险完整计划可选：预授权 revert/降级触发线，命中即可现场执行不必升级裁决）。
 
 ## 检查点与集成区块
 
-- 检查点是计划**唯一验收节点来源**，Atlas 的验收节奏直接挂靠，不另设重复节点。
+- 检查点是计划**唯一验收节点来源**，Atlas 的验收节奏直接挂靠，不另设重复节点；轻量计划默认 `checkpoints: none`（见「计划分级」），完整计划可选一行提交意图（`验证通过后以 <commit 主题> 原子提交`）。
 - 检查点声明二选一：
   - 列出检查点：每个检查点给出纳入的 task 集合（应互斥，重复纳入须说明原因）、放行条件与验收命令；或
   - 写 `checkpoints: none` 并说明无需中间检查点的依赖与风险依据；仅显式 `none` 时由 Atlas 按依赖、背压与终态排水触发器验收。
@@ -101,6 +111,6 @@ description: 当当前代理承担 Prometheus（编写或修订计划）或 Momu
 
 ## 计划与账本分离
 
-- 动态状态（checkbox、验收回执、尝试次数、会话链与执行进度）**不写入计划文件**，记入配属的 append-only 执行账本 `<plan>.ledger.md`：账本只追加事件、不回改历史条目，恢复执行时重放尾部重建状态。
+- 动态状态（验收回执、尝试次数、会话链与执行进度）**不写入计划文件**，记入配属的 append-only 执行账本 `<plan>.ledger.md`：账本只追加事件、不回改历史条目，恢复执行时重放尾部重建状态；task 行勾选状态随 `ACCEPTED` 投影为 `- [x]`（属当前生效投影），其余动态状态只在账本。
 - 账本物理文件只保留在主目录（主分支下的存放路径），不复制到任何 lane worktree；全部 append 统一写入主目录账本。
 - 正文与账本头部摘要不一致时执行侧 fail-closed，停止派发、验收与恢复。
