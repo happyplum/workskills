@@ -9,7 +9,7 @@ description: 当当前代理承担 OMO 协调者角色（Sisyphus 或 Atlas）�
 
 本 skill 是 OMO 环境下执行与委托的**单一入口**：滚动波次、任务边界、并发、质量门与 `task()` 路由策略均在本文件。非 OMO 环境不使用。
 
-以目标和验收条件为稳定边界，只执行当前证据支持的工作。父协调者维护动态任务图，worker 交付内聚结果，验证证据决定下一波。
+以目标和验收条件为稳定边界，只执行当前证据支持的工作。拆解以任务内聚为限，不为并行制造任务；相互独立的 task 用最低足够档位的 worker 并发执行，不追求代理数量。父协调者维护动态任务图，worker 交付内聚结果，验证证据决定下一波。
 
 ## 路径选择
 
@@ -168,7 +168,7 @@ worker 返回 `completed`、`blocked`、`needs-continuation` 或 `invalid-task`�
 
 | 错误 | 正确 |
 |---|---|
-| 为制造蜂群感拆散同一接口 | 一个 owner 交付内聚接口，其余任务依赖它 |
+| 为凑并行拆散同一接口 | 一个 owner 交付内聚接口，其余任务依赖它 |
 | 所有实现都派给同一高层 category | 按本文件 Category 表匹配最低足够能力 |
 | 计划写了 high/串行就原样执行 | dispatch 前复核；无 `WHY_NOT_*` 则降档、并发或 REMAP |
 | 根 verify 在中间态不绿，所以所有 owner 必须合并 | owner 定向验收并行，根 verify 留给 integration/checkpoint |
