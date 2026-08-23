@@ -2,6 +2,8 @@
 
 oh-my-opencode 多智能体系统的自定义技能集，覆盖路由调度、计划执行、外部协作与存储维护。
 
+**决策入口**：用户裁决与行为决策史（D-0xx）统一维护在同级 `../prompts/DECISIONS.md`（两仓共享的单一决策入口）；修改任何 skill 行为前先核对其中的 `active` / `superseded` 状态，避免回退到已废弃方向。本仓不另设决策文件。
+
 ## 安装
 
 将技能目录放置于 oh-my-opencode 的技能配置路径下（如 `~/.config/opencode/skills/`），重启会话后自动加载。
