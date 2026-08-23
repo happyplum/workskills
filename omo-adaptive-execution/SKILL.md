@@ -32,7 +32,7 @@ description: 当当前代理承担 OMO 协调者角色（Sisyphus 或 Atlas）�
 | 已知路径、单关键词/单符号、一次工具调用可闭合 | 父级有界直接查（read/grep/codegraph 等） |
 | 仓库结构不明、多角度搜索、跨模块「在哪/怎么连」 | **默认**后台 `explore`；父级**不**并行自搜同一问题 |
 | 外部文档、SDK、OSS 用法/行为 | **默认**后台 `librarian`（或 Context7）；父级不重复同一外部检索 |
-| 跨会话历史溯源（`session_search` / `session_read` 翻扫既往会话找改造范围、决策与状态） | **默认**派后台子代理执行（单证据目标，返回结论摘要 + session_id 与轮次定位）；父级仅限已知 `session_id` 的单次定向查证 |
+| 跨会话历史溯源（`session_search` / `session_read` 翻扫既往会话找改造范围、决策与状态） | **默认**派后台子代理执行并加载 `opencode-subagent-log-triage`（含 session API、SQLite 兜底与结构化报告；单证据目标，返回结论摘要 + session_id 与轮次定位）；父级仅限已知 `session_id` 的单次定向查证 |
 | 已派 explore/librarian 的同一证据目标 | 父级 **MUST NOT** 再用 grep/read 重做同一搜索；等结果或续用原 `task_id` |
 
 规则：每个证据目标只指定一个发现代理，互不重叠的发现目标可并行；发现默认只读后台、不计入写入并发；禁止为展示并发拆碎本可一次有界查找完成的问题，也禁止父级大范围自搜代替 explore/librarian。父级不自行多轮翻扫会话历史——原始会话输出直接进入父级上下文构成污染，错抓线索还会带偏后续检索；连续两次会话检索无结论即改派子代理或放弃该线索。
