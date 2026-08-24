@@ -15,7 +15,7 @@
 - 状态：`active`
 - 决策：
   - 计划分级：task 数 ≤3、单 lane、未命中高风险特征（公共接口或公共契约变化、架构或数据结构变化、不可逆动作、权限/安全边界——分级唯一判源）走轻量三节（摘要含 core 缺省与假设子行、节尾 Workspaces 一行 / 任务清单 / 终态验收含具名 gate 与 F1 行）；否则完整五区块。执行期超判据以一次 `topology_remap` 升格重排，既有验收条目 ID 与 `checklist_hash` 不变。
-  - Task 字段 5 个：标题行（`[test-freeze]` / `[test-supplement]` / `[integration]` 前缀替代 step_type）+ 路由行（上游 category 字面前缀保留、execution_mode 同行括注、`subagent_type=<name>` 二选一）+ 上下文胶囊 + 验收条目 + 写域；条件字段（环境 preflight / reviewer 安排 / 放弃-风险判据）另计。拓扑字段（硬前驱、仅集成关联、owner、lane）只写并发矩阵——矩阵是唯一拓扑事实源，账本 `owner` 取矩阵值。
+  - Task 字段 5 个：标题行（`[integration]` 前缀替代 step_type；`[test-freeze]` / `[test-supplement]` 已随 prompts 仓 D-017 改造移除）+ 路由行（上游 category 字面前缀保留、execution_mode 同行括注、`subagent_type=<name>` 二选一）+ 上下文胶囊 + 验收条目 + 写域；条件字段（环境 preflight / reviewer 安排 / 放弃-风险判据）另计。拓扑字段（硬前驱、仅集成关联、owner、lane）只写并发矩阵——矩阵是唯一拓扑事实源，账本 `owner` 取矩阵值。
   - 验收条目机械语法：`- <ID>：<二元条件> → 命令=<命令> 预期=<结果>` 一行一条，ID 惯例 `T<n>-A<m>`；高风险 task 同行尾追加 `scope=`；`checklist_hash` = 当前生效条目（未被 supersedes）按 ID 排序的原文行（去首尾空白）串接；CAS 三元组（artifact_revision / contract_revision / checklist_hash）与 append-only 修订不变。
   - 计划级通用约定（通用禁止、终止状态断点胶囊、package_manager、默认 load_skills）以 Task 契约区块引言一次承载；轻量计划由任务清单节首引言承载。
 - 验收：固定字段合计 ≤5 行/task、验收每条 1 行，task 参考区间 12-20 行；胶囊密度不设上限（decision-complete 是北极星）。
@@ -54,6 +54,12 @@
 - 状态：`active`
 - 决策：`omo-adaptive-execution` 的波次制与并发预算（默认 3/4，`concurrency_budget` 唯一覆盖）为**计划路径**（Atlas/矩阵）节奏；例外条款**仅限 Sisyphus overlay（日常任务路径）**显式声明的蜂群滑动并发模式可覆盖节奏与数值上限（运行中 + 未验收 ≤6 滑动窗口：依赖就绪集单批爆发、完成即释放额度滑动补位、排水点统一验收）。不豁免项：写域互斥、命名依赖串行（后继读取前驱产物、同文件写入）、验收门（排水点统一验收 + 高风险边界完成即验）、Category 路由与升档协议、发现委托、质量门。SK-003 的最小化拆解与「共享推理不拆」边界不变；SK-004 的预算体制在 Sisyphus 路径由 overlay 蜂群条款承接。
 - 验收：skill 例外条款含角色限定与不豁免清单；路径选择表与反例表「ready 即全部派发」行含蜂群例外限定；skill 内「唯一覆盖入口」表述带「计划路径」限定。
+
+### SK-008 审查协议单一来源（omo-plan-review）
+
+- 状态：`active`
+- 决策：计划审查流程协议（单审/双审两阶段循环——先 Oracle 循环至 `OKAY` 再 Momus 循环至 `OKAY`、Momus 阶段修订不回送；reviewer 委托注入模板——Oracle 架构层大雷判据与 `handoff-to-momus`、Momus 机械维度穷举与三判定要求；温链收敛默认 1 轮最多 2 轮、`WHY_HIGH_REVIEW_COST` 成本门槛）由 `omo-plan-review` 单一承载，用户选送审时由 Prometheus 加载；`prometheus.md` 只保留三选项与加载指令，不复制协议（「派发方持有协议、判据随委托注入」原则）。审查判定附件格式（`tdd`/`split`/`route` 逐 task 一行、绑定计划版本、`review_verdict` 入账）与「路由档位判据」速览（quick/low/high/deep/ultrabrain/visual-engineering 适用边界——Prometheus 标注与 Momus 判定共用）定义于 `omo-plan-structure`；完整执行映射（`WHY_NOT_LOWER_COST`、升降档协议）仍归 `omo-adaptive-execution`。
+- 验收：审查协议条款只在 `omo-plan-review` 一处；`prometheus.md` 无循环/注入/收敛条款复制；`omo-plan-structure` 含判定附件格式与路由档位判据两节。
 
 ## 已废弃决策
 

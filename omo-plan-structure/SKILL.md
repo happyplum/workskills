@@ -52,6 +52,19 @@ description: 当当前代理承担 Prometheus（编写或修订计划）或 Momu
 - 拆分粒度以低档可执行为准：内聚单元超出 `quick` / `unspecified-low` 单次可执行尺寸时，优先沿独立 owner / failure family / 可独立验收边界继续拆小；共享同一推理、确实不可拆的直接路由高档（路由下限规则仍适用），不得用低档硬试。
 - 「非原子」合并举证三要素：点名具体共享不变量、未冻结接口或不可分割验收命令；说明反事实拆分后哪个中间状态无法独立通过；列出统一 owner 的必要性。确实无法拆分的合并必须标注「非原子」并逐项举证。
 
+## 路由档位判据
+
+计划路由标注（Prometheus）与路由合适性判定（Momus `route=`）共用以下判据；执行映射（`WHY_NOT_LOWER_COST` 举证、升降档协议、本地模型绑定）以 `omo-adaptive-execution` 为准：
+
+| 档位 | 适用 | 不适用 |
+|---|---|---|
+| `quick` | 机械、完全明确、局部改动 | 共享接口或连续推理 |
+| `unspecified-low` | 模式已知的常规实现或修复，范围有界 | 架构判断或广泛未知 |
+| `unspecified-high` | 非局部不变量、复杂生命周期或不可拆集成 | 仅因跨文件、测试多、prompt 长 |
+| `deep` | 陌生子系统、研究与实现迭代 | 多个无关目标 |
+| `ultrabrain` | 复杂算法、并发、状态机、架构级推理 | 常规模式可完成的工作 |
+| `visual-engineering` | UI/UX/布局/样式与视觉验证 | 非视觉实现 |
+
 ## 并行准入标准
 
 以下 6 个条件**全部满足**才可进入 parallel wave：
@@ -93,7 +106,7 @@ description: 当当前代理承担 Prometheus（编写或修订计划）或 Momu
 
 每个实施 task 写以下字段（标题/路由/写域等固定字段合计 ≤5 行，条件字段另计；胶囊与验收条目密度不设上限——decision-complete 是北极星）：
 
-- **标题行**：`- [ ] N. <标题>`——标题即一行内聚意图（交付什么可观察结果、服务哪个下游），用户可读语言；前置红测试用 `[test-freeze]`、后置补测试用 `[test-supplement]`、集成用 `[integration]` 标题前缀，普通实现无前缀。
+- **标题行**：`- [ ] N. <标题>`——标题即一行内聚意图（交付什么可观察结果、服务哪个下游），用户可读语言；集成 task 用 `[integration]` 标题前缀，普通实现无前缀；测试组织由上游 QA per todo 契约承接，不设测试专用前缀。
 - **路由行**：`Recommended task executor category: <route>`（字面前缀保留，取值限上游 category 词表，不与 execution_mode 合并），使用专用子代理时改写 `subagent_type=<name>`（二者选一）；execution_mode 以同行括注（如 `(background)`），无法预定时写 `executor_judgment` 及原因。
 - **上下文胶囊**：相关文件清单、关键符号与行区间、规划期已验证结论、无需重复探索的范围，并记录生成时的代码 revision 锚（commit hash 或文件摘要），供 Atlas 注入前校验时效；落点已知且为单点修改的 task 豁免行区间与结论摘录，胶囊只写目标路径与符号名。
 - **验收条目**（acceptance_contract，初始基线 `contract_revision: 0`）：逐条一行，机械语法 `- <ID>：<二元条件> → 命令=<命令> 预期=<结果>`，`ID` 惯例 `T<n>-A<m>`（task 序号-条目序号）；高风险 task 在同条目行尾追加 `scope=<作用域文件清单>`（Tier 1 scope 扩展裁决的参照落点）。条目 `ID` 从不复用、既有条目不原地改写，语义替换以新条目 `supersedes` 旧条目表达；`checklist_hash` = 当前生效条目（未被 supersedes）按 `ID` 排序的原文行（去首尾空白）串接计算；执行期修订一律 append-only，经执行侧分级裁决后以账本 `plan_revision` 事件生效。
@@ -108,6 +121,18 @@ description: 当当前代理承担 Prometheus（编写或修订计划）或 Momu
   - 写 `checkpoints: none` 并说明无需中间检查点的依赖与风险依据；仅显式 `none` 时由 Atlas 按依赖、背压与终态排水触发器验收。
 - 检查点断言须标注证据强度（集成实测/切片单测拼装/类型检查），不得宣称高于证据强度；切片单测拼装的链不得宣称 E2E，需要 E2E 时显式加入范围。
 - 基线预验证据以单行记入本区块（命令、退出码、失败摘要与处置），不设专用模板区块。
+
+## 审查判定附件（review verdict 附件）
+
+Momus 审查 verdict（官方 `[OKAY]` / `[REJECT]` 格式不变）之后附执行判定段，逐实施 task 一行：
+
+`- T<n>: tdd=<first|after> split=<no|yes:拆分边界与各自验收> route=<档位>`
+
+- `tdd`：测试时序判定，first = Atlas 派发时注入先红后绿指令；after = 默认时序。
+- `split`：拆解与并发重组判定，yes 附拆分边界（或 cohort 重组）与各自验收，Atlas 经标准 REMAP 通道生效；「非原子」举证成立的合并不因「还能拆」被推翻。
+- `route`：路由合适性判定（对照「路由档位判据」）；与计划标注一致时照抄，失当时写判定值，Atlas preflight 采纳。
+- 判定**绑定审查时的计划版本**：Atlas 首次消费时以 `review_verdict` 事件摘录入执行账本（版本 + 判定摘要）；结构性变化触及的 task 判定失效，Atlas 对变化部分回到自行 preflight。
+- 判定是执行期输入而非阻断项，不改变官方 verdict 格式与阻断语义。
 
 ## 计划与账本分离
 
