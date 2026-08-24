@@ -7,7 +7,7 @@ description: 当当前代理承担 OMO 协调者角色（Sisyphus 或 Atlas）�
 
 ## 概述
 
-本 skill 是 OMO 环境下执行与委托的**单一入口**：滚动波次、任务边界、并发、质量门与 `task()` 路由策略均在本文件。非 OMO 环境不使用。
+本 skill 是 OMO 环境下执行与委托的**单一入口**：滚动波次、任务边界、并发、质量门与 `task()` 路由策略均在本文件。并发节奏按路径区分：计划路径（Atlas/矩阵）为波次制；**仅 Sisyphus overlay（日常任务路径）**显式声明的单批蜂群模式可覆盖节奏与数值上限（见该 overlay），写域互斥、命名依赖串行与验收门不豁免。非 OMO 环境不使用。
 
 以目标和验收条件为稳定边界，只执行当前证据支持的工作。拆解以任务内聚为限，不为并行制造任务；相互独立的 task 用最低足够档位的 worker 并发执行，不追求代理数量。父协调者维护动态任务图，worker 交付内聚结果，验证证据决定下一波。
 
@@ -19,7 +19,7 @@ description: 当当前代理承担 OMO 协调者角色（Sisyphus 或 Atlas）�
 |---|---|
 | 配置/文档/非产品元数据：已知位置、单一机械、可直接验证 | 协调者直接执行 |
 | 产品代码：单一机械实现或修复 | **恰好 1** 个 `quick`（或等价）worker；协调者只验收，不写产品代码 |
-| 多步骤、隐藏依赖、混合能力或 ≥2 独立可验收产品改动 | 滚动波次 / 有界并发派发（上限不是配额） |
+| 多步骤、隐藏依赖、混合能力或 ≥2 独立可验收产品改动 | 滚动波次 / 有界并发派发（上限不是配额；Sisyphus overlay 的单批蜂群例外见其 overlay） |
 | 产品边界、验收或架构方向需要用户决定 | 停止并提出一个定向问题 |
 | 现有计划已规定 task、route 或串并行方式 | 先按本 skill 复核；符合则执行，边界或路由失效则 REMAP，计划稳定性不构成豁免 |
 
@@ -42,7 +42,7 @@ description: 当当前代理承担 OMO 协调者角色（Sisyphus 或 Atlas）�
 1. **固定完成条件**：记录目标、硬约束、非目标和可观察验收；未知项保持未知。
 2. **先按本文件路由**：首次直接操作或调用 `task()` 前按「路由决策顺序」选择执行者；边界不明显时由前台 `metis` 生成首波最小执行图，简单明确任务由父协调者直接拆分。
 3. **保持任务内聚**：每个 task 交付一个可独立验收的结果；共享接口、不变量或验证面的工作保持同一 owner，不按文件机械拆分；包含两个以上可独立失败、独立回退或独立验收的 owner / failure family 时必须拆分；workspace 全量门禁只在 integration/checkpoint 通过，不证明 owner task 不可拆。
-4. **治理写入并发**：写入 worker 默认并发预算 3，workspace、写入资源、共享接口和验收 owner 均隔离充分时至 4，计划 `concurrency_budget` 为唯一覆盖入口；无法证明隔离的 ready 保持 pending；同一 ready cohort 隔离充分时同波派发；只读发现不计入；独立 ready 写入任务默认后台并发，仅立即后继依赖其结论时同步等待。
+4. **治理写入并发**：写入 worker 默认并发预算 3，workspace、写入资源、共享接口和验收 owner 均隔离充分时至 4，计划 `concurrency_budget` 为唯一覆盖入口；无法证明隔离的 ready 保持 pending；同一 ready cohort 隔离充分时同波派发；只读发现不计入；独立 ready 写入任务默认后台并发，仅立即后继依赖其结论时同步等待。**例外（仅 Sisyphus overlay·日常任务路径）**：overlay 显式声明单批蜂群模式时可覆盖波次节奏与数值上限；写域互斥、命名依赖串行与验收门不豁免。计划路径（Atlas/矩阵）不适用本例外，`concurrency_budget` 仍为计划路径唯一覆盖入口。
 5. **父级持有验收与重排**：worker 报告只是候选证据，父级核对产物、diff、诊断与测试后才推进后继；依赖、共享契约、验证或 task 有效性变化时局部拆分、合并、换 owner 或重排，不改变用户目标。
 
 ## 路由决策顺序
@@ -101,7 +101,9 @@ description: 当当前代理承担 OMO 协调者角色（Sisyphus 或 Atlas）�
 - 独立 ready 实现任务默认 `run_in_background=true`；前台执行必须写 `WHY_NOT_PARALLEL`，说明哪个立即后继必须等待该结论；验证命令长或输出多不是同步理由。
 - 路由能力不可用时回退到直接工具、官方文档或 Context7，不捏造能力。
 
-## 滚动波次
+## 滚动波次（计划路径节奏）
+
+以下为计划路径（Atlas/矩阵）的节奏；Sisyphus overlay 的单批蜂群例外见其 overlay，两节奏共用的硬边界（写域互斥、命名依赖串行、验收门）不变。
 
 INTAKE（确认目标、约束、非目标和验收）→ ANALYZE（生成当前最小执行图，核对 owner、依赖和路由）→ WAVE-READY（选择依赖满足、写入隔离且接口决策明确的 task）→ DISPATCH（按关键路径与并发预算派发，其余 pending）→ COLLECT / VERIFY（读取产物与证据；验收集中在 wave 末、检查点或依赖解锁前统一执行，高风险边界完成即验收）→ REMAP（仅根据证据更新粒度、依赖、owner、路由和下一波；拆分、合并、owner、依赖与顺序调整属结构性 REMAP，验收语义变化不走 REMAP，无法当场证明语义保持时升级 Oracle）→ DONE（验收闭合、影响面核对且无阻塞后结束）。
 
@@ -135,7 +137,7 @@ worker 返回 `completed`、`blocked`、`needs-continuation` 或 `invalid-task`�
 | 为凑并行拆散同一接口 | 一个 owner 交付内聚接口，其余任务依赖它 |
 | 计划写了 high/串行就原样执行 | dispatch 前复核；无 `WHY_NOT_*` 则降档、并发或 REMAP |
 | 根 verify 在中间态不绿，所以所有 owner 必须合并 | owner 定向验收并行，根 verify 留给 integration/checkpoint |
-| ready 即全部派发 | 区分 ready、dispatch 和 pending |
+| ready 即全部派发（Sisyphus 蜂群按依赖就绪集单批，仍禁写域重叠或跨依赖集抢跑） | 区分 ready、dispatch 和 pending |
 | worker 声称完成就推进 | 父级验证后才解锁后继 |
 | 失败就新开会话 | 同一目标优先续用原 `task_id` |
 | 父级多轮翻扫会话历史找线索 | 会话溯源派后台子代理，父级只消费结论摘要 |

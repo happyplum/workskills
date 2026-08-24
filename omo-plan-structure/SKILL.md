@@ -78,7 +78,7 @@ description: 当当前代理承担 Prometheus（编写或修订计划）或 Momu
 
 - 表格逐 task 列出 cohort 归属、硬前驱、仅集成关联（跨 lane 生产/消费协同，非硬依赖）、owner、互斥写入与可变资源、workspace lane 与 route；矩阵是**唯一拓扑事实源**——Task 契约不重复拓扑字段，执行账本的 `owner` 取矩阵值。
 - cohort 是并行归属而非物理派发批次：实际分批由 Atlas 按并发预算执行，分批不改变归属。
-- 预算口径：运行中写入 worker 与未验收积压之和**默认 ≤ 3**，**隔离充分时可至 4**；矩阵可声明 `concurrency_budget: N`，声明时以计划值为准（预算体制的**唯一覆盖入口**，与 shared skills、atlas 三方一致）。
+- 预算口径：运行中写入 worker 与未验收积压之和**默认 ≤ 3**，**隔离充分时可至 4**；矩阵可声明 `concurrency_budget: N`，声明时以计划值为准（计划路径预算体制的**唯一覆盖入口**，与 shared skills、atlas 三方一致；Sisyphus 日常路径的蜂群上限见其 overlay，不经本字段）。
 - 拓扑豁免：单 writer 单 lane（允许串行多个写入 task）可写 `cohorts: none` 代替表格；轻量计划免写矩阵。
 - lane 数 ≤ 可独立验收 owner 数 + 唯一 integration lane；机械任务共享 lane，不得因文件多或任务多开 lane。
 
