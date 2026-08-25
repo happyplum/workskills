@@ -1,6 +1,6 @@
 ---
 name: omo-plan-review
-description: 当用户在计划完成后选择送审（Momus 单审，或 Oracle 循环→Momus 循环双审）时，由 Prometheus 在发起审查前加载；选择直接执行（不审）或仅讨论审查规则不加载。
+description: 当用户在计划完成后选择送审（Momus 单审，或 Oracle 循环→Momus 循环双审）时，Prometheus 必须在发起任何审查委托前先加载本 skill 并确认成功，加载失败即停止不得凭记忆执行；选择直接执行（不审）或仅讨论审查规则不加载。
 ---
 
 # OMO 计划审查协议
