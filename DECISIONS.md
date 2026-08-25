@@ -61,6 +61,12 @@
 - 决策：计划审查流程协议（单审/双审两阶段循环——先 Oracle 循环至 `OKAY` 再 Momus 循环至 `OKAY`、Momus 阶段修订不回送；reviewer 委托注入模板——Oracle 架构层大雷判据与 `handoff-to-momus`、Momus 机械维度穷举与三判定要求；温链收敛默认 1 轮最多 2 轮、`WHY_HIGH_REVIEW_COST` 成本门槛）由 `omo-plan-review` 单一承载，用户选送审时由 Prometheus 加载；`prometheus.md` 只保留三选项与加载指令，不复制协议（「派发方持有协议、判据随委托注入」原则）。审查判定附件格式（`tdd`/`split`/`route` 逐 task 一行、绑定计划版本、`review_verdict` 入账）与「路由档位判据」速览（quick/low/high/deep/ultrabrain/visual-engineering 适用边界——Prometheus 标注与 Momus 判定共用）定义于 `omo-plan-structure`；完整执行映射（`WHY_NOT_LOWER_COST`、升降档协议）仍归 `omo-adaptive-execution`。
 - 验收：审查协议条款只在 `omo-plan-review` 一处；`prometheus.md` 无循环/注入/收敛条款复制；`omo-plan-structure` 含判定附件格式与路由档位判据两节。
 
+### SK-009 Sisyphus 简单自改例外（路径选择表）
+
+- 状态：`active`
+- 决策（2026-08-25，prompts 仓 D-031）：`omo-adaptive-execution` 路径选择表「产品代码：单一机械实现或修复 → 恰好 1 个 quick worker；协调者只验收不写产品代码」加 Sisyphus overlay 例外标注——Sisyphus 简单改动自改 + 统一回归验收（少量修正自修、量大派修、上下文防污染，细则见其 overlay）；**Atlas 不适用例外**（计划路径仍纯编排）。蜂群与预算体制（SK-007）不变。
+- 验收：路径选择表含例外与 Atlas 不适用标注；skill 其余条款无「Sisyphus 不写产品代码」表述。
+
 ## 已废弃决策
 
 （暂无）
