@@ -105,13 +105,13 @@ description: 当当前代理承担 OMO 协调者角色（Sisyphus 或 Atlas）�
 
 以下为计划路径（Atlas/矩阵）的节奏；Sisyphus overlay 的蜂群滑动并发例外见其 overlay，两节奏共用的硬边界（写域互斥、命名依赖串行、验收门）不变。
 
-INTAKE（确认目标、约束、非目标和验收）→ ANALYZE（生成当前最小执行图，核对 owner、依赖和路由）→ WAVE-READY（选择依赖满足、写入隔离且接口决策明确的 task）→ DISPATCH（按关键路径与并发预算派发，其余 pending）→ COLLECT / VERIFY（读取产物与证据；验收集中在 wave 末、检查点或依赖解锁前统一执行，高风险边界完成即验收）→ REMAP（仅根据证据更新粒度、依赖、owner、路由和下一波；拆分、合并、owner、依赖与顺序调整属结构性 REMAP，验收语义变化不走 REMAP，无法当场证明语义保持时升级 Oracle）→ DONE（验收闭合、影响面核对且无阻塞后结束）。
+INTAKE（确认目标、约束、非目标和验收）→ ANALYZE（生成当前最小执行图，核对 owner、依赖和路由）→ WAVE-READY（选择依赖满足、写入隔离且接口决策明确的 task）→ DISPATCH（按关键路径与并发预算派发，其余 pending）→ COLLECT / VERIFY（读取产物与证据；验收集中在 wave 末、检查点、依赖解锁前或终态排水统一执行，高风险边界完成即验收）→ REMAP（仅根据证据更新粒度、依赖、owner、路由和下一波；拆分、合并、owner、依赖与顺序调整属结构性 REMAP，验收语义变化不走 REMAP，无法当场证明语义保持时升级 Oracle）→ DONE（验收闭合、影响面核对且无阻塞后结束）。
 
 失败 task 只阻塞依赖分支；共享接口、集成点和最终交付仍需统一验收。
 
 ## 委托契约
 
-每个新 `task()` 使用英文 prompt，包含 `[CONTEXT]`（证据、约束和 owner 边界）、`[GOAL]`（唯一可验收结果）、`[STOP WHEN]`（可观察停止状态）、`[EVIDENCE]`（必须返回的产物和验证）、`[DOWNSTREAM]`（后继消费者或关卡）、`[REQUEST]`（允许范围、禁止项和返回格式）六段。
+每个新 `task()` 使用英文 prompt，采用上游委托六段：`TASK`（原子、唯一可验收目标）、`EXPECTED OUTCOME`（可观察停止状态与必须返回的产物、验证证据——验收核对以此段为准）、`REQUIRED TOOLS`（该 task 的工具白名单与检索方式）、`MUST DO`（允许范围、必要步骤与返回格式）、`MUST NOT DO`（禁止项，预先阻断越界）、`CONTEXT`（证据、约束、owner 边界与后继消费者，附一句目标语义锚——这一改动的用户可见目的）。
 
 worker 返回 `completed`、`blocked`、`needs-continuation` 或 `invalid-task`，不得扩大范围或宣称全局完成；返回 `blocked` 时必须附断点胶囊（已验证结论、已排除路径、卡点描述），供父级不重读旧会话即可重派。
 

@@ -67,6 +67,24 @@
 - 决策（2026-08-25，prompts 仓 D-031）：`omo-adaptive-execution` 路径选择表「产品代码：单一机械实现或修复 → 恰好 1 个 quick worker；协调者只验收不写产品代码」加 Sisyphus overlay 例外标注——Sisyphus 简单改动自改 + 统一回归验收（少量修正自修、量大派修、上下文防污染，细则见其 overlay）；**Atlas 不适用例外**（计划路径仍纯编排）。蜂群与预算体制（SK-007）不变。
 - 验收：路径选择表含例外与 Atlas 不适用标注；skill 其余条款无「Sisyphus 不写产品代码」表述。
 
+### SK-010 委托契约对齐上游六段
+
+- 状态：`active`
+- 决策（2026-08-25，prompts 仓 D-032 同裁决）：`omo-adaptive-execution` 委托契约弃用本地六段（`[CONTEXT][GOAL][STOP WHEN][EVIDENCE][DOWNSTREAM][REQUEST]`），改用上游委托六段 `TASK / EXPECTED OUTCOME / REQUIRED TOOLS / MUST DO / MUST NOT DO / CONTEXT`——上游 Atlas 与 Sisyphus 均以 MUST 级强制该模板且上游不可改（用户裁决「上游优先」），双模板并存时本地对齐。本地原有语义折叠进对应段：`GOAL`→`TASK`，`STOP WHEN`+`EVIDENCE`→`EXPECTED OUTCOME`，`REQUEST`→`MUST DO`+`MUST NOT DO`，`DOWNSTREAM` 与目标语义锚→`CONTEXT`。worker 四态返回与断点胶囊不变。
+- 验收：skill 与 prompts 引用处无旧六段名残留；原引用 `[EVIDENCE]` 的验收核对条款改为 `EXPECTED OUTCOME` 段。
+
+### SK-011 Momus 委托模板补 handoff 承接
+
+- 状态：`active`
+- 决策（2026-08-25）：`omo-plan-review` Momus 委托注入模板补 handoff 承接条款——Oracle 阶段移交的 `handoff-to-momus` 显微发现必须出现在 Momus 核对清单，逐项核对：命中官方四类才升级 blocker，未命中在 verdict Summary 记录一句处置结论，不得静默丢弃。属 SK-008 迁移遗漏修复（D-016 验收「handoff 建议出现在 Momus 核对清单」补全）。
+- 验收：omo-plan-review Momus 模板含 handoff 承接条款；handoff 产出端（Oracle 模板）与消费端（Momus 模板）闭环。
+
+### SK-012 滚动波次验收节点补终态排水
+
+- 状态：`active`
+- 决策（2026-08-25）：`omo-adaptive-execution` 滚动波次 COLLECT/VERIFY 的验收节点枚举补「终态排水」，与 atlas.md 四节点口径（wave 末 / 检查点 / 依赖解锁前 / 终态排水）及 SK-004 对齐。
+- 验收：skill 节点枚举为四节点，与 atlas.md 一致。
+
 ## 已废弃决策
 
 （暂无）
