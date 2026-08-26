@@ -91,6 +91,12 @@
 - 决策（2026-08-25 用户裁决，prompts 仓 D-036 同裁决）：OMO 体系计划的存放路径约定由 `docs/plans/` 改为 `.omo/plans/`——上游 Momus 输入契约只认 `.omo/plans/*.md`（0 匹配即拒审），ulw-plan 计划工位与 `/start-work` 计划选择均基于该路径；本地对齐后送审管道与执行入口天然成立，不对上游契约做任何本地适配。`docs/plans/` 等其他路径为非 OMO 体系计划，不经本体系送审与执行。存量计划按其 workspaces 已声明路径继续生效，不强制迁移。
 - 验收：`omo-plan-structure` workspaces 示例路径为 `.omo/plans/`；两仓活动文件无 `docs/plans` 新引用。
 
+### SK-014 Oracle 审查注入升级为架构师评估
+
+- 状态：`active`
+- 决策（2026-08-25 用户裁决，prompts 仓 D-038 同裁决）：`omo-plan-review` Oracle 委托注入模板由「只阻断架构层大雷」升级为架构师评估——以架构师视角做架构分析、技术细节风险与技术盲点搜索，产出架构完善建议；`[REJECT]` 仍只限架构层大雷；非阻断产出双通道（架构完善建议与盲点清单随 verdict 交修订方，可机械核对的显微发现走 `handoff-to-momus` 移交 Momus）。审查意图随委托写明，Oracle 角色 prompt 保持架构师纯职（D-038 单职原则）。
+- 验收：注入模板含架构师评估意图与非阻断双通道；Oracle 角色 prompt 无审查模式语句。
+
 ## 已废弃决策
 
 （暂无）
