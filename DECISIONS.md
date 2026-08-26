@@ -85,6 +85,12 @@
 - 决策（2026-08-25）：`omo-adaptive-execution` 滚动波次 COLLECT/VERIFY 的验收节点枚举补「终态排水」，与 atlas.md 四节点口径（wave 末 / 检查点 / 依赖解锁前 / 终态排水）及 SK-004 对齐。
 - 验收：skill 节点枚举为四节点，与 atlas.md 一致。
 
+### SK-013 计划工位对齐上游 .omo/plans
+
+- 状态：`active`
+- 决策（2026-08-25 用户裁决，prompts 仓 D-036 同裁决）：OMO 体系计划的存放路径约定由 `docs/plans/` 改为 `.omo/plans/`——上游 Momus 输入契约只认 `.omo/plans/*.md`（0 匹配即拒审），ulw-plan 计划工位与 `/start-work` 计划选择均基于该路径；本地对齐后送审管道与执行入口天然成立，不对上游契约做任何本地适配。`docs/plans/` 等其他路径为非 OMO 体系计划，不经本体系送审与执行。存量计划按其 workspaces 已声明路径继续生效，不强制迁移。
+- 验收：`omo-plan-structure` workspaces 示例路径为 `.omo/plans/`；两仓活动文件无 `docs/plans` 新引用。
+
 ## 已废弃决策
 
 （暂无）
