@@ -9,6 +9,7 @@
 - 状态：`active`
 - 决策：计划结构体系（区块构成、Task 字段、验收条目语法、矩阵结构约束、任务原子性契约、并行准入六条件、计划/账本分离）以 `omo-plan-structure` 为单一标准，编写方（Prometheus）与审查方（Momus）共用；任何一方不得另行复制或改写结构定义，结构类不一致以该 skill 裁决。本地计划不经上游 `ulw-plan` scaffold 生成，task 行保留上游 checkbox 语法与 `Recommended task executor category:` 字面前缀作为路由锚。
 - 验收：结构 schema 只在 SKILL.md 一处定义；后续字段增改只改 skill 一处，消费方 prompt 不出现字段名漂移。
+- 修订（2026-08-26，SK-015）：计划/账本分离的账本载体改为上游 `.omo/start-work/ledger.jsonl`。
 
 ### SK-002 计划分级与 Task 契约精简
 
@@ -19,6 +20,7 @@
   - 验收条目机械语法：`- <ID>：<二元条件> → 命令=<命令> 预期=<结果>` 一行一条，ID 惯例 `T<n>-A<m>`；高风险 task 同行尾追加 `scope=`；`checklist_hash` = 当前生效条目（未被 supersedes）按 ID 排序的原文行（去首尾空白）串接；CAS 三元组（artifact_revision / contract_revision / checklist_hash）与 append-only 修订不变。
   - 计划级通用约定（通用禁止、终止状态断点胶囊、package_manager、默认 load_skills）以 Task 契约区块引言一次承载；轻量计划由任务清单节首引言承载。
 - 验收：固定字段合计 ≤5 行/task、验收每条 1 行，task 参考区间 12-20 行；胶囊密度不设上限（decision-complete 是北极星）。
+- 修订（2026-08-26，SK-015）：`checklist_hash` 定义随 CAS 废除而移除；条目 `ID` 与 `supersedes`、append-only 语法不变。
 
 ### SK-003 经济路由与失败升档（omo-adaptive-execution）
 
@@ -36,6 +38,7 @@
 - 决策：删除逐任务验收仪式——`omo-adaptive-execution` 滚动波次的 COLLECT/VERIFY 阶段为集中验收：预算内持续 fan-out 补位，验收集中在 wave 末、检查点、依赖解锁前、终态排水；预算口径（运行中写入 worker + 未验收产物，默认 3、隔离充分至 4、计划 `concurrency_budget` 唯一覆盖）为强制背压，达到上限先统一验收再派发；公共接口、持久化、安全、并发、迁移、不可逆等高风险边界完成即验收。
 - 验收：滚动波次 COLLECT/VERIFY 表述与节点统一召回一致；预算上限仍为强制背压。
 - 修订（2026-08-24，SK-007）：预算体制限定为计划路径；Sisyphus 日常路径的并发节奏由 overlay 蜂群滑动并发条款承接（SK-007），强制背压思想不变——运行中+未验收 ≤6 的滑动窗口即该路径的背压门。
+- 修订（2026-08-26，SK-015/D-039）：「验收集中在四类节点」废止，回归上游逐 task 验证即勾选；预算背压与 Sisyphus 路径承接不变。
 
 ### SK-005 跨会话历史检索归入发现委托
 
@@ -84,6 +87,7 @@
 - 状态：`active`
 - 决策（2026-08-25）：`omo-adaptive-execution` 滚动波次 COLLECT/VERIFY 的验收节点枚举补「终态排水」，与 atlas.md 四节点口径（wave 末 / 检查点 / 依赖解锁前 / 终态排水）及 SK-004 对齐。
 - 验收：skill 节点枚举为四节点，与 atlas.md 一致。
+- 修订（2026-08-26，SK-015/D-039）：终态排水节点同步条款随节点体系废止而失效（终态排水保留为聚合强化点）。
 
 ### SK-013 计划工位对齐上游 .omo/plans
 
@@ -96,6 +100,12 @@
 - 状态：`active`
 - 决策（2026-08-25 用户裁决，prompts 仓 D-038 同裁决）：`omo-plan-review` Oracle 委托注入模板由「只阻断架构层大雷」升级为架构师评估——以架构师视角做架构分析、技术细节风险与技术盲点搜索，产出架构完善建议；`[REJECT]` 仍只限架构层大雷；非阻断产出双通道（架构完善建议与盲点清单随 verdict 交修订方，可机械核对的显微发现走 `handoff-to-momus` 移交 Momus）。审查意图随委托写明，Oracle 角色 prompt 保持架构师纯职（D-038 单职原则）。
 - 验收：注入模板含架构师评估意图与非阻断双通道；Oracle 角色 prompt 无审查模式语句。
+
+### SK-015 执行状态回归上游（ledger.jsonl 与逐 task 完成契约）
+
+- 状态：`active`
+- 决策（2026-08-26 用户裁决，prompts 仓 D-039 同裁决）：`omo-plan-structure` 账本载体改为上游 `.omo/start-work/ledger.jsonl`（计划/账本分离原则不变，本地事件同载体）；`checklist_hash` 定义随 CAS 废除而移除（验收条目 `ID` 与 `supersedes`、append-only 机械语法保留）；`omo-adaptive-execution` 滚动波次 COLLECT/VERIFY 改为「每个 task 完成即验证并勾选，检查点、集成与终态排水为聚合强化点」。受修订：SK-001（账本载体）、SK-002（checklist_hash）、SK-004（节点召回）、SK-012（节点同步条款失效）。
+- 验收：两 skill 无 `<plan>.ledger.md` / `checklist_hash` 残留；滚动波次与 atlas.md 验收节奏一致。
 
 ## 已废弃决策
 

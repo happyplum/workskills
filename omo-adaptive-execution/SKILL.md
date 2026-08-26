@@ -105,7 +105,7 @@ description: 当当前代理承担 OMO 协调者角色（Sisyphus 或 Atlas）�
 
 以下为计划路径（Atlas/矩阵）的节奏；Sisyphus overlay 的蜂群滑动并发例外见其 overlay，两节奏共用的硬边界（写域互斥、命名依赖串行、验收门）不变。
 
-INTAKE（确认目标、约束、非目标和验收）→ ANALYZE（生成当前最小执行图，核对 owner、依赖和路由）→ WAVE-READY（选择依赖满足、写入隔离且接口决策明确的 task）→ DISPATCH（按关键路径与并发预算派发，其余 pending）→ COLLECT / VERIFY（读取产物与证据；验收集中在 wave 末、检查点、依赖解锁前或终态排水统一执行，高风险边界完成即验收）→ REMAP（仅根据证据更新粒度、依赖、owner、路由和下一波；拆分、合并、owner、依赖与顺序调整属结构性 REMAP，验收语义变化不走 REMAP，无法当场证明语义保持时升级 Oracle）→ DONE（验收闭合、影响面核对且无阻塞后结束）。
+INTAKE（确认目标、约束、非目标和验收）→ ANALYZE（生成当前最小执行图，核对 owner、依赖和路由）→ WAVE-READY（选择依赖满足、写入隔离且接口决策明确的 task）→ DISPATCH（按关键路径与并发预算派发，其余 pending）→ COLLECT / VERIFY（读取产物与证据；每个 task 完成即验证并勾选，检查点、集成与终态排水为聚合强化点）→ REMAP（仅根据证据更新粒度、依赖、owner、路由和下一波；拆分、合并、owner、依赖与顺序调整属结构性 REMAP，验收语义变化不走 REMAP，无法当场证明语义保持时升级 Oracle）→ DONE（验收闭合、影响面核对且无阻塞后结束）。
 
 失败 task 只阻塞依赖分支；共享接口、集成点和最终交付仍需统一验收。
 
