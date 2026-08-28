@@ -107,6 +107,12 @@
 - 决策（2026-08-26 用户裁决，prompts 仓 D-039 同裁决）：`omo-plan-structure` 账本载体改为上游 `.omo/start-work/ledger.jsonl`（计划/账本分离原则不变，本地事件同载体）；`checklist_hash` 定义随 CAS 废除而移除（验收条目 `ID` 与 `supersedes`、append-only 机械语法保留）；`omo-adaptive-execution` 滚动波次 COLLECT/VERIFY 改为「每个 task 完成即验证并勾选，检查点、集成与终态排水为聚合强化点」。受修订：SK-001（账本载体）、SK-002（checklist_hash）、SK-004（节点召回）、SK-012（节点同步条款失效）。
 - 验收：两 skill 无 `<plan>.ledger.md` / `checklist_hash` 残留；滚动波次与 atlas.md 验收节奏一致。
 
+### SK-016 账本路径随上游改名（.omo/ulw-execute/ledger.jsonl）
+
+- 状态：`active`
+- 决策（2026-08-26，上游 5.0.0-beta.24，prompts 仓 D-040 同裁决）：上游 start-work skill 更名 `ulw-execute` 并将证据账本路径改为 `.omo/ulw-execute/ledger.jsonl`；`omo-plan-structure` 的 workspaces 示例与「计划与账本分离」节路径同步。其余不变（`.omo/plans/` 计划工位、boulder、事件词表、`/ulw-execute` 计划选择语义）。
+- 验收：skill 无 `.omo/start-work` 残留。
+
 ## 已废弃决策
 
 （暂无）

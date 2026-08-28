@@ -81,7 +81,7 @@ description: 当当前代理承担 Prometheus（编写或修订计划）或 Momu
 ## Workspaces 区块
 
 - 含仓库写入的完整计划必须定义 `workspaces`，标注 `vcs: git | none` 和 `mode: current | worktree`，每个写入 task 引用唯一 `workspace_lane`；轻量计划按「计划分级」的节尾一行声明。
-- `vcs: git` 时必须标明**主分支**（项目默认分支，如 `main`）及**计划文件与账本在主分支下的存放路径**（约定计划 `.omo/plans/<plan-name>.md`——上游计划工位，Momus 输入契约与 `/start-work` 计划选择由此识别；执行账本统一为上游 `.omo/start-work/ledger.jsonl`，见「计划与账本分离」；`docs/plans/` 等其他路径为非 OMO 体系计划，不经本体系送审与执行；存量计划按其已声明路径继续生效，不强制迁移）；所有 worktree lane 自该主分支创建，计划与账本的权威版本只保留在主工作区（主分支检出）的该路径下，lane worktree 内不得另建计划或账本副本。`vcs: none` 时改标计划与账本所在目录的绝对路径。
+- `vcs: git` 时必须标明**主分支**（项目默认分支，如 `main`）及**计划文件与账本在主分支下的存放路径**（约定计划 `.omo/plans/<plan-name>.md`——上游计划工位，Momus 输入契约与 `/ulw-execute` 计划选择由此识别；执行账本统一为上游 `.omo/ulw-execute/ledger.jsonl`，见「计划与账本分离」；`docs/plans/` 等其他路径为非 OMO 体系计划，不经本体系送审与执行；存量计划按其已声明路径继续生效，不强制迁移）；所有 worktree lane 自该主分支创建，计划与账本的权威版本只保留在主工作区（主分支检出）的该路径下，lane worktree 内不得另建计划或账本副本。`vcs: none` 时改标计划与账本所在目录的绝对路径。
 - `mode: current` **必须记录 `authorization_source`**，指向用户对使用当前工作区的明确授权；普通计划批准、工作区看似干净或规划者判断**均不算授权**，且保留现有分支。
 - 新建 worktree 命名：单 lane 主 workspace 或多 lane integration workspace 使用 `<plan-name>--main` 与分支 `work/<plan-name>/main`；实施 lane 使用 `<plan-name>--<task-key>` 与分支 `work/<plan-name>/<task-key>`。
 - 存在多个写入 lane 时，必须增加唯一 integration task/workspace，依赖各 lane 的已验证产物，明确允许的汇合顺序，并只在集成树上运行最终验收与 Final Wave。
@@ -136,6 +136,6 @@ Momus 审查 verdict（官方 `[OKAY]` / `[REJECT]` 格式不变）之后附执�
 
 ## 计划与账本分离
 
-- 动态状态（验证证据、尝试次数、会话链与执行进度）**不写入计划文件**，统一 append 到上游执行账本 `.omo/start-work/ledger.jsonl`（一行一个 JSON 对象；本地特有事件 `review_verdict` / `plan_revision` / `prompt_rev` 同载体）：账本只追加、不回改历史条目，恢复执行时重放尾部重建状态；task 行勾选状态随验证通过投影为 `- [x]`（属当前生效投影），其余动态状态只在账本。
-- 账本物理文件只保留在主工作区 `.omo/start-work/`，不复制到任何 lane worktree；全部 append 统一写入主工作区账本。
+- 动态状态（验证证据、尝试次数、会话链与执行进度）**不写入计划文件**，统一 append 到上游执行账本 `.omo/ulw-execute/ledger.jsonl`（一行一个 JSON 对象；本地特有事件 `review_verdict` / `plan_revision` / `prompt_rev` 同载体）：账本只追加、不回改历史条目，恢复执行时重放尾部重建状态；task 行勾选状态随验证通过投影为 `- [x]`（属当前生效投影），其余动态状态只在账本。
+- 账本物理文件只保留在主工作区 `.omo/ulw-execute/`，不复制到任何 lane worktree；全部 append 统一写入主工作区账本。
 - 正文与账本事件摘要不一致时执行侧 fail-closed，停止派发、验收与恢复。
