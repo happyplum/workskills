@@ -113,6 +113,12 @@
 - 决策（2026-08-26，上游 5.0.0-beta.24，prompts 仓 D-040 同裁决）：上游 start-work skill 更名 `ulw-execute` 并将证据账本路径改为 `.omo/ulw-execute/ledger.jsonl`；`omo-plan-structure` 的 workspaces 示例与「计划与账本分离」节路径同步。其余不变（`.omo/plans/` 计划工位、boulder、事件词表、`/ulw-execute` 计划选择语义）。
 - 验收：skill 无 `.omo/start-work` 残留。
 
+### SK-017 visual-engineering 边界收紧（按交付物性质判定）
+
+- 状态：`active`
+- 决策（2026-08-31，prompts 仓 D-042 同裁决，skills 29605b4）：`omo-adaptive-execution` Category 选择表 `visual-engineering` 行「不应使用」列由「非视觉实现」收紧为「非视觉实现；触碰 UI 文件或带 UI/manual QA 验收的实现任务同样不属此类——按交付物性质判定，不按触碰文件面或验收手段」。背景：chat-unify 计划执行中 Atlas 把触碰 UI 文件的实现任务（计划推荐 unspecified-high）误判为 visual-engineering，导致该分类模型池首位（kimi k3-256k）被反复命中且派发中断率偏高。
+- 验收：Category 表 visual-engineering 行含交付物性质判定边界；边界细则不复制到其他仓 prompt（单一来源，atlas.md 只留引用与执行纪律）。
+
 ## 已废弃决策
 
 （暂无）
