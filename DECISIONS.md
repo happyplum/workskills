@@ -118,12 +118,19 @@
 - 状态：`active`
 - 决策（2026-08-31，prompts 仓 D-042 同裁决，skills 29605b4）：`omo-adaptive-execution` Category 选择表 `visual-engineering` 行「不应使用」列由「非视觉实现」收紧为「非视觉实现；触碰 UI 文件或带 UI/manual QA 验收的实现任务同样不属此类——按交付物性质判定，不按触碰文件面或验收手段」。背景：chat-unify 计划执行中 Atlas 把触碰 UI 文件的实现任务（计划推荐 unspecified-high）误判为 visual-engineering，导致该分类模型池首位（kimi k3-256k）被反复命中且派发中断率偏高。
 - 验收：Category 表 visual-engineering 行含交付物性质判定边界；边界细则不复制到其他仓 prompt（单一来源，atlas.md 只留引用与执行纪律）。
+- 修订（2026-08-31，SK-019）：本条「不应使用」表述由 SK-019 整行重写承载（使用条件改判定语句），「按交付物性质判定」原则保留不变。
 
 ### SK-018 领域 category 判定证据化（explore 勘察前置）
 
 - 状态：`active`
 - 决策（2026-08-31，prompts 仓 D-044 同裁决）：`omo-adaptive-execution`「路由决策顺序」第 5 步由「领域 category 按任务性质优先」改为「领域 category 必须以任务性质证据判定——交付物性质不明或候选不止一个时，先派后台 `explore` 勘察该 task 触及的代码面与交付物性质再定档；不以标题措辞、触碰文件面或验收手段推断」。背景：chat-unify T3/T4 误判 visual-engineering 的根因是派发方无勘察证据即凭文本印象定档。
 - 验收：路由决策顺序第 5 步含证据判定与 explore 前置；流程细则不复制到角色 prompt（单一来源）。
+
+### SK-019 visual-engineering 判定标准重写（交付物以写界面为主）
+
+- 状态：`active`
+- 决策（2026-08-31，用户裁决「不要过度限制，核心是完善路由判定标准，让加载时选择更准确」+「复杂的 UI、UX、样式、动画交给 visual-engineering」；同轮曾拟「全部领域 category 强制举证 + 领域交付物指不出回落」方案，因过度限制被否撤回，其 prompts 侧执行引用 D-046 一并撤销）：`Category 选择` 表 `visual-engineering` 行由名词罗列（「UI、UX、布局、样式、动画和视觉验证」）重写为双维判定——使用条件「**复杂的 UI、UX、样式、动画实现——交付物以写用户可见界面为主**（界面结构、布局、视觉呈现、视觉走查）」，不应使用「业务、数据或架构逻辑实现——即使代码位于 UI 层、或以 UI/manual QA 收尾验收；**简单界面改动走 `unspecified-*` 档**」；性质与复杂度双维均满足才入领域路由；`WHY_NOT_LOWER_COST` 清单维持原状不扩展。背景：chat-unify 误判根因是「UI」字样名词匹配（改 UI 层文件即命中），判定基准移到交付物语义后此类任务不再命中。与 SK-017（交付物判定原则）、D-042（计划推荐默认采纳）、D-044（勘察前置）配合——判定标准本身写准 + 拿不准有据定档，不加派发闸。
+- 验收：visual-engineering 行使用条件含「复杂」限定与「交付物以写用户可见界面为主」；不应使用列含简单界面改动回落 `unspecified-*`；举证段无领域 category 扩展（与 SK-019 重写前原状一致）。
 
 ## 已废弃决策
 
