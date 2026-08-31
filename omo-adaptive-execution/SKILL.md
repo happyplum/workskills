@@ -51,7 +51,7 @@ description: 当当前代理承担 OMO 协调者角色（Sisyphus 或 Atlas）�
 2. 需要仓库发现：`subagent_type="explore"`，只读后台。
 3. 需要外部文档、SDK 或 OSS 证据：`subagent_type="librarian"`，只读后台。
 4. 多步骤且边界不明：前台 `metis` 生成首波最小图。
-5. 实现任务按最低足够 category 派发：机械局部改动用 `quick`，模式已知且范围有界的普通产品实现用 `unspecified-low`（本地配置为 Luna-max）；只有低档无法覆盖的证据成立时才提级。领域 category 按任务性质优先。
+5. 实现任务按最低足够 category 派发：机械局部改动用 `quick`，模式已知且范围有界的普通产品实现用 `unspecified-low`（本地配置为 Luna-max）；只有低档无法覆盖的证据成立时才提级。领域 category 必须以任务性质证据判定——交付物性质不明或候选不止一个时，先派后台 `explore` 勘察该 task 触及的代码面与交付物性质再定档；不以标题措辞、触碰文件面或验收手段推断。
 6. 架构、高风险判断、失败策略或 Metis 发现的结构缺口：前台 `oracle`。
 7. 显式计划审查：`momus`。
 

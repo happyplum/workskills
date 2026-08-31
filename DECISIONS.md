@@ -119,6 +119,12 @@
 - 决策（2026-08-31，prompts 仓 D-042 同裁决，skills 29605b4）：`omo-adaptive-execution` Category 选择表 `visual-engineering` 行「不应使用」列由「非视觉实现」收紧为「非视觉实现；触碰 UI 文件或带 UI/manual QA 验收的实现任务同样不属此类——按交付物性质判定，不按触碰文件面或验收手段」。背景：chat-unify 计划执行中 Atlas 把触碰 UI 文件的实现任务（计划推荐 unspecified-high）误判为 visual-engineering，导致该分类模型池首位（kimi k3-256k）被反复命中且派发中断率偏高。
 - 验收：Category 表 visual-engineering 行含交付物性质判定边界；边界细则不复制到其他仓 prompt（单一来源，atlas.md 只留引用与执行纪律）。
 
+### SK-018 领域 category 判定证据化（explore 勘察前置）
+
+- 状态：`active`
+- 决策（2026-08-31，prompts 仓 D-044 同裁决）：`omo-adaptive-execution`「路由决策顺序」第 5 步由「领域 category 按任务性质优先」改为「领域 category 必须以任务性质证据判定——交付物性质不明或候选不止一个时，先派后台 `explore` 勘察该 task 触及的代码面与交付物性质再定档；不以标题措辞、触碰文件面或验收手段推断」。背景：chat-unify T3/T4 误判 visual-engineering 的根因是派发方无勘察证据即凭文本印象定档。
+- 验收：路由决策顺序第 5 步含证据判定与 explore 前置；流程细则不复制到角色 prompt（单一来源）。
+
 ## 已废弃决策
 
 （暂无）
