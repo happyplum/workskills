@@ -35,6 +35,15 @@ oh-my-opencode 多智能体系统的自定义技能集，覆盖路由调度、�
 | [opencode-subagent-log-triage](opencode-subagent-log-triage/) | 卡住取证：session/tool/进程树 → writer 三态 ACTIVE/INACTIVE/UNKNOWN；执行审计：会话树成本/token/时长总账（SQLite 权威，scripts/query-sessions.mjs、dump-session-parts.mjs）；不 `task()` 续派，应用进程清理交 long-running-process |
 | [weekly-report-generator](weekly-report-generator/) | 从 git 历史生成中文周报（默认上周日至今天，不截成完整周日周，显式区间优先）；按独立交付分条，标题写做了哪件事、正文写结果，禁止注释腔、口语流水账和副作用标题，只读取证不落入 commit hash/逐项日期 |
 
+### 工程规范
+
+手动/显式加载的个人工程契约；协同或非本人主导项目仅在用户明确要求时应用。
+
+| 技能 | 说明 |
+|------|------|
+| [dev-standards](dev-standards/) | 框架中立的通用开发规范与工程结构契约（原则 / 落位 / 代码内部）；用于按个人习惯实现、评审或落成项目 AGENTS.md |
+| [vue-standards](vue-standards/) | 自包含 Vue 工程规范（结构 / 请求 / 表格表单 / 工程化）；不依赖通用版 skill |
+
 ## 技能依赖关系
 
 ```

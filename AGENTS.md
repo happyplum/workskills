@@ -17,7 +17,9 @@ skills/
 ├── omo-adaptive-execution/          # Core: OMO 执行与路由
 ├── omo-atlas-execution-constraints/ # Execution: OMO Atlas 治理
 ├── review-work/                      # Review: 风险路由的完成工作审查
-└── opencode-subagent-log-triage/    # Global: OpenCode 子代理日志排查
+├── opencode-subagent-log-triage/    # Global: OpenCode 子代理日志排查
+├── dev-standards/                   # 个人: 框架中立开发规范（显式加载）
+└── vue-standards/                   # 个人: Vue 工程规范（显式加载，自包含）
 ```
 
 > OMO 执行与路由规则统一维护在 `omo-adaptive-execution/SKILL.md`（含发现委托、路由顺序、Category）。其它 prompt 和治理 skill 不复制其内容。
