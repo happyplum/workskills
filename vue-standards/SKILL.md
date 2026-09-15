@@ -26,6 +26,7 @@ description: lzy 的 Vue 工程规范（自包含 canon，蒸馏自 vue-vite-cli
 | 写接口层 / 错误处理 / 列表页 | `references/request-error.md` |
 | 写表格 / 表单 / 弹窗 / 图表 | `references/table-form.md` |
 | 配 lint / 提交 / mock / i18n / 样式 / 构建 | `references/engineering.md`（含已知漂移清单） |
+| 遇到不明的习惯名词 / 术语用法存疑 | `references/glossary.md`（术语唯一权威表） |
 
 ## 目录速览（一页图）
 
