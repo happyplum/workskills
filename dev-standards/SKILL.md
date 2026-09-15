@@ -17,6 +17,7 @@ description: lzy 的通用开发规范与工程结构契约（框架中立，Vue
 | 决定「这个文件/组件放哪」 | `references/placement.md` |
 | 写请求层 / 列表页 / 表单 / 状态 / 通信 | `references/code-internal.md` |
 | 转成项目规则（AGENTS.md）或做 monorepo/双宿主改造 | `references/localize.md` |
+| 遇到不明的习惯名词 / 术语用法存疑 | `references/glossary.md`（术语唯一权威表） |
 
 ## 八条元习惯（原则层）
 
