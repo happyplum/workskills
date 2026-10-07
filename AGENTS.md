@@ -18,7 +18,7 @@ skills/
 ├── omo-atlas-execution-constraints/ # Execution: OMO Atlas 治理
 ├── review-work/                      # Review: 风险路由的完成工作审查
 ├── opencode-subagent-log-triage/    # Global: OpenCode 子代理日志排查
-├── dev-standards/                   # 个人: 框架中立开发规范（显式加载）
+├── dev-standards/                   # 个人: 前端开发通用规范（框架中立，显式加载）
 └── vue-standards/                   # 个人: Vue 工程规范（显式加载，自包含）
 ```
 

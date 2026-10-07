@@ -41,7 +41,7 @@ oh-my-opencode 多智能体系统的自定义技能集，覆盖路由调度、�
 
 | 技能 | 说明 |
 |------|------|
-| [dev-standards](dev-standards/) | 框架中立的通用开发规范与工程结构契约（原则 / 落位 / 代码内部）；用于按个人习惯实现、评审或落成项目 AGENTS.md |
+| [dev-standards](dev-standards/) | 框架中立的前端开发通用规范与工程结构契约（原则 / 落位 / 代码内部）；用于按个人习惯实现、评审或落成项目 AGENTS.md |
 | [vue-standards](vue-standards/) | 自包含 Vue 工程规范（结构 / 请求 / 表格表单 / 工程化）；不依赖通用版 skill |
 
 ## 技能依赖关系
