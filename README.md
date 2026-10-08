@@ -10,18 +10,16 @@ oh-my-opencode 多智能体系统的自定义技能集，覆盖路由调度、�
 
 与手动治理命令对应的命令目录现已迁移为独立的 `commands/` Git 子仓库；为避免 `commands/README.md` 被命令加载器误识别，命令目录说明与命令入口文档请维护在上层同级 `../commands/docs/README.md`，不要继续把 command catalog 作为本 README 的主事实来源。
 
+**omo-* 治理 skills 已迁出**（2026-10-08）：`omo-adaptive-execution`、`omo-atlas-execution-constraints`、`omo-plan-structure`、`omo-plan-review` 现维护于 `~/.config/opencode/skills/`（独立 Git 仓库，即 oh-my-opencode 技能加载路径）。本仓不再维护其内容；迁移前的 SK-xxx 决策史仍见 [`DECISIONS.md`](DECISIONS.md)。
+
 ## 技能列表
 
 ### 计划与执行
 
-计划生命周期——覆盖执行阶段协调。计划结构修复能力已迁出为独立的手动治理入口；自动执行路径应通过 `oracle` 的结构化修订结果推进，而不是把命令名当成执行动作。
+计划生命周期——覆盖执行阶段协调。计划结构修复能力已迁出为独立的手动治理入口；自动执行路径应通过 `oracle` 的结构化修订结果推进，而不是把命令名当成执行动作。omo-* 治理 skills 已迁出（见上方迁移说明）。
 
 | 技能 | 说明 |
 |------|------|
-| [omo-adaptive-execution](omo-adaptive-execution/) | OMO 统一执行入口：滚动波次（计划路径节奏）+ 路由 + 发现委托均在 `SKILL.md`；Sisyphus overlay 的蜂群滑动并发为例外（角色限定，不豁免硬边界） |
-| [omo-atlas-execution-constraints](omo-atlas-execution-constraints/) | OMO Atlas 中大型目标编排的角色边界、执行门控和质量要求 |
-| [omo-plan-structure](omo-plan-structure/) | OMO 计划结构单一标准：五区块 schema、矩阵结构约束、任务原子性契约、并行准入标准、Task 契约字段、路由档位判据、审查判定附件格式与计划/账本分离；Prometheus 编写与 Momus 审查前必须加载 |
-| [omo-plan-review](omo-plan-review/) | OMO 计划审查协议单一来源：单审/双审两阶段循环（先 Oracle 循环→再 Momus 循环）、reviewer 委托注入模板、温链收敛与成本门槛；用户选送审时由 Prometheus 加载 |
 | [review-work](review-work/) | 基于风险选择最少充分审查 lane；普通 QA/代码审查走 Luna-max，Oracle 仅裁决未决结构问题 |
 
 ### 全局约束
@@ -47,13 +45,7 @@ oh-my-opencode 多智能体系统的自定义技能集，覆盖路由调度、�
 ## 技能依赖关系
 
 ```
-omo-adaptive-execution ──→ OMO 执行状态机 + 路由 + 发现委托 + Atlas 顺序引导（单文件）
-
-omo-atlas-execution-constraints ──→ omo-adaptive-execution（统一规则源）
-
-omo-plan-structure ──→ 计划结构单一标准（Prometheus 编写 / Momus 审查前加载，prompt 不复制结构定义）
-
-review-work ──→ omo-adaptive-execution（启动审查 lane 前加载；最低足够路由与并发预算）
+review-work ──→ omo-adaptive-execution（启动审查 lane 前加载；最低足够路由与并发预算；该 skill 已迁至 ~/.config/opencode/skills/）
 
 其它特殊执行方式由各 skill 的 description 自行触发，不在本地依赖图重复枚举
 ```

@@ -8,21 +8,21 @@ oh-my-opencode 多智能体系统的自定义 Skill 仓库。每个 skill 是独
 ## 结构
 
 ```
-skills/
+（仓库根，扁平结构：每个 skill 是根下独立目录）
 ├── README.md                        # 项目总览 + 分类索引 + 依赖关系图
 ├── AGENTS.md                        # 项目知识库
+├── DECISIONS.md                     # skill 行为裁决与决策史（SK-xxx）
 ├── docs/                            # 设计参照（skill-design-guide.md）
 ├── deep-thinking/                   # Global: 深度思考模式
 ├── long-running-process/            # Global: Windows 长运行进程治理
-├── omo-adaptive-execution/          # Core: OMO 执行与路由
-├── omo-atlas-execution-constraints/ # Execution: OMO Atlas 治理
-├── review-work/                      # Review: 风险路由的完成工作审查
+├── review-work/                     # Review: 风险路由的完成工作审查
 ├── opencode-subagent-log-triage/    # Global: OpenCode 子代理日志排查
+├── weekly-report-generator/         # Global: git 历史中文周报生成
 ├── dev-standards/                   # 个人: 前端开发通用规范（框架中立，显式加载）
 └── vue-standards/                   # 个人: Vue 工程规范（显式加载，自包含）
 ```
 
-> OMO 执行与路由规则统一维护在 `omo-adaptive-execution/SKILL.md`（含发现委托、路由顺序、Category）。其它 prompt 和治理 skill 不复制其内容。
+> **omo-* 治理 skills 已迁出**（2026-10-08）：`omo-adaptive-execution`、`omo-atlas-execution-constraints`、`omo-plan-structure`、`omo-plan-review` 迁至 `~/.config/opencode/skills/`（独立 Git 仓库，即 oh-my-opencode 技能加载路径）。OMO 执行与路由规则（发现委托、路由顺序、Category）现以该仓 `omo-adaptive-execution/SKILL.md` 为准；本仓 skill（如 review-work）引用它时按名字加载，不复制内容。迁移前的 SK-xxx 决策史仍在本仓 `DECISIONS.md`。
 
 ## 约定
 
