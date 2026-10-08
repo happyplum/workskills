@@ -30,8 +30,8 @@ description: 当用户明确要求 review work、审查已完成实现、QA 改�
 
 - 若需启动任何审查 lane，首次调用 `task()` 前先加载 `omo-adaptive-execution`；其成功返回是 category 与并发预算生效的顺序证据，不凭记忆路由。
 - 先按 `omo-adaptive-execution` 确认最低足够 category；普通 reviewer 使用本地 `unspecified-low`（Luna-max）。
-- 相互独立的 QA、代码质量、安全和上下文 lane 在同一轮 `run_in_background=true` 启动，受统一并发预算约束。
-- 只有下一个审查决策立即依赖某 lane 时才前台等待；否则需要 `WHY_NOT_PARALLEL`。
+- 审查 lane 的执行模式与结果收取统一按已加载的 `omo-adaptive-execution`「task 执行方式」；相互独立且资源隔离的 lane 同一响应成组派发，受统一并发预算约束。
+- 真实依赖或共享资源仍须串行；本 skill 不另设后台默认或前台例外理由，也不把并行解释为必须后台。
 - 使用 `unspecified-high` / `deep` / `ultrabrain` 或 Oracle 时必须说明低一档缺失的能力；测试多、diff 大或想更稳妥不构成理由。
 - reviewer 是叶子任务，不再派子 reviewer；同一证据目标只有一个 owner。
 
@@ -49,7 +49,7 @@ description: 当用户明确要求 review work、审查已完成实现、QA 改�
 |---|---|
 | 每次固定 3 个 Oracle + 2 个高级代理 | 按改动风险启动最少充分 lane |
 | 普通代码质量或 QA 交 Oracle | Luna-max reviewer + 可执行检查 |
-| 五条 lane 串行等待 | 独立 lane 同轮后台并发 |
+| 五条 lane 串行等待 | 独立 lane 同轮成组 task 派发，执行模式与结果收取按 shared skill |
 | 每个 reviewer 都接收全量文件与完整会话 | 共享基线 + lane 专属证据胶囊 |
 | 局部改动重复 full verify、build、全量浏览器矩阵 | 定向检查先行，有具体理由才升级 |
 | review 为完整而发现无关问题 | 只审当前目标、约束与可达影响面 |
