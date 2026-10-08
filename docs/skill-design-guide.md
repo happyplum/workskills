@@ -127,6 +127,7 @@ skill-name/
 | opencode-subagent-log-triage | ~210 | SKILL.md + 2 scripts + evals | 健康（已脚本化） |
 | dev-standards | 71 | SKILL.md + 3 references | 健康（域知识，L2） |
 | vue-standards | 61 | SKILL.md + 4 references | 健康（域知识，L2） |
+| audit-loop | 70 | 单文件 | 健康 |
 
 ## 参考来源
 

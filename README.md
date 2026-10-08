@@ -32,6 +32,7 @@ oh-my-opencode 多智能体系统的自定义技能集，覆盖路由调度、�
 | [deep-thinking](deep-thinking/) | 显式触发的深度分析模式；默认仍保持简洁优先，仅在 `ult`、`ulw` 或“深度思考 / 帮我思考 / 超级思考 / 深度分析”等触发时使用 |
 | [opencode-subagent-log-triage](opencode-subagent-log-triage/) | 卡住取证：session/tool/进程树 → writer 三态 ACTIVE/INACTIVE/UNKNOWN；执行审计：会话树成本/token/时长总账（SQLite 权威，scripts/query-sessions.mjs、dump-session-parts.mjs）；不 `task()` 续派，应用进程清理交 long-running-process |
 | [weekly-report-generator](weekly-report-generator/) | 从 git 历史生成中文周报（默认上周日至今天，不截成完整周日周，显式区间优先）；按独立交付分条，标题写做了哪件事、正文写结果，禁止注释腔、口语流水账和副作用标题，只读取证不落入 commit hash/逐项日期 |
+| [audit-loop](audit-loop/) | 审查→修复→同一审查会话温链续审，直到审查子代理明确无误通过；用户点名审查者则直接用，未点名先确认，执行类子代理不能当审计者 |
 
 ### 工程规范
 

@@ -18,6 +18,7 @@ oh-my-opencode 多智能体系统的自定义 Skill 仓库。每个 skill 是独
 ├── review-work/                     # Review: 风险路由的完成工作审查
 ├── opencode-subagent-log-triage/    # Global: OpenCode 子代理日志排查
 ├── weekly-report-generator/         # Global: git 历史中文周报生成
+├── audit-loop/                      # Global: 审查→修复→温链续审直到通过
 ├── dev-standards/                   # 个人: 前端开发通用规范（框架中立，显式加载）
 └── vue-standards/                   # 个人: Vue 工程规范（显式加载，自包含）
 ```
