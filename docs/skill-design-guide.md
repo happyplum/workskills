@@ -58,7 +58,7 @@ skill 不应一次性倾倒所有信息，而应分层按需加载：
     └─ SKILL.md <400 行 → 单文件足够，不需要 references/
 ```
 
-规则/治理型 skill（review-work、deep-thinking 等）均 <200 行，不需要 `references/`。域知识密集型 skill（`dev-standards`、`vue-standards`）按正文加载地图拆 `references/`。
+规则/治理型 skill（lzy-review-work、deep-thinking 等）均 <200 行，不需要 `references/`。域知识密集型 skill（`dev-standards`、`vue-standards`）按正文加载地图拆 `references/`。
 
 ## 脚本化原则
 
@@ -122,7 +122,7 @@ skill-name/
 | skill | 行数 | 结构 | 状态 |
 |---|---|---|---|
 | long-running-process | 94 | SKILL.md + 5 scripts | 健康（已脚本化） |
-| review-work | 55 | 单文件 | 健康 |
+| lzy-review-work | 55 | 单文件 | 健康 |
 | deep-thinking | 57 | 单文件 | 健康 |
 | opencode-subagent-log-triage | ~210 | SKILL.md + 2 scripts + evals | 健康（已脚本化） |
 | dev-standards | 71 | SKILL.md + 3 references | 健康（域知识，L2） |

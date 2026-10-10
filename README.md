@@ -20,7 +20,7 @@ oh-my-opencode 多智能体系统的自定义技能集，覆盖路由调度、�
 
 | 技能 | 说明 |
 |------|------|
-| [review-work](review-work/) | 基于风险选择最少充分审查 lane；普通 QA/代码审查走 Luna-max，Oracle 仅裁决未决结构问题 |
+| [lzy-review-work](lzy-review-work/) | 基于风险选择最少充分审查 lane；普通 QA/代码审查走 Luna-max，Oracle 仅裁决未决结构问题 |
 
 ### 全局约束
 
@@ -46,7 +46,7 @@ oh-my-opencode 多智能体系统的自定义技能集，覆盖路由调度、�
 ## 技能依赖关系
 
 ```
-review-work ──→ omo-adaptive-execution（启动审查 lane 前加载；最低足够路由与并发预算；该 skill 已迁至 ~/.config/opencode/skills/）
+lzy-review-work ──→ omo-adaptive-execution（启动审查 lane 前加载；最低足够路由与并发预算；该 skill 已迁至 ~/.config/opencode/skills/）
 
 其它特殊执行方式由各 skill 的 description 自行触发，不在本地依赖图重复枚举
 ```

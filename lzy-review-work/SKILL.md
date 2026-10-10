@@ -1,5 +1,5 @@
 ---
-name: review-work
+name: lzy-review-work
 description: 当用户明确要求 review work、审查已完成实现、QA 改动、验证实现或交付前复核时使用。
 ---
 
