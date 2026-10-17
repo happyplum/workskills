@@ -14,6 +14,7 @@ oh-my-opencode 多智能体系统的自定义 Skill 仓库。每个 skill 是独
 ├── DECISIONS.md                     # skill 行为裁决与决策史（SK-xxx）
 ├── docs/                            # 设计参照（skill-design-guide.md）
 ├── deep-thinking/                   # Global: 深度思考模式
+├── external-executor-plan/          # Plan: 面向外部执行器的完整交接方案
 ├── long-running-process/            # Global: Windows 长运行进程治理
 ├── lzy-review-work/                 # Review: 风险路由的完成工作审查
 ├── opencode-subagent-log-triage/    # Global: OpenCode 子代理日志排查
