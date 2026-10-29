@@ -15,7 +15,7 @@ description: lzy 的前端开发通用规范与工程结构契约（框架中立
 |---|---|
 | 做任何结构决策前 | 本文件（元习惯 + 主分界规则） |
 | 决定「这个文件/组件放哪」 | `references/placement.md` |
-| 写请求层 / 列表页 / 表单 / 状态 / 通信 | `references/code-internal.md` |
+| 写请求层 / 列表页 / 表单 / 状态 / 通信，或处理加载、错误与消息反馈 | 读取 `references/code-internal.md`；界面反馈必读其中「错误反馈与布局稳定」 |
 | 转成项目规则（AGENTS.md）或做 monorepo/双宿主改造 | `references/localize.md` |
 | 遇到不明的习惯名词 / 术语用法存疑 | `references/glossary.md`（术语唯一权威表） |
 
@@ -49,12 +49,14 @@ description: lzy 的前端开发通用规范与工程结构契约（框架中立
 4. API 薄包装、类型随行（每端点一函数，无中间 service 层）
 5. 组件通信只有三通道：props 下发、事件上抛、ref 实例方法
 6. 不缓存页面列表数据（宁重查不脏缓存）
-7. 组件写法唯一（Vue：script-setup 组合式；React：函数组件）+ 组件名必填 + 模板/JSX 标签 PascalCase
+7. 业务组件写法唯一（Vue：script-setup 组合式；React：函数组件）+ 组件名必填 + 模板/JSX 标签 PascalCase；底层错误边界遵循框架 API
 8. UI 库就地覆写层（不 fork 组件库）
 9. 错误码查表 + 会话过期拦截位常备
 10. 提交卫生：[type] 格式、锁文件/编辑器配置/产物不入库
 
 ## 框架映射提示（Vue 概念 → React 等价）
+
+**错误反馈不得破坏原布局**：普通错误、警告和成功提示不替换页面、表格、卡片或表单主体；保留结构与仍有效的用户状态，按场景使用消息层、字段反馈或容器内的状态区域。具体边界与验收以 `references/code-internal.md` 的「错误反馈与布局稳定」为准。
 
 | Vue 侧习惯 | React 侧等价 |
 |---|---|
