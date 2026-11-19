@@ -3,7 +3,7 @@
   "evals": [
     {
       "id": 1,
-      "prompt": "有个 OpenCode 子代理会话卡住了，我只知道工具描述里有 Checks browser settings redirect，帮我查日志并判断能不能杀进程。",
+      "prompt": "有个 OpenCode 子代理会话卡住了，我只知道工具描述里有 verify login redirect，帮我查日志并判断能不能杀进程。",
       "expected_output": "先搜索 session，再回退到 opencode.db/part.data/WAL，定位 session 和 tool part，复核进程树与端口后给出最小安全建议。",
       "files": []
     },
@@ -16,7 +16,7 @@
     {
       "id": 3,
       "prompt": "playwright-cli 检查已经输出页面快照，但 OpenCode 里还是 running，我想解除卡住。",
-      "expected_output": "要求先复核 exact PID、父子进程、端口归属和工具 part 状态，只终止证明为孤儿的工具进程树。",
+      "expected_output": "要求先复核精确 PID、父子进程、端口归属和工具 part 状态，只终止证明为孤儿的工具进程树，避免误杀应用服务器。",
       "files": []
     }
   ]

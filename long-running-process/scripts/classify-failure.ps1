@@ -1,13 +1,12 @@
-<#
+﻿<#
 .SYNOPSIS
   启动失败分类（读 stderr 日志匹配已知错误模式）
 .DESCRIPTION
   当 start-background 启动成功但 wait-ready 超时时，用本脚本读日志分类失败原因。
-  来自 long-running-process skill 模板 5。
 .PARAMETER LogPath
-  stderr 日志路径（start-background 输出的 *-stderr-*.log）
+  stderr 日志路径（start-background 输出的 %TEMP%\opencode-long-running\<RunId>-stderr.log）
 .EXAMPLE
-  .\classify-failure.ps1 -LogPath "$env:TEMP\dev-stderr-12345.log"
+  .\classify-failure.ps1 -LogPath "$env:TEMP\opencode-long-running\<RunId>-stderr.log"
 #>
 param(
     [Parameter(Mandatory)][string]$LogPath

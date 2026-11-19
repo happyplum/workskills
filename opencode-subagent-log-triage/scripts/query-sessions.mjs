@@ -7,9 +7,9 @@
  *   多长时间/派了哪些子代理」类审计，也用于按标题或工作目录定位目标会话。
  *
  * .USAGE (PowerShell)
- *   node "<skill-dir>/scripts/query-sessions.mjs" --match webpath --since 2026-08-19
+ *   node "<skill-dir>/scripts/query-sessions.mjs" --match my-project --since 2026-01-01
  *   node "<skill-dir>/scripts/query-sessions.mjs" --root ses_xxxxxxxx
- *   node "<skill-dir>/scripts/query-sessions.mjs" --match remediate --db D:\path\opencode.db
+ *   node "<skill-dir>/scripts/query-sessions.mjs" --match auth-fix --db D:\path\opencode.db
  *
  * .PARAMETERS
  *   --match <substr>   title 或 directory 包含子串（LIKE %..%，大小写不敏感）

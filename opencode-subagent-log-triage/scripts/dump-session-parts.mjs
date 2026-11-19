@@ -12,7 +12,7 @@
  *   node "<skill-dir>/scripts/dump-session-parts.mjs" ses_xxxxxxxx --tool bash --last 20
  *
  * .PARAMETERS
- *   <sessionId>   位置参数，支持唯一前缀（如 ses_fe4fbef3）
+ *   <sessionId>   位置参数，支持唯一前缀（如 ses_xxxxxxxx）
  *   --stuck       只看未闭合 part（status 非 completed/error）
  *   --tool <name> 只看指定工具
  *   --last <N>    只输出最后 N 条
@@ -20,7 +20,7 @@
  *
  * .NOTES
  *   - 始终 readOnly。WAL 中的新鲜事件随主库一并可读，无需单独处理。
- *   - 判定卡住后仍需关联进程状态（见 SKILL.md「Windows 进程检查」），
+ *   - 判定卡住后仍需关联进程状态（见 SKILL.md「Windows 进程与端口核查」），
  *     本脚本只解决「存储里是什么状态」。
  */
 
