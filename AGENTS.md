@@ -1,75 +1,58 @@
 # 项目知识库
 
-
 ## 概述
 
-oh-my-opencode 多智能体系统的自定义 Skill 仓库。每个 skill 是独立目录，包含 SKILL.md 定义文件。纯文档项目，无构建/测试/CI。
+个人维护的通用公开 AI Agent Skills 仓库（以作者日常自用为主，同时公开分享）。每个 skill 为仓库根目录下的独立目录，包含 `SKILL.md` 及可选的 `references/`、`scripts/`、`evals/`。纯文档与轻脚本项目，无统一构建或 CI 流水线。
 
-## 结构
+## 目录结构
 
+```text
+├── README.md                        # 仓库总览与技能索引
+├── AGENTS.md                        # 本仓库维护知识库
+├── DECISIONS.md                     # 本仓库公开设计决策记录（PUB-xxx）
+├── docs/skill-design-guide.md       # Skill 设计与维护指南
+├── audit-loop/                      # 审查→修复→同会话增量复审闭环
+├── deep-thinking/                   # 显式触发的深度分析模式
+├── dev-standards/                   # 框架中立的前端中后台工程规范（显式加载）
+├── external-executor-plan/          # 脱离聊天与工具的完整外部交接方案
+├── linearize-commits/               # 线性化整理 git 提交历史与提交信息规范
+├── long-running-process/            # Windows + PowerShell 长运行进程托管与脚本
+├── lzy-review-work/                 # 按风险动态选择维度的完成工作审查
+├── opencode-subagent-log-triage/    # OpenCode 本地日志排查与会话树成本复盘
+├── vue-standards/                   # 自包含 Vue 3 + Element Plus 工程规范（显式加载）
+└── weekly-report-generator/         # 从 git 历史生成书面中文周报
 ```
-（仓库根，扁平结构：每个 skill 是根下独立目录）
-├── README.md                        # 项目总览 + 分类索引 + 依赖关系图
-├── AGENTS.md                        # 项目知识库
-├── DECISIONS.md                     # skill 行为裁决与决策史（SK-xxx）
-├── docs/                            # 设计参照（skill-design-guide.md）
-├── deep-thinking/                   # Global: 深度思考模式
-├── external-executor-plan/          # Plan: 面向外部执行器的完整交接方案
-├── long-running-process/            # Global: Windows 长运行进程治理
-├── lzy-review-work/                 # Review: 风险路由的完成工作审查
-├── opencode-subagent-log-triage/    # Global: OpenCode 子代理日志排查
-├── weekly-report-generator/         # Global: git 历史中文周报生成
-├── audit-loop/                      # Global: 审查→修复→温链续审直到通过
-├── dev-standards/                   # 个人: 前端开发通用规范（框架中立，显式加载）
-└── vue-standards/                   # 个人: Vue 工程规范（显式加载，自包含）
-```
 
-> **omo-* 治理 skills 已迁出**（2026-10-08）：`omo-adaptive-execution`、`omo-atlas-execution-constraints`、`omo-plan-structure`、`omo-plan-review` 迁至 `~/.config/opencode/skills/`（独立 Git 仓库，即 oh-my-opencode 技能加载路径）。OMO 执行与路由规则（发现委托、路由顺序、Category）现以该仓 `omo-adaptive-execution/SKILL.md` 为准；本仓 skill（如 lzy-review-work）引用它时按名字加载，不复制内容。迁移前的 SK-xxx 决策史仍在本仓 `DECISIONS.md`。
+## 维护约定
 
-## 约定
+维护任何 skill 前，先阅读 [`docs/skill-design-guide.md`](docs/skill-design-guide.md) 与 [`DECISIONS.md`](DECISIONS.md)。
 
-> **详细设计参照见 [`docs/skill-design-guide.md`](docs/skill-design-guide.md)**（渐进式披露分层、description 写法、长度红线与拆分信号、脚本化原则、反模式清单、本仓库 skill 现状速查）。维护任何 skill 前先读。
-
-### SKILL.md 结构（按渐进式披露分层）
-
-详细分层与设计原则以 [`docs/skill-design-guide.md`](docs/skill-design-guide.md) 为权威参照；本节仅给出快速约束。
+### 渐进式披露分层
 
 | 层 | 位置 | 内容 |
 |---|---|---|
-| **L0 触发** | frontmatter `description` | 「当……时使用」格式的触发条件 + 触发词；纯触发，**不写工作流/能力清单** |
-| **L1 规范** | SKILL.md 正文 | 概述、强制规则、决策树、反例；**不写触发词或加载条件** |
-| **L2 详情** | `references/*.md` | 仅域知识密集型 skill 需要，按正文显式指令加载 |
-| **L3 执行** | `scripts/*`、`assets/*` | 确定性脚本/模板，执行不进 context |
+| **L0 触发** | frontmatter `description` | 「当……时使用」格式的触发条件与触发词；纯触发，**不写工作流或能力清单** |
+| **L1 规范** | `SKILL.md` 正文 | 概述、核心规则、工作流/决策表、反例；**不在正文重复写触发词章节**；行数控制在 `<500` 行 |
+| **L2 详情** | `references/*.md` | 仅域知识密集型 skill（如 `dev-standards`、`vue-standards`）使用，须由正文显式指明阅读时机 |
+| **L3 执行** | `scripts/*` | 确定性脚本，执行时不占用正文 context |
 
-**Frontmatter 约束**：仅 `name` + `description` 两个字段；`name` 仅字母/数字/连字符；Frontmatter 总长 ≤1024 字符；`description` 中文。
+### Frontmatter 与命名
 
-**正文常用章节**：`## 概述` / `## 强制规则` / `## 反例`。
+- Frontmatter 仅保留 `name` 和 `description` 两个字段；`name` 仅含小写字母、数字和连字符，与目录名保持一致；Frontmatter 总长 ≤ 1024 字符；`description` 使用中文。
+- 目录和文件采用 kebab-case（除 `SKILL.md`、`README.md`、`AGENTS.md`、`DECISIONS.md`）。
 
-> **触发词归 L0，不进正文**：触发词属于 `description`（始终全量注入），不应在正文以章节形式重复——重复既浪费 L1 加载成本，也与 L0 触发器职责冲突。
+### 语言与公开卫生
 
-### 外部 skill 触发边界
-- 特殊执行方式由外部 skill 的 description 自行触发；本地 prompt 和治理 skill 不重复枚举或强绑外部执行 skill。
+- **语言**：正文、标题、表格与 `description` 统一用自然流畅的中文；系统标识符、代码块、命令、文件路径和技术专有名词保留英文。
+- **去 AI 味与通俗表达**：优先使用开发者通行的直白术语，避免自创黑话、空泛隐喻或为了防模型钻空子而无限叠甲。
+- **公开自包含**：禁止写入本机绝对路径、未公开的私有包名/项目名/模型别名、真实私密业务案例，或指向本仓外部私有仓库/私有 skill 的硬依赖。
 
-### 手动触发 skill 约定
-- 记忆重组、工作区清理、计划结构修复等手动治理能力已迁移至同级独立子仓库 `../commands/`；为避免 `commands/README.md` 被命令加载器误识别，命令目录说明与手动治理工作流文档维护在 `../commands/docs/README.md`
-- 本仓库仅保留与这些命令配套的治理知识、边界说明与可复用参考，不承担 command catalog 的主文档职责
+## 常见维护误区
 
-### 文件命名
-- 目录: kebab-case
-- 文件: kebab-case（SKILL.md, AGENTS.md, template.md, examples.md）
-
-### 语言
-- Skill 内容: 中文（章节标题、正文、表格内容均已中文化）
-- 系统标识符: 英文（`name` 字段、代码块、命令、文件路径、技术术语）
-- 触发词: 中文（如 `omo-adaptive-execution` 的「多步骤委托」）
-- 用户输出: 中文
-
-## skills 开发常见错误积累
-
-历次维护 skill 时实际犯过的错误。新增一条要求：现象 + 为什么错 + 如何避免。
-
-| # | 现象 | 为什么错 | 如何避免 |
-|---|------|---------|---------|
-| 1 | 在 SKILL.md 正文写 `## 最小 CSO 触发词` / `## 最小触发词` 章节 | 触发词属 L0 description（始终全量注入），正文重复既浪费 L1 加载成本，又与 L0 触发器职责冲突；同义变体命名（CSO 触发词 vs 触发词）还制造 grep 漏检 | 触发词只融合进 frontmatter `description`；维护时 grep 多种命名变体确认无残留 |
-| 2 | 固定审查代理数量并默认调用高价 Oracle | 普通 QA、代码质量和上下文核对不需要架构推理；固定 lane 会重复验证、放大 token 与时延 | 按风险选择最少充分 lane，普通审查走 `unspecified-low`，仅未决结构决策使用 Oracle |
-| 3 | 消费统一路由规则却不建立 skill 加载顺序证据 | 代理可能凭旧上下文或记忆选择 category、并发预算和 reviewer，绕过最新约束 | 依赖方在首次 `task()` 前显式加载规则 owner；角色专属 skill 同时验证加载顺序 |
+| # | 现象 | 问题所在 | 如何避免 |
+|---|---|---|---|
+| 1 | 在 `SKILL.md` 正文单独写「触发词」章节 | 触发词属于常驻注入的 L0 `description`，正文重复既浪费加载 token，也容易前后不一致 | 触发词只放在 frontmatter `description` 中 |
+| 2 | 在 `description` 里把工作流和细则写满 | Agent 容易跳过 `SKILL.md` 正文直接按描述发挥 | `description` 只写「什么时候用」，不写「怎么做」 |
+| 3 | 把本机路径、私有项目实例或外部私有 skill 写进正文 | 公开分享时他人完全无法追溯或运行，且存在私密信息泄露风险 | 写完后自查路径、包名、示例与外部引用，确保完全自包含 |
+| 4 | 自创大量冷僻黑话，再专门附一份名词表翻译 | 抬高阅读门槛，偏离通用工程共识 | 直接使用业界通行说法，写清原因和边界即可 |
+| 5 | 代码审查固定拉满全套维度和高成本专家 | 小改动重复验证、浪费时间与算力 | 按改动风险选最少充分维度，复用同版本已有验证证据 |

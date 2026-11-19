@@ -1,55 +1,49 @@
-# oh-my-opencode 技能集
+# Public AI Agent Skills
 
-oh-my-opencode 多智能体系统的自定义技能集，覆盖路由调度、计划执行、外部协作与存储维护。
+个人维护的通用公开 AI Agent Skills 仓库，主要服务于作者日常开发工作流，同时也经过整理与脱敏，方便公开分享与跨平台复用。仓库内所有 skill 均自包含，不依赖未公开的私有配置或外部内部仓库。
 
-**决策入口**：本仓 skill 行为的用户裁决与决策史（SK-xxx）记录在 [`DECISIONS.md`](DECISIONS.md)；修改任何 skill 行为前先核对其中的 `active` / `superseded` 状态，避免回退到已废弃方向。
+维护决策见 [`DECISIONS.md`](DECISIONS.md)，编写与设计规范见 [`docs/skill-design-guide.md`](docs/skill-design-guide.md)。
 
-## 安装
+## 安装与使用
 
-将技能目录放置于 oh-my-opencode 的技能配置路径下（如 `~/.config/opencode/skills/`），重启会话后自动加载。
+本仓库采用扁平目录结构，每个顶层 skill 目录均可独立使用。将需要的 skill 目录复制到你所使用的 AI 编程工具的技能路径即可（例如 `~/.config/opencode/skills/`、`.agents/skills/` 或项目级 skills 目录），重启或刷新会话后即可按需加载。
 
-与手动治理命令对应的命令目录现已迁移为独立的 `commands/` Git 子仓库；为避免 `commands/README.md` 被命令加载器误识别，命令目录说明与命令入口文档请维护在上层同级 `../commands/docs/README.md`，不要继续把 command catalog 作为本 README 的主事实来源。
+## 技能索引
 
-**omo-* 治理 skills 已迁出**（2026-10-08）：`omo-adaptive-execution`、`omo-atlas-execution-constraints`、`omo-plan-structure`、`omo-plan-review` 现维护于 `~/.config/opencode/skills/`（独立 Git 仓库，即 oh-my-opencode 技能加载路径）。本仓不再维护其内容；迁移前的 SK-xxx 决策史仍见 [`DECISIONS.md`](DECISIONS.md)。
-
-## 技能列表
-
-### 计划与执行
-
-覆盖外部执行方案编写与执行阶段协调。计划结构修复能力已迁出为独立的手动治理入口；自动执行路径应通过 `oracle` 的结构化修订结果推进，而不是把命令名当成执行动作。omo-* 治理 skills 已迁出（见上方迁移说明）。
+### 分析与审查
 
 | 技能 | 说明 |
-|------|------|
-| [external-executor-plan](external-executor-plan/) | 生成供外部执行器或工程师独立使用的完整方案，保留已确认决策、实施边界和验收依据；不绑定本地模型与代理编排 |
-| [lzy-review-work](lzy-review-work/) | 基于风险选择最少充分审查 lane；普通 QA/代码审查走 Luna-max，Oracle 仅裁决未决结构问题 |
+|---|---|
+| [deep-thinking](deep-thinking/) | 显式触发的深度分析模式（`ult` 或明确要求深度思考时激活），强调证据支撑、假设与失败路径，避免漫无边际发散与思维流水账 |
+| [lzy-review-work](lzy-review-work/) | 按改动风险动态选择最少充分审查维度，低成本优先、复用已有验证证据（保留 `lzy-` 前缀以避免与其他工具内置的 `review-work` 冲突） |
+| [audit-loop](audit-loop/) | 「只读审查 → 修复与验证 → 同一审查会话增量复审」的迭代闭环，直到审查者确认零未决问题 PASS，含轮数熔断与防削弱验证保护 |
 
-`external-executor-plan/` 在本仓维护；`~/.agents/skills/external-executor-plan/` 为全局安装副本，后续修改从本仓同步，不分别维护两套内容。它不替代已迁出的 OMO 专属计划结构与执行规则。
-
-### 全局约束
-
-跨项目、跨子代理生效的通用约束。
+### 规划与交付
 
 | 技能 | 说明 |
-|------|------|
-| [long-running-process](long-running-process/) | Windows + PowerShell 应用进程：WMI supervisor、RunId ownership、wait-ready 归属校验、stop-background；禁止无界等待与 OpenCode shell 内 Start-Process |
-| [deep-thinking](deep-thinking/) | 显式触发的深度分析模式；默认仍保持简洁优先，仅在 `ult`、`ulw` 或“深度思考 / 帮我思考 / 超级思考 / 深度分析”等触发时使用 |
-| [opencode-subagent-log-triage](opencode-subagent-log-triage/) | 卡住取证：session/tool/进程树 → writer 三态 ACTIVE/INACTIVE/UNKNOWN；执行审计：会话树成本/token/时长总账（SQLite 权威，scripts/query-sessions.mjs、dump-session-parts.mjs）；不 `task()` 续派，应用进程清理交 long-running-process |
-| [weekly-report-generator](weekly-report-generator/) | 从 git 历史生成中文周报（默认上周日至今天，不截成完整周日周，显式区间优先）；按独立交付分条，标题写做了哪件事、正文写结果，禁止注释腔、口语流水账和副作用标题，只读取证不落入 commit hash/逐项日期 |
-| [audit-loop](audit-loop/) | 审查→修复→同一审查会话温链续审，直到审查子代理明确无误通过；用户点名审查者则直接用，未点名先确认，执行类子代理不能当审计者 |
+|---|---|
+| [external-executor-plan](external-executor-plan/) | 将讨论与核查事实整理为脱离当前聊天上下文、与具体 AI 工具解耦的完整交接实施方案，修订时输出完整替代稿 |
+| [linearize-commits](linearize-commits/) | 线性化整理 git 提交历史：按「可独立 revert」划分粒度、保留原作者、严禁 `--no-verify`、校验代码零差异，并默认规范为 `type(scope): 中文描述` |
+| [weekly-report-generator](weekly-report-generator/) | 从 git 历史只读取证生成中文书面周报（默认上周日到今天），按独立交付分条，规避代码注释腔、口语流水账与正文复述标题 |
 
-### 工程规范
+### 工程规范（显式加载）
 
-手动/显式加载的个人工程契约；协同或非本人主导项目仅在用户明确要求时应用。
+个人中后台/管理端前端工程习惯的系统整理。在团队协同或非本人主导的项目中，仅在明确要求时应用。
 
 | 技能 | 说明 |
-|------|------|
-| [dev-standards](dev-standards/) | 框架中立的前端开发通用规范与工程结构契约（原则 / 落位 / 代码内部）；用于按个人习惯实现、评审或落成项目 AGENTS.md |
-| [vue-standards](vue-standards/) | 自包含 Vue 工程规范（结构 / 请求 / 表格表单 / 工程化）；不依赖通用版 skill |
+|---|---|
+| [dev-standards](dev-standards/) | 框架中立的前端中后台工程规范，涵盖目录组织、请求与错误处理、界面优先呈现与布局稳定、表格/表单/通信约定及项目落地指南 |
+| [vue-standards](vue-standards/) | 自包含的 Vue 3 + Element Plus + Pinia 中后台工程规范（目录、请求错误、表格表单弹窗图表封装、工程化配置），无需先加载 `dev-standards` |
 
-## 技能依赖关系
+### 环境与排障工具
 
-```
-lzy-review-work ──→ omo-adaptive-execution（启动审查 lane 前加载；最低足够路由与并发预算；该 skill 已迁至 ~/.config/opencode/skills/）
+| 技能 | 说明 | 适用环境 |
+|---|---|---|
+| [long-running-process](long-running-process/) | Windows + PowerShell 后台长运行进程安全托管：WMI 脱离管道继承、`RunId` 生命周期管理、有界就绪与端口归属校验、精确停止（含 8 个配套 `.ps1` 脚本） | Windows + PowerShell 7+ |
+| [opencode-subagent-log-triage](opencode-subagent-log-triage/) | OpenCode 本地 SQLite 会话库只读排查与复盘：判断卡住状态并关联 Windows 进程/端口、统计父子会话树成本与 token（含 2 个配套只读 `.mjs` 脚本） | OpenCode（Windows） |
 
-其它特殊执行方式由各 skill 的 description 自行触发，不在本地依赖图重复枚举
-```
+## 技能间关系
+
+- `lzy-review-work` 与 `audit-loop` 互补：前者决定单轮审查启用哪些维度和验证强度，后者负责将查出的问题经「修 → 同会话增量复审」收敛至通过。
+- `dev-standards` 与 `vue-standards` 相互独立：`vue-standards` 完全自包含，不依赖先加载 `dev-standards`。
+- `opencode-subagent-log-triage` 排查出需清理的应用服务器时，可配合 `long-running-process` 的脚本按 `RunId` 或端口安全停止。
