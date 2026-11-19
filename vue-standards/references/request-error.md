@@ -1,45 +1,49 @@
-# 请求层与数据流 canon
+# Vue 请求层、错误处理与数据流规范
 
-## HttpRequest（libs/HttpRequest.ts）
+## 统一请求封装（`libs/HttpRequest.ts`）
 
-- 单例 axios 包装；自定义 Token header（从 user store 读）
-- 双信封桥：真实后端 {retCode,msg,data}；mock {code,message,data}——`retCode === undefined` 直通区分两轨
-- errorCode = res.msg || String(retCode)：msg 字段兼做机器码
-- 三级回退：codeMap[i18n key] → res.msg → UNKNOWN_ERROR；ElMessage 提示 5s
-- 业务成功判定 retCode === 1；HTTP 层错误统一 SERVICE_ERROR
-- LOGOUT_CODES 常量（登出码数组）+ 完整登出分支——机制先行，码值按后端补
-- 拦截器内惰性 useUserStore()（规避 pinia 初始化顺序与循环依赖）
-- timeout 显式设定；不做自动重试/去重（保持管道零状态）
+- **单例 Axios 包装**：所有 HTTP 请求经同一实例发出；请求拦截器自动附加认证 Token 请求头（从 user store 读取）。
+- **兼容 Mock 与真实后端响应格式**：当本地 Mock（如 `{ code, message, data }`）与真实后端（如 `{ retCode, msg, data }`）返回结构不同时，在响应拦截器里通过特征字段是否存在区分处理，做到零代码改动平滑切换，不维护两套请求逻辑。
+- **业务成功判定与错误分叉**：按项目后端约定判定业务成功（例如特定成功码）；网络异常与非 2xx HTTP 错误统一映射为服务异常码（如 `SERVICE_ERROR`），与业务错误分开处理。
+- **错误码三级回退**：
+  1. 先查错误码映射表，命中后取对应的 i18n 键名翻译展示；
+  2. 未命中时，若服务端返回消息经契约确认可安全面向用户且不含敏感信息，展示该原始消息；
+  3. 否则回退到通用兜底错误文案（如 `UNKNOWN_ERROR`），通过 `ElMessage` 统一提示（如持续 5s）。
+- **强制登出机制先行**：预先定义登出触发码数组（如 `LOGOUT_CODES`）和完整的清理跳转分支；具体码值按后端契约填入即可，无需后期大改拦截器。
+- **拦截器内延迟获取 Pinia store**：在请求/响应拦截回调内部再调用 `useUserStore()`，避免模块加载阶段因 Pinia 未挂载或循环引用报错。
+- **显式超时、管道无状态**：配置明确的 `timeout`；不在通用请求层默认做隐式自动重试或请求去重，保持行为可预测。
 
-## codeMap（utils/error/codeMap.ts）
+## 错误码映射表（`utils/error/codeMap.ts`）
 
-- 键：'模块_子域_序号' 三段码（如 '1_01_02'）
-- 值：i18n 键名（不是文案本身）
-- `ErrorCode = keyof typeof codeMap` 类型收窄
-- getErrorMessage(code, params?) 支持 {count} 插值——参数来自响应 data（remainingAttempts/accountLockRemainMinutes）
+- 键为后端约定的业务错误码（如分层错误码字符串），**值为 i18n 键名而非写死的中文文案**。
+- 使用 `type ErrorCode = keyof typeof codeMap` 收窄类型。
+- 封装 `getErrorMessage(code, params?)` 支持占位符插值（例如 `{count}`），动态参数从响应 `data` 字段提取（如剩余重试次数、账号锁定分钟数）。
 
-## apis/ 薄包装
+## 接口薄封装（`apis/`）
 
-- 每端点导出一个函数；入参/返回接 types/apis 类型
-- pageSize/pageNumber 分页约定；函数名 post<Domain><Action> 风格
-- codegen 子树（如 park-group-service/）机械命名 + 端到端类型，是唯一全链路类型真源
-- 不建 service 层、不做 loading/缓存
+- 每个后端端点导出一个函数，入参与返回值绑定 `types/apis/` 中的类型。
+- 分页参数（如 `pageSize` / `pageNumber`）与函数命名风格（如 `get<Domain><Action>` / `post<Domain><Action>`）在项目内保持一致。
+- 如果项目采用 OpenAPI 等代码生成工具，将生成的接口和类型归入对应服务子目录作为单一类型真源。
+- `apis/` 只负责发请求和类型声明，不建多余的业务 service 中间层，也不在接口层耦合 loading 或页面缓存。
 
-## 列表页五件套（同构强制）
+## 列表页标准五步骤
 
-1. searchForm + pageInfo 组件内 reactive（不进 store）
-2. `query() { pageNumber = 1; getData() }`
-3. changePage(pageNum, pageSize) 统一处理
-4. try/finally 包 getData 管 tableLoading
-5. reset：逐字段还原 + query()
+所有常规列表页保持一致的结构和交互，降低维护成本：
 
-- dateRange → ISO 在组装参数时转一次（边界归一化）
-- getData() 在 setup 顶层直接调用（不等 onMounted）
-- 搜索输入 @keyup.enter="query"
+1. **查询条件与分页状态留在组件内**：用局部 `reactive` / `ref` 维护 `searchForm` 和 `pageInfo`，不放进全局 Pinia store。
+2. **查询入口强制回到第 1 页**：`query()` 先将页码重置为 `1`，再调用 `getData()`（改变筛选条件后避免停留在不存在的页码）。
+3. **统一分页回调**：由 `changePage(pageNum, pageSize)` 统一更新分页参数并触发查询。
+4. **`try / finally` 管理 loading**：在 `getData()` 外层用 `try / finally` 切换 `tableLoading`，保证接口失败时也不会卡死 loading。
+5. **重置按钮完整闭环**：逐字段还原筛选条件默认状态后直接调用 `query()`（自动回第 1 页并重查）。
 
-## 会话与多租户
+补充习惯：
+- 参数归一化只做一次（例如把日期选择器数组转成 ISO 字符串，统一在组装请求参数时转换）。
+- 首屏数据直接在 `<script setup>` 顶层调用 `getData()`，无需额外包一层 `onMounted`（依赖 DOM 尺寸的场景除外）。
+- 搜索输入框绑定 `@keyup.enter="query"` 提升键盘操作体验。
 
-- token/user 存 sessionStorage（JSON + try/catch 恢复）；与标签页同生共死
-- 登出焦土式：sessionStorage.clear() + 跳登录——新增缓存自动被覆盖，免清理清单
-- 多租户切分：身份租户（groupId/loginGroupId）进凭证；数据范围（parkId）进各页查询参数，不全局注入
-- 密码摘要：MD5×10 链式 + 小写用户名盐（前后端算法契约）
+## 会话管理与多租户边界
+
+- **会话态存储**：认证 token 与基础用户信息存入 `sessionStorage`（解析时用 `JSON.parse` + `try/catch` 兜底防脏数据报错），与浏览器标签页同生命周期。
+- **登出彻底清空**：登出时直接执行 `sessionStorage.clear()` 再跳转登录页——后续新增任何会话缓存键都会自动清干净，无需维护容易遗漏的逐键删除列表。
+- **多租户职责拆分**：用户所属身份租户放进认证凭证（token / 请求头）；页面级数据过滤范围（如具体组织、站点或空间 ID）由各页面查询参数显式传递，不在请求层隐式全局注入。
+- **敏感数据处理**：密码加密或签名方式严格遵循当前项目后端安全契约，不跨项目照搬旧算法。
