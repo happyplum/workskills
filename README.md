@@ -16,7 +16,7 @@
 |---|---|
 | [deep-thinking](deep-thinking/) | 显式触发的深度分析模式（`ult` 或明确要求深度思考时激活），强调证据支撑、假设与失败路径，避免漫无边际发散与思维流水账 |
 | [lzy-review-work](lzy-review-work/) | 按改动风险动态选择最少充分审查维度，低成本优先、复用已有验证证据（保留 `lzy-` 前缀以避免与其他工具内置的 `review-work` 冲突） |
-| [audit-loop](audit-loop/) | 「只读审查 → 修复与验证 → 同一审查会话增量复审」的迭代闭环，直到审查者确认零未决问题 PASS，含轮数熔断与防削弱验证保护 |
+| [audit-loop](audit-loop/) | 「只读审查 → 轻量二次确认 → 修复与验证 → 原审查会话温链复审」的迭代闭环，核心 PASS 后可由用户选择干净代理复核，含轮数熔断与防削弱验证保护 |
 
 ### 规划与交付
 
@@ -44,6 +44,6 @@
 
 ## 技能间关系
 
-- `lzy-review-work` 与 `audit-loop` 互补：前者决定单轮审查启用哪些维度和验证强度，后者负责将查出的问题经「修 → 同会话增量复审」收敛至通过。
+- `lzy-review-work` 与 `audit-loop` 互补：前者决定单轮审查启用哪些维度和验证强度，后者负责将二次确认的问题经「修 → 原会话温链复审」收敛至通过，并支持核心 PASS 后可选干净代理复核。
 - `dev-standards` 与 `vue-standards` 相互独立：`vue-standards` 完全自包含，不依赖先加载 `dev-standards`。
 - `opencode-subagent-log-triage` 排查出需清理的应用服务器时，可配合 `long-running-process` 的脚本按 `RunId` 或端口安全停止。

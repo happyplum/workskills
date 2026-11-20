@@ -81,7 +81,7 @@ Skill 不应一次性倾倒全部细节，而应分层按需加载：
 
 | Skill | `SKILL.md` 行数 | 配套目录 | 状态 |
 |---|---|---|---|
-| `audit-loop` | 85 | 单文件 | 健康 |
+| `audit-loop` | 119 | 单文件 | 健康 |
 | `deep-thinking` | 38 | 单文件 | 健康 |
 | `dev-standards` | 77 | 3 references | 健康（L2 分层） |
 | `external-executor-plan` | 98 | 单文件 | 健康 |
