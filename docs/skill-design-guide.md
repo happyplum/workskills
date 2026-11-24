@@ -85,7 +85,7 @@ Skill 不应一次性倾倒全部细节，而应分层按需加载：
 | `deep-thinking` | 38 | 单文件 | 健康 |
 | `dev-standards` | 77 | 3 references | 健康（L2 分层） |
 | `external-executor-plan` | 98 | 单文件 | 健康 |
-| `linearize-commits` | 148 | 单文件 | 健康 |
+| `linearize-commits` | 151 | 单文件 | 健康 |
 | `long-running-process` | 94 | 8 scripts | 健康（已脚本化） |
 | `lzy-review-work` | 78 | 单文件 | 健康 |
 | `opencode-subagent-log-triage` | 181 | 2 scripts + evals | 健康（已脚本化） |
