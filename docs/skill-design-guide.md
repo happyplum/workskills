@@ -42,7 +42,7 @@ Skill 不应一次性倾倒全部细节，而应分层按需加载：
 
 **何时需要 `references/`**：
 - **域知识密集型**（如 `dev-standards`、`vue-standards`，包含多个相互独立的技术面）→ 在正文配「按需阅读路径」表，按主题拆入 `references/`。
-- **规则 / 流程 / 工具型**（如 `audit-loop`、`deep-thinking`、`lzy-review-work`、`linearize-commits`）→ 控制在 200 行以内，单文件足够。
+- **规则 / 流程 / 工具型**（如 `audit-loop`、`lzy-review-work`、`linearize-commits`）→ 控制在 200 行以内，单文件足够。
 
 ## 脚本化原则
 
@@ -82,12 +82,9 @@ Skill 不应一次性倾倒全部细节，而应分层按需加载：
 | Skill | `SKILL.md` 行数 | 配套目录 | 状态 |
 |---|---|---|---|
 | `audit-loop` | 119 | 单文件 | 健康 |
-| `deep-thinking` | 38 | 单文件 | 健康 |
 | `dev-standards` | 77 | 3 references | 健康（L2 分层） |
 | `external-executor-plan` | 98 | 单文件 | 健康 |
 | `linearize-commits` | 151 | 单文件 | 健康 |
-| `long-running-process` | 94 | 8 scripts | 健康（已脚本化） |
 | `lzy-review-work` | 78 | 单文件 | 健康 |
-| `opencode-subagent-log-triage` | 181 | 2 scripts + evals | 健康（已脚本化） |
 | `vue-standards` | 55 | 4 references | 健康（L2 分层） |
 | `weekly-report-generator` | 135 | 单文件 | 健康 |

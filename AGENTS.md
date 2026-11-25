@@ -12,13 +12,10 @@
 ├── DECISIONS.md                     # 本仓库公开设计决策记录（PUB-xxx）
 ├── docs/skill-design-guide.md       # Skill 设计与维护指南
 ├── audit-loop/                      # 审查→修复→同会话增量复审闭环
-├── deep-thinking/                   # 显式触发的深度分析模式
 ├── dev-standards/                   # 框架中立的前端中后台工程规范（显式加载）
 ├── external-executor-plan/          # 脱离聊天与工具的完整外部交接方案
 ├── linearize-commits/               # 线性化整理 git 提交历史与提交信息规范
-├── long-running-process/            # Windows + PowerShell 长运行进程托管与脚本
 ├── lzy-review-work/                 # 按风险动态选择维度的完成工作审查
-├── opencode-subagent-log-triage/    # OpenCode 本地日志排查与会话树成本复盘
 ├── vue-standards/                   # 自包含 Vue 3 + Element Plus 工程规范（显式加载）
 └── weekly-report-generator/         # 从 git 历史生成书面中文周报
 ```
